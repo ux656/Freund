@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import PairingFlow from "@/components/PairingFlow";
 import Features from "@/components/Features";
+import About from "@/components/About";
 import FAQ from "@/components/FAQ";
 import Developers from "@/components/Developers";
 import Privacy from "@/components/Privacy";
@@ -24,7 +25,7 @@ export default function Home() {
             <PairingFlow />
           </div>
         )}
-        {activePage === "about" && <Features />}
+        {activePage === "about" && <About />}
         {activePage === "features" && <Features />}
         {activePage === "faq" && <FAQ />}
         {activePage === "developers" && <Developers />}
