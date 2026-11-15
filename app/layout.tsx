@@ -8,10 +8,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#141413" },
-    { media: "(prefers-color-scheme: light)", color: "#FAF9F5" },
-  ],
+  themeColor: "#151515",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -39,16 +36,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body
         className={cn(
-          "font-body bg-bg-light text-text-light dark:bg-bg dark:text-text",
+          "font-body bg-[#151515] text-text",
           "min-h-dvh antialiased transition-colors duration-300"
         )}
       >
-        {/* خلفية الزجاج السائل */}
-        <div className="liquid-bg" aria-hidden="true">
-          <div className="liquid-blob liquid-blob-1" />
-          <div className="liquid-blob liquid-blob-2" />
-          <div className="liquid-blob liquid-blob-3" />
-        </div>
         {children}
       </body>
     </html>
