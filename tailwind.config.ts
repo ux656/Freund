@@ -16,27 +16,27 @@ const config: Config = {
         },
         surface: {
           DEFAULT: "#1F1E1D",
-          light: "#EEEEEA",
+          light: "#F0F0EB",
         },
         "surface-2": {
           DEFAULT: "#262624",
-          light: "#E9E9E4",
+          light: "#E7E7E0",
         },
         "surface-3": {
           DEFAULT: "#30302E",
-          light: "#DEDED8",
+          light: "#DDDDD5",
         },
         text: {
           DEFAULT: "#FAF9F5",
-          light: "#141413",
+          light: "#181816",
         },
         "text-2": {
           DEFAULT: "#B0AEA5",
-          light: "#6C6A64",
+          light: "#55534D",
         },
         "text-3": {
           DEFAULT: "#73726C",
-          light: "#77776F",
+          light: "#5D5B54",
         },
         primary: {
           DEFAULT: "#D97757",
@@ -56,11 +56,11 @@ const config: Config = {
         },
         border: {
           DEFAULT: "#30302E",
-          light: "#D4D4CD",
+          light: "#C5C5BA",
         },
         input: {
           DEFAULT: "#1A1918",
-          light: "#F5F0E8",
+          light: "#F0EFE8",
         },
       },
       fontFamily: {
@@ -76,7 +76,7 @@ const config: Config = {
       boxShadow: {
         glass: "inset 0 1px 0 rgba(255,255,255,0.18), 0 12px 32px -14px rgba(0,0,0,0.45)",
         "glass-light":
-          "inset 0 1px 0 rgba(255,255,255,0.8), 0 12px 32px -14px rgba(15,23,42,0.14)",
+          "inset 0 1px 0 rgba(255,255,255,0.55), 0 12px 32px -14px rgba(15,23,42,0.18)",
       },
       backgroundImage: {
         "glass-rim":
