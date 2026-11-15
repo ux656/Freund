@@ -8,7 +8,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#151515",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#F9F9F7" },
+    { media: "(prefers-color-scheme: dark)", color: "#151515" },
+  ],
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -36,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body
         className={cn(
-          "font-body bg-[#151515] text-text",
+          "font-body bg-[#F9F9F7] text-text-light dark:bg-[#151515] dark:text-text",
           "min-h-dvh antialiased transition-colors duration-300"
         )}
       >
