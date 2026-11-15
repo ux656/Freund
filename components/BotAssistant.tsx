@@ -19,13 +19,13 @@ const actions = [
 ];
 
 function RebootMascot({ className = "h-9 w-12" }: { className?: string }) {
-  const body = "M24 7H96V31H108V49H96V70H91V91H79V70H73V91H61V70H39V91H27V70H21V49H9V31H24V7Z";
   return (
-    <svg viewBox="0 0 120 98" fill="none" className={className} aria-hidden="true">
-      <path d={body} fill="#D97858" />
-      <rect x="37" y="20" width="7" height="14" fill="#090909" />
-      <rect x="76" y="20" width="7" height="14" fill="#090909" />
-    </svg>
+    <img
+      src="/reboot.png"
+      alt="Reboot"
+      className={className + " object-contain"}
+      draggable={false}
+    />
   );
 }
 
