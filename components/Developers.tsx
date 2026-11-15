@@ -19,12 +19,12 @@ const devs = [
 
 const iconMap = { github: Github, email: Mail, website: Globe, telegram: MessageCircle, linkedin: Linkedin, twitter: Twitter };
 
-function ContactIcons({ contacts }: { contacts: Record<string, string> }) {
+function ContactIcons({ contacts }: { contacts: Record<string, string | undefined> }) {
   return (
     <div className="flex gap-1.5">
       {Object.entries(contacts).map(([k, v]) => {
         const Icon = iconMap[k as keyof typeof iconMap];
-        if (!Icon) return null;
+        if (!Icon || !v) return null;
         const url =
           k === "email" ? `mailto:${v}` : k === "github" ? `https://github.com/${v}` : k === "telegram" ? `https://t.me/${v}` : k === "linkedin" ? `https://linkedin.com/in/${v}` : v;
         return (
