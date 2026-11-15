@@ -49,7 +49,7 @@ function delay(ms: number) {
 }
 function prune(map: Map<string, number[]>) {
   const cutoff = now() - 3_600_000;
-  for (const [k, arr] of map) {
+  for (const [k, arr] of Array.from(map.entries())) {
     const kept = arr.filter((t) => t > cutoff);
     if (kept.length) map.set(k, kept);
     else map.delete(k);
