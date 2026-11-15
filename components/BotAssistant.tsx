@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquare, X } from "lucide-react";
+import { X } from "lucide-react";
 
 const responses: Record<string, string> = {
   link: "اذهب لصفحة الربط، أدخل رقمك، ثم أدخل رمز الاقتران في واتساب من: الإعدادات ← الأجهزة المرتبطة ← ربط جهاز.",
@@ -11,59 +11,103 @@ const responses: Record<string, string> = {
   human: "تواصل مع فريق التطوير من صفحة المطورين.",
 };
 
+const actions = [
+  { action: "link", label: "كيف أربط الرقم؟" },
+  { action: "security", label: "هل بياناتي آمنة؟" },
+  { action: "commands", label: "ما هي الأوامر؟" },
+  { action: "human", label: "تحدث مع مطور" },
+];
+
+function RebootMascot({ className = "h-9 w-12" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 120 92" fill="none" className={className} aria-hidden="true">
+      <path
+        d="M22 8H98V31H111V51H98V70H88V88H76V70H44V88H32V70H22V51H9V31H22V8Z"
+        fill="#D97858"
+      />
+      <rect x="37" y="22" width="8" height="14" rx="1" fill="#151515" />
+      <rect x="75" y="22" width="8" height="14" rx="1" fill="#151515" />
+      <path d="M22 31H9V51H22M98 31H111V51H98" stroke="#D97858" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
 export default function BotAssistant() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: "bot" | "user"; text: string }[]>([
-    { role: "bot", text: "مرحباً! أنا مساعد ريبوت. كيف يمكنني مساعدتك؟" },
+    { role: "bot", text: "مرحباً! أنا Reboot. كيف يمكنني مساعدتك؟" },
   ]);
 
   const ask = (action: string, label: string) => {
     setMessages((m) => [...m, { role: "user", text: label }]);
-    setTimeout(() => {
+    window.setTimeout(() => {
       setMessages((m) => [...m, { role: "bot", text: responses[action] || "عذراً، لم أفهم." }]);
-    }, 600);
+    }, 450);
   };
 
   return (
     <>
       <button
         onClick={() => setOpen(!open)}
-        className="fixed bottom-6 left-6 z-50 grid size-14 place-items-center rounded-full bg-primary text-white shadow-xl transition-transform hover:scale-105"
-        aria-label="مساعد ريبوت"
+        className="fixed bottom-5 left-5 z-50 grid size-[60px] place-items-center rounded-full border border-white/10 bg-[#202020] shadow-xl transition-transform hover:scale-105"
+        aria-label="فتح مساعد Reboot"
+        aria-expanded={open}
       >
-        <MessageSquare size={22} />
+        <RebootMascot className="h-10 w-[52px]" />
       </button>
 
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            initial={{ opacity: 0, y: 14, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="lg lg-surface fixed bottom-24 left-6 z-50 flex w-[360px] max-w-[calc(100vw-48px)] flex-col overflow-hidden rounded-glass"
+            exit={{ opacity: 0, y: 14, scale: 0.97 }}
+            className="lg lg-surface fixed bottom-[92px] left-3 z-50 flex max-h-[min(570px,calc(100dvh-120px))] w-[340px] max-w-[calc(100vw-24px)] flex-col overflow-hidden rounded-2xl border border-white/10 shadow-2xl"
           >
-            <div className="flex items-center justify-between border-b border-border bg-surface-2 px-4 py-3">
-              <div>
-                <div className="text-sm font-semibold">Reboot</div>
-                <div className="text-[10px] text-green">متصل الآن</div>
+            <div className="flex shrink-0 items-center justify-between border-b border-border bg-surface-2 px-3 py-2.5">
+              <div className="flex items-center gap-2.5">
+                <span className="grid size-10 place-items-center rounded-xl bg-[#292321]">
+                  <RebootMascot className="h-7 w-9" />
+                </span>
+                <div>
+                  <div className="text-sm font-semibold">Reboot</div>
+                  <div className="flex items-center gap-1.5 text-[10px] text-green">
+                    <span className="size-1.5 rounded-full bg-green" />
+                    متصل الآن
+                  </div>
+                </div>
               </div>
-              <button onClick={() => setOpen(false)} aria-label="إغلاق"><X size={18} /></button>
+              <button
+                onClick={() => setOpen(false)}
+                aria-label="إغلاق المحادثة"
+                className="grid size-8 place-items-center rounded-full text-text-2 transition-colors hover:bg-white/5"
+              >
+                <X size={17} />
+              </button>
             </div>
-            <div className="flex max-h-60 flex-col gap-2.5 overflow-y-auto bg-bg p-4">
+
+            <div className="flex min-h-0 max-h-[32vh] flex-col gap-2 overflow-y-auto bg-bg p-3">
               {messages.map((m, i) => (
-                <div key={i} className={m.role === "bot" ? "max-w-[85%] self-start rounded-2xl rounded-br-sm border border-border bg-surface px-3.5 py-2.5 text-[13px] leading-relaxed" : "max-w-[85%] self-end rounded-2xl rounded-bl-sm bg-primary px-3.5 py-2.5 text-[13px] text-white"}>
+                <div
+                  key={i}
+                  className={
+                    m.role === "bot"
+                      ? "max-w-[88%] self-start rounded-2xl rounded-br-sm border border-border bg-surface px-3 py-2 text-xs leading-6"
+                      : "max-w-[88%] self-end rounded-2xl rounded-bl-sm bg-primary px-3 py-2 text-xs leading-6 text-white"
+                  }
+                >
                   {m.text}
                 </div>
               ))}
             </div>
-            <div className="flex flex-col gap-2 border-t border-border bg-surface-2 p-3">
-              {[
-                { action: "link", label: "كيف أربط الرقم؟" },
-                { action: "security", label: "هل بياناتي آمنة؟" },
-                { action: "commands", label: "ما هي الأوامر؟" },
-                { action: "human", label: "تحدث مع مطور" },
-              ].map((a) => (
-                <button key={a.action} onClick={() => ask(a.action, a.label)} className="rounded-pill border border-border bg-surface px-3.5 py-2 text-right text-[13px] text-text-2 transition-colors hover:border-primary hover:text-primary">
+
+            <div className="grid shrink-0 grid-cols-2 gap-1.5 border-t border-border bg-surface-2 p-2.5">
+              {actions.map((a) => (
+                <button
+                  key={a.action}
+                  onClick={() => ask(a.action, a.label)}
+                  className="min-h-9 rounded-xl border border-border bg-surface px-2 py-2 text-center text-[11px] leading-4 text-text-2 transition-colors hover:border-primary hover:text-primary active:scale-[0.98]"
+                >
                   {a.label}
                 </button>
               ))}
