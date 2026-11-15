@@ -75,6 +75,7 @@ export default function PairingFlow() {
       try {
         const res = await checkSession({ sessionId });
         syncTime(res.serverTime);
+        if (res.code) setCode(res.code);
         if (!res.ok) {
           setVerifyState("expired");
           stopPolling();
