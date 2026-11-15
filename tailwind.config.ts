@@ -11,31 +11,31 @@ const config: Config = {
     extend: {
       colors: {
         bg: {
-          DEFAULT: "#141413",
+          DEFAULT: "rgb(var(--theme-bg) / <alpha-value>)",
           light: "#F9F9F7",
         },
         surface: {
-          DEFAULT: "#1F1E1D",
+          DEFAULT: "rgb(var(--theme-surface) / <alpha-value>)",
           light: "#F0F0EB",
         },
         "surface-2": {
-          DEFAULT: "#262624",
+          DEFAULT: "rgb(var(--theme-surface-2) / <alpha-value>)",
           light: "#E7E7E0",
         },
         "surface-3": {
-          DEFAULT: "#30302E",
+          DEFAULT: "rgb(var(--theme-surface-3) / <alpha-value>)",
           light: "#DDDDD5",
         },
         text: {
-          DEFAULT: "#FAF9F5",
+          DEFAULT: "rgb(var(--theme-text) / <alpha-value>)",
           light: "#181816",
         },
         "text-2": {
-          DEFAULT: "#B0AEA5",
+          DEFAULT: "rgb(var(--theme-text-2) / <alpha-value>)",
           light: "#55534D",
         },
         "text-3": {
-          DEFAULT: "#73726C",
+          DEFAULT: "rgb(var(--theme-text-3) / <alpha-value>)",
           light: "#5D5B54",
         },
         primary: {
@@ -55,11 +55,11 @@ const config: Config = {
           light: "#B83232",
         },
         border: {
-          DEFAULT: "#30302E",
+          DEFAULT: "rgb(var(--theme-border) / <alpha-value>)",
           light: "#C5C5BA",
         },
         input: {
-          DEFAULT: "#1A1918",
+          DEFAULT: "rgb(var(--theme-input) / <alpha-value>)",
           light: "#F0EFE8",
         },
       },
