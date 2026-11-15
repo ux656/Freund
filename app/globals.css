@@ -13,13 +13,13 @@
 
 /* ========== المتغيرات الأساسية ========== */
 :root {
-  --lg-rim-hi: rgba(255, 255, 255, 0.8);
-  --lg-rim-lo: rgba(255, 255, 255, 0.18);
-  --lg-highlight: rgba(255, 255, 255, 0.6);
-  --lg-drop: rgba(15, 23, 42, 0.14);
+  --lg-rim-hi: rgba(255, 255, 255, 0.95);
+  --lg-rim-lo: rgba(110, 110, 100, 0.12);
+  --lg-highlight: rgba(255, 255, 255, 0.7);
+  --lg-drop: rgba(35, 35, 30, 0.12);
   --lg-tint: transparent;
   --lg-tint-amt: 0%;
-  --lg-base: rgba(255, 255, 255, 0.42);
+  --lg-base: rgba(235, 235, 230, 0.92);
   --lg-blur: 16px;
   --lg-sat: 180%;
 }
@@ -30,6 +30,14 @@
   --lg-highlight: rgba(255, 255, 255, 0.16);
   --lg-drop: rgba(0, 0, 0, 0.45);
   --lg-base: rgba(30, 32, 40, 0.45);
+}
+
+html:not(.dark) .lg {
+  color: #141413;
+}
+
+.dark .lg {
+  color: #FAF9F5;
 }
 
 /* ========== طبقة الزجاج السائل ========== */
@@ -61,10 +69,11 @@
 
   .lg-light {
     color: theme("colors.text.light");
-    --lg-rim-hi: rgba(255, 255, 255, 0.9);
-    --lg-rim-lo: rgba(255, 255, 255, 0.2);
-    --lg-highlight: rgba(255, 255, 255, 0.8);
-    --lg-drop: rgba(15, 23, 42, 0.08);
+    --lg-rim-hi: rgba(255, 255, 255, 0.95);
+    --lg-rim-lo: rgba(100, 100, 90, 0.14);
+    --lg-highlight: rgba(255, 255, 255, 0.75);
+    --lg-drop: rgba(35, 35, 30, 0.12);
+    --lg-base: rgba(235, 235, 230, 0.94);
   }
 
   /* خلفية متحركة خلف الزجاج لظهور الانكسار */
