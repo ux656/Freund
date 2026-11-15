@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ========== الخطوط ========== */
+@import "@fontsource/lemonada/400.css";
+@import "@fontsource/lemonada/500.css";
+@import "@fontsource/lemonada/600.css";
+@import "@fontsource/lemonada/700.css";
+@import "@fontsource/playfair-display/500.css";
+@import "@fontsource/playfair-display/600.css";
+@import "@fontsource/playfair-display/700.css";
+
+/* ========== المتغيرات الأساسية ========== */
+:root {
+  --lg-rim-hi: rgba(255, 255, 255, 0.8);
+  --lg-rim-lo: rgba(255, 255, 255, 0.18);
+  --lg-highlight: rgba(255, 255, 255, 0.6);
+  --lg-drop: rgba(15, 23, 42, 0.14);
+  --lg-tint: transparent;
+  --lg-tint-amt: 0%;
+  --lg-base: rgba(255, 255, 255, 0.42);
+  --lg-blur: 16px;
+  --lg-sat: 180%;
+}
+
+.dark {
+  --lg-rim-hi: rgba(255, 255, 255, 0.34);
+  --lg-rim-lo: rgba(255, 255, 255, 0.06);
+  --lg-highlight: rgba(255, 255, 255, 0.16);
+  --lg-drop: rgba(0, 0, 0, 0.45);
+  --lg-base: rgba(30, 32, 40, 0.45);
+}
+
+/* ========== طبقة الزجاج السائل ========== */
+@layer components {
+  .lg {
+    color: theme("colors.text.DEFAULT");
+    border: 1px solid transparent;
+    background:
+      linear-gradient(
+          color-mix(in oklab, var(--lg-tint) var(--lg-tint-amt), var(--lg-base)),
+          color-mix(in oklab, var(--lg-tint) var(--lg-tint-amt), var(--lg-base))
+        )
+        padding-box,
+      linear-gradient(
+          135deg,
+          var(--lg-rim-hi),
+          var(--lg-rim-lo) 35%,
+          var(--lg-rim-lo) 65%,
+          var(--lg-rim-hi)
+        )
+        border-box;
+    backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-sat));
+    -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-sat));
+    box-shadow:
+      inset 0 1px 0 var(--lg-highlight),
+      0 1px 2px var(--lg-drop),
+      0 12px 32px -14px var(--lg-drop);
+  }
+
+  .lg-light {
+    color: theme("colors.text.light");
+    --lg-rim-hi: rgba(255, 255, 255, 0.9);
+    --lg-rim-lo: rgba(255, 255, 255, 0.2);
+    --lg-highlight: rgba(255, 255, 255, 0.8);
+    --lg-drop: rgba(15, 23, 42, 0.08);
+  }
+
+  /* خلفية متحركة خلف الزجاج لظهور الانكسار */
+  .liquid-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .liquid-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.35;
+    animation: liquidFloat 12s ease-in-out infinite;
+  }
+  .liquid-blob-1 {
+    width: 40vw;
+    height: 40vw;
+    background: #d97757;
+    top: -10%;
+    left: -10%;
+  }
+  .liquid-blob-2 {
+    width: 35vw;
+    height: 35vw;
+    background: #4a90e2;
+    bottom: 10%;
+    right: -5%;
+    animation-delay: -4s;
+  }
+  .liquid-blob-3 {
+    width: 30vw;
+    height: 30vw;
+    background: #e8a55a;
+    top: 40%;
+    left: 30%;
+    animation-delay: -8s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .liquid-blob {
+      animation: none;
+    }
+  }
+
+  /* ========== RTL / LTR ========== */
+  html[dir="rtl"] {
+    direction: rtl;
+  }
+  html[dir="ltr"] {
+    direction: ltr;
+  }
+
+  /* ========== Focus Visible ========== */
+  :focus-visible {
+    outline: 2px solid theme("colors.primary.DEFAULT");
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* ========== Screen Reader Only ========== */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+}
