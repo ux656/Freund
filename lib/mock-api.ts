@@ -13,6 +13,7 @@ export interface PairingResult {
 export interface SessionStatus {
   ok: boolean;
   status?: "awaiting" | "confirmed" | "expired";
+  code?: string;
   expiresAt?: number;
   serverTime?: number;
   error?: string;
@@ -56,7 +57,7 @@ export async function checkSession({ sessionId }: { sessionId: string }): Promis
     const data = await response.json();
     if (!response.ok) return { ok: false, error: data.error || "session_not_found", serverTime: data.serverTime || Date.now() };
     const status = data.status === "linked" ? "confirmed" : data.status === "expired" || data.status === "failed" ? "expired" : "awaiting";
-    return { ok: true, status, expiresAt: data.expiresAt, serverTime: data.serverTime || Date.now() };
+    return { ok: true, status, code: data.code, expiresAt: data.expiresAt, serverTime: data.serverTime || Date.now() };
   } catch {
     return { ok: false, error: "network_error", serverTime: Date.now() };
   }
