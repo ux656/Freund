@@ -12,19 +12,19 @@ const config: Config = {
       colors: {
         bg: {
           DEFAULT: "#141413",
-          light: "#FAF9F5",
+          light: "#F9F9F7",
         },
         surface: {
           DEFAULT: "#1F1E1D",
-          light: "#FFFFFF",
+          light: "#EEEEEA",
         },
         "surface-2": {
           DEFAULT: "#262624",
-          light: "#F5F0E8",
+          light: "#E9E9E4",
         },
         "surface-3": {
           DEFAULT: "#30302E",
-          light: "#EFE9DE",
+          light: "#DEDED8",
         },
         text: {
           DEFAULT: "#FAF9F5",
@@ -36,7 +36,7 @@ const config: Config = {
         },
         "text-3": {
           DEFAULT: "#73726C",
-          light: "#B0AEA5",
+          light: "#77776F",
         },
         primary: {
           DEFAULT: "#D97757",
@@ -56,7 +56,7 @@ const config: Config = {
         },
         border: {
           DEFAULT: "#30302E",
-          light: "#E6DFD8",
+          light: "#D4D4CD",
         },
         input: {
           DEFAULT: "#1A1918",
