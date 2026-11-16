@@ -58,6 +58,17 @@ export default function SideMenu({
             </div>
             <div className="mb-3 px-2 text-[10px] font-bold tracking-wider text-text-3">التنقل بين الصفحات</div>
             <nav className="flex-1 space-y-1 overflow-y-auto" aria-label="القائمة الجانبية">
+              {mode === "home" ? (
+                <button type="button" onClick={() => { onNavigate?.("home"); close(); }}
+                  className={`flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-right text-[13px] font-medium transition ${activePage === "home" ? "bg-primary/10 text-primary" : "text-text-2 hover:bg-surface-2 hover:text-text"}`}>
+                  <MessageCircle size={17} /><span>ربط بوت</span>{activePage === "home" && <span className="mr-auto size-1.5 rounded-full bg-primary" />}
+                </button>
+              ) : (
+                <Link href="/#home" onClick={close}
+                  className="flex items-center gap-3 rounded-xl px-3.5 py-3 text-[13px] font-medium text-text-2 transition hover:bg-surface-2 hover:text-text">
+                  <MessageCircle size={17} /><span>ربط بوت</span>
+                </Link>
+              )}
               {homeItems.map((item) => {
                 const Icon = item.icon;
                 const active = activePage === item.id;
