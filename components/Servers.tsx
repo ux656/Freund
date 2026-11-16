@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Activity, CheckCircle2, Clock3, ExternalLink, RefreshCw, Server, ShieldCheck, Wifi, WifiOff } from "lucide-react";
+import { Activity, Clock3, Cpu, ExternalLink, HardDrive, RefreshCw, Server, ShieldCheck, Smartphone, Wifi, WifiOff } from "lucide-react";
 import SideMenu from "./SideMenu";
 
 type CheckResult = {
@@ -9,13 +9,6 @@ type CheckResult = {
   reachable?: boolean;
   serviceStatus?: string;
   checkedAt?: string;
-};
-
-const serverInfo = {
-  name: "nezuko server 1",
-  proxy: "server-side",
-  reportedStatus: "ONLINE",
-  reportedAt: "16/11/2026 - 12:09:59 م",
 };
 
 function formatTime(value?: string) {
@@ -56,6 +49,15 @@ export default function Servers() {
 
   const statusLabel = reachable === null ? "جارٍ الفحص" : reachable ? "ONLINE" : "OFFLINE";
 
+  const metrics = [
+    { label: "أنوية المعالج", value: "غير متاح", Icon: Cpu },
+    { label: "المساحة المتاحة", value: "غير متاح", Icon: HardDrive },
+    { label: "استهلاك المعالج", value: "غير متاح", Icon: Activity },
+    { label: "استهلاك الذاكرة", value: "غير متاح", Icon: Smartphone },
+    { label: "البوتات النشطة", value: "غير متاح", Icon: Server },
+    { label: "الجلسات المباشرة", value: "غير متاح", Icon: Wifi },
+  ];
+
   return (
     <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-6xl px-4 pb-16 pt-7 sm:px-6">
       <div className="mb-7 flex flex-wrap items-center justify-between gap-4">
@@ -77,12 +79,12 @@ export default function Servers() {
         </button>
       </div>
 
-      <section className="mb-5 grid gap-3 sm:grid-cols-2">
+      <section className="mb-5 grid gap-3 md:grid-cols-2">
         <article className="lg lg-surface rounded-2xl border border-border/70 p-4 sm:p-5">
           <div className="mb-5 flex items-start justify-between gap-3">
             <div className="flex items-center gap-3">
               <span className="grid size-11 place-items-center rounded-xl bg-primary/10 text-primary"><Server size={21} /></span>
-              <div><h2 className="text-sm font-bold">{serverInfo.name}</h2><p className="mt-1 text-[11px] text-text-3">WhatsApp SubBot Gateway</p></div>
+              <div><h2 className="text-sm font-bold">خادم BMG</h2><p className="mt-1 text-[11px] text-text-3">بوابة تشغيل البوت</p></div>
             </div>
             <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold ${reachable === false ? "bg-danger/10 text-danger" : reachable === true ? "bg-green/10 text-green" : "bg-surface-3 text-text-2"}`}>
               {reachable === false ? <WifiOff size={12} /> : <Wifi size={12} />}
@@ -91,61 +93,42 @@ export default function Servers() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-xl bg-surface/70 p-3">
-              <div className="mb-1 text-[10px] text-text-3">نوع الـ Proxy</div>
-              <div className="text-sm font-semibold">{serverInfo.proxy}</div>
+              <div className="mb-1 text-[10px] text-text-3">نوع الاتصال</div>
+              <div className="text-sm font-semibold">بوابة الخادم</div>
             </div>
             <div className="rounded-xl bg-surface/70 p-3">
-              <div className="mb-1 text-[10px] text-text-3">حالة النظام</div>
+              <div className="mb-1 text-[10px] text-text-3">نتيجة الفحص</div>
               <div className="flex items-center gap-1.5 text-sm font-semibold">
                 {reachable === false ? <WifiOff size={14} className="text-danger" /> : <ShieldCheck size={14} className="text-green" />}
-                {reachable === false ? "Connection unavailable" : reachable === true ? "All systems clear" : "بانتظار الفحص"}
+                {reachable === false ? "تعذر الاتصال" : reachable === true ? "البوابة تستجيب" : "بانتظار الفحص"}
               </div>
             </div>
           </div>
           <div className="mt-4 flex items-center justify-between gap-3 border-t border-border/60 pt-3 text-[10px] text-text-3">
             <span className="flex items-center gap-1.5"><Clock3 size={12} /> آخر فحص فعلي</span>
-            <span className="text-left">{checkedAt ? formatTime(checkedAt) : "جارٍ الفحص..."}</span>
+            <span className="text-left">{formatTime(checkedAt)}</span>
           </div>
         </article>
 
         <article className="lg lg-surface flex flex-col justify-between rounded-2xl border border-border/70 p-4 sm:p-5">
           <div>
-            <div className="mb-3 flex items-center gap-2 text-primary"><Activity size={17} /><h2 className="text-sm font-bold">ملخص البنية التحتية</h2></div>
-            <p className="text-xs leading-6 text-text-2">يعرض هذا القسم خادم التشغيل المسجل حاليًا. فحص الاتصال يؤكد إمكانية الوصول إلى بوابة البوت فقط، ولا يمثل اختبارًا لكل خدمة أو جلسة واتساب.</p>
+            <div className="mb-3 flex items-center gap-2 text-primary"><Activity size={17} /><h2 className="text-sm font-bold">حالة البنية التحتية</h2></div>
+            <p className="text-xs leading-6 text-text-2">الفحص الحالي يتحقق من إمكانية الوصول إلى بوابة خادم البوت فقط. لا يعني ذلك أن جميع خدمات الخادم أو جلسات واتساب تعمل.</p>
           </div>
           <div className="mt-5 rounded-xl border border-border/60 bg-surface/60 p-3">
-            <div className="text-[10px] text-text-3">الحالة الواردة في بياناتك</div>
-            <div className="mt-1 text-lg font-bold">{serverInfo.reportedStatus}</div>
-            <div className="mt-1 text-[10px] text-text-3">وقت التقرير: {serverInfo.reportedAt}</div>
+            <div className="text-[10px] text-text-3">استجابة الخدمة</div>
+            <div className="mt-1 text-lg font-bold">{serviceStatus || "CHECKING"}</div>
           </div>
-          <a href="/servers#system" className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl border border-border px-3 py-2.5 text-xs font-semibold text-text transition hover:bg-surface-2">
+          <a href="#system" className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl border border-border px-3 py-2.5 text-xs font-semibold text-text transition hover:bg-surface-2">
             فتح تفاصيل النظام <ExternalLink size={13} />
           </a>
         </article>
       </section>
 
-      <section className="lg lg-surface rounded-2xl border border-border/70 p-4 sm:p-5">
-        <div className="mb-3 flex items-center gap-2"><ShieldCheck size={17} className="text-primary" /><h2 className="text-sm font-bold">حالة الاتصال</h2></div>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="text-xs font-semibold">{reachable === null ? "يتم التحقق من بوابة الخادم" : reachable ? "بوابة الخادم تستجيب" : "تعذر الوصول إلى بوابة الخادم"}</div>
-            <p className="mt-1 text-[10px] text-text-3">نتيجة فحص endpoint الحالة عبر خادم الموقع.</p>
-          </div>
-          <span className="rounded-lg bg-surface-2 px-3 py-2 text-xs font-mono">{serviceStatus || "CHECKING"}</span>
-        </div>
-      </section>
-
       <section id="system" className="mb-5 scroll-mt-6">
-        <div className="mb-3 flex items-center gap-2"><Cpu size={17} className="text-primary" /><h2 className="text-sm font-bold">معلومات النظام</h2><span className="text-[10px] text-text-3">حسب التقرير المرسل</span></div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {[
-            ["أنوية المعالج", "16 Core", Cpu],
-            ["المساحة الفاضية", "425.58 GB", HardDrive],
-            ["استهلاك المعالج", "9.73", Activity],
-            ["استهلاك الرام", "83.83 GB", Smartphone],
-            ["مدعوم من", "MONTE", ShieldCheck],
-            ["حالة السيرفر", "ONLINE · PRIVATE GATEWAY", Server],
-          ].map(([label, value, Icon]: any) => (
+        <div className="mb-3 flex items-center gap-2"><ShieldCheck size={17} className="text-primary" /><h2 className="text-sm font-bold">معلومات النظام</h2></div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          {metrics.map(({ label, value, Icon }) => (
             <article key={label} className="lg lg-surface min-w-0 rounded-2xl border border-border/70 p-4">
               <div className="mb-3 flex items-center justify-between gap-2 text-[11px] text-text-2">
                 <span>{label}</span><Icon size={16} className="shrink-0 text-primary" />
@@ -154,12 +137,12 @@ export default function Servers() {
             </article>
           ))}
         </div>
-        <div id="bots" className="mt-3 grid grid-cols-3 gap-3 scroll-mt-6">
-          <article className="lg lg-surface rounded-2xl border border-border/70 p-3 text-center"><Bot size={17} className="mx-auto mb-2 text-primary" /><div className="text-xl font-bold">3</div><div className="mt-1 text-[10px] text-text-3">بوتات نشطة</div></article>
-          <article className="lg lg-surface rounded-2xl border border-border/70 p-3 text-center"><Activity size={17} className="mx-auto mb-2 text-primary" /><div className="text-xl font-bold">84</div><div className="mt-1 text-[10px] text-text-3">جروب</div></article>
-          <article className="lg lg-surface rounded-2xl border border-border/70 p-3 text-center"><Smartphone size={17} className="mx-auto mb-2 text-primary" /><div className="text-xl font-bold">23</div><div className="mt-1 text-[10px] text-text-3">جلسة مباشرة</div></article>
-        </div>
-        <p className="mt-3 text-[10px] leading-5 text-text-3">هذه الأرقام من التقرير الذي أرسلته وليست قراءات مباشرة من الخادم. لم يتم تحديد وحدة قياس قيمة استهلاك المعالج (9.73)، لذلك عُرضت كما وردت دون إضافة نسبة مئوية.</p>
+        <p className="mt-3 text-[10px] leading-5 text-text-3">تفاصيل المعالج والذاكرة والتخزين وأعداد البوتات والجلسات لا يوفرها فحص الحالة الحالي؛ ستظهر بعد ربط واجهة بيانات النظام الفعلية.</p>
+      </section>
+
+      <section id="bots" className="scroll-mt-6 lg lg-surface rounded-2xl border border-border/70 p-4 sm:p-5">
+        <div className="mb-2 flex items-center gap-2"><Server size={17} className="text-primary" /><h2 className="text-sm font-bold">البوتات والجلسات</h2></div>
+        <p className="text-xs leading-6 text-text-2">قائمة البوتات وعدد الجلسات غير متاحة من endpoint الفحص الحالي. لم تتم إضافة أرقام تقديرية أو جلسات وهمية.</p>
       </section>
     </main>
   );
