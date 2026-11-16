@@ -102,7 +102,7 @@ export default function Dashboard() {
     try {
       const response = await fetch("/api/dashboard/overview", { cache: "no-store" });
       const result = await response.json();
-      if (!response.ok || !result?.ok) throw new Error(result?.error || "تعذر جلب بيانات لوحة التحكم");
+      if (!response.ok || !result?.ok) throw new Error(result?.error || "تعذر جلب بيانات السيرفر");
       setData(result.data as Overview);
       setError("");
     } catch (err) {
@@ -134,16 +134,16 @@ export default function Dashboard() {
           <div className="min-w-0">
           <div className="mb-2 flex items-center gap-2 text-[10px] font-bold tracking-[.16em] text-primary">
             <span className="size-2 rounded-full bg-primary" />
-            BMG CONTROL CENTER
+            BMG SERVER MONITOR
           </div>
-          <h1 className="font-display text-2xl font-bold sm:text-3xl">لوحة التحكم</h1>
-          <p className="mt-1.5 text-xs text-text-2">مراقبة حالة البوت والخادم والبوتات الفرعية.</p>
+          <h1 className="font-display text-2xl font-bold sm:text-3xl">سيرفرات التشغيل</h1>
+          <p className="mt-1.5 text-xs text-text-2">مراقبة حالة خادم تشغيل BMG والموارد والبوتات المرتبطة به.</p>
           </div>
         </div>
         <button type="button" onClick={() => void refresh()} disabled={refreshing}
           className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-3.5 py-2.5 text-xs font-semibold text-text transition hover:bg-surface-2 disabled:opacity-50">
           <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} />
-          تحديث البيانات
+          تحديث الفحص
         </button>
       </div>
 
@@ -155,7 +155,7 @@ export default function Dashboard() {
       )}
 
       <section className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <StatCard title="حالة الخادم" value={loading && !data ? "..." : online ? "يعمل" : "غير متاح"}
+        <StatCard title="حالة السيرفر" value={loading && !data ? "..." : online ? "يعمل" : "غير متاح"}
           detail={data?.service.status ?? "لا توجد بيانات"} icon={online ? Wifi : WifiOff} tone={online ? "green" : "orange"} />
         <StatCard title="البوتات المتصلة" value={connected ?? "—"}
           detail={data ? `من أصل ${data.bots.total} بوت` : "بانتظار بيانات الخادم"} icon={Bot} tone="green" />
@@ -169,7 +169,7 @@ export default function Dashboard() {
         <article id="system" className="lg lg-surface rounded-2xl border border-border/70 p-4 sm:p-5">
           <div className="mb-4 flex items-center gap-2">
             <Server size={17} className="text-primary" />
-            <h2 className="text-sm font-bold">موارد الخادم</h2>
+            <h2 className="text-sm font-bold">تفاصيل السيرفر</h2>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="rounded-xl bg-surface/70 p-3">
@@ -197,7 +197,7 @@ export default function Dashboard() {
 
         <article id="bots" className="lg lg-surface rounded-2xl border border-border/70 p-4 sm:p-5">
           <div className="mb-4 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2"><Activity size={17} className="text-primary" /><h2 className="text-sm font-bold">البوتات الفرعية</h2></div>
+            <div className="flex items-center gap-2"><Activity size={17} className="text-primary" /><h2 className="text-sm font-bold">البوتات على السيرفر</h2></div>
             <span className="text-[10px] text-text-3">{data ? `${data.bots.total} إجمالي` : "—"}</span>
           </div>
           <div className="mb-4 grid grid-cols-3 gap-2 text-center">
@@ -222,7 +222,7 @@ export default function Dashboard() {
 
       <section className="lg lg-surface rounded-2xl border border-border/70 p-4 sm:p-5">
         <div className="mb-4 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2"><Clock3 size={17} className="text-primary" /><h2 className="text-sm font-bold">سجل النشاط الأخير</h2></div>
+          <div className="flex items-center gap-2"><Clock3 size={17} className="text-primary" /><h2 className="text-sm font-bold">النشاط الأخير على السيرفر</h2></div>
           <span className="text-[10px] text-text-3">آخر 20 حدثًا</span>
         </div>
         <div className="space-y-2">
