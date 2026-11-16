@@ -30,7 +30,13 @@ export async function GET(request: NextRequest, context: { params: { sessionId: 
       headers: { Authorization: "Bearer " + token }, cache: "no-store", signal: AbortSignal.timeout(8_000),
     });
     const data = await response.json().catch(() => ({}));
-    if (!response.ok) return NextResponse.json({ error: "session_not_found", serverTime: Date.now() }, { status: response.status === 404 ? 404 : 502 });
+    if (!response.ok) {
+      const missing = response.status === 404;
+      return NextResponse.json(
+        { error: missing ? "session_not_found" : "session_check_failed", serverTime: Date.now() },
+        { status: missing ? 404 : 502, headers: { "Cache-Control": "no-store" } }
+      );
+    }
     return NextResponse.json({
       status: data.status,
       code: typeof data.code === "string" ? data.code : undefined,
