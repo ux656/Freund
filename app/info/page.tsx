@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Activity, Cpu, HardDrive, MemoryStick, Server, Smartphone, Users, Wifi, ShieldCheck } from "lucide-react";
 import SideMenu from "@/components/SideMenu";
 import PageEntrance from "@/components/PageEntrance";
-import PageEntrance from "@/components/PageEntrance";
 
 export const metadata: Metadata = {
   title: "معلومات النظام | BMG",
@@ -32,6 +31,7 @@ function SectionTitle({ icon: Icon, title, detail }: { icon: typeof Server; titl
 
 export default function InfoPage() {
   return (
+    <PageEntrance>
     <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-5 pb-20 pt-8">
       <header className="mb-7 flex items-start gap-3">
         <SideMenu mode="dashboard" activePage="system" />
@@ -80,5 +80,6 @@ export default function InfoPage() {
 
       <p className="mt-4 text-[10px] leading-5 text-text-3">تنبيه: الأرقام والتفاصيل المعروضة من التقرير المرسل، وليست قراءات مباشرة من خادم BMG. لم يتم ربط مصدر بيانات حي لهذه الصفحة.</p>
     </main>
+    </PageEntrance>
   );
 }
