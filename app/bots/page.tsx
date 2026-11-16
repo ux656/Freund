@@ -40,7 +40,7 @@ export default function BotsPage() {
 
         <div className="space-y-3">
           {filtered.map((server) => (
-            <article key={server.id} className="rounded-xl border border-border/70 bg-surface/50 p-4">
+            <article key={server.id} className="ui-card p-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
                   <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary"><Server size={19} /></span>
