@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Activity, Cpu, HardDrive, MemoryStick, Server, Smartphone, Users, Wifi, ShieldCheck } from "lucide-react";
 import SideMenu from "@/components/SideMenu";
+import PageEntrance from "@/components/PageEntrance";
+import PageEntrance from "@/components/PageEntrance";
 
 export const metadata: Metadata = {
   title: "معلومات النظام | BMG",
