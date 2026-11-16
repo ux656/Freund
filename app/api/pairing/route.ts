@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { enforcePairingLimits } from "@/lib/server/rate-limit";
 import { isTrustedAppRequest } from "@/lib/server/request-guard";
+import { isFiniteNumber, readNonEmptyString, readUpstreamJson } from "@/lib/server/upstream-response";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -63,19 +64,20 @@ export async function POST(request: NextRequest) {
       cache: "no-store",
       signal: AbortSignal.timeout(8_000),
     });
-    const data = await response.json().catch(() => ({}));
+    const data = await readUpstreamJson(response);
     if (!response.ok) return NextResponse.json({ error: "bot_request_failed", serverTime: Date.now() }, { status: response.status >= 500 ? 502 : response.status });
-    if (typeof data.sessionId !== "string" || !data.sessionId || data.sessionId.length > 200) {
+    const sessionId = readNonEmptyString(data.sessionId);
+    if (!sessionId) {
       return NextResponse.json({ error: "invalid_bot_response", serverTime: Date.now() }, { status: 502 });
     }
     if (data.status === "failed") return NextResponse.json({ error: "pairing_failed", serverTime: Date.now() }, { status: 400 });
     const botServerTime = data.serverTime;
     const botExpiresAt = data.expiresAt;
-    if (!Number.isFinite(botServerTime) || !Number.isFinite(botExpiresAt)) {
+    if (!isFiniteNumber(botServerTime) || !isFiniteNumber(botExpiresAt)) {
       return NextResponse.json({ error: "invalid_bot_time", serverTime: Date.now() }, { status: 502 });
     }
     return NextResponse.json({
-      sessionId: data.sessionId,
+      sessionId,
       code: typeof data.code === "string" ? data.code : undefined,
       expiresAt: botExpiresAt,
       nextAllowedAt: botServerTime + 60_000,
