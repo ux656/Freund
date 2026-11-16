@@ -119,11 +119,7 @@ export default function PairingFlow() {
     setRateLimit("");
 
     try {
-      const res = await requestPairing({
-        phone,
-        captchaAnswer: captchaExpected !== null ? captchaInput : undefined,
-        captchaExpected: captchaExpected ?? undefined,
-      });
+      const res = await requestPairing({ phone });
       syncTime(res.serverTime);
 
       if (res.ok) {
