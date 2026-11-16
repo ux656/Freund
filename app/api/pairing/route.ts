@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { enforcePairingLimits } from "@/lib/server/rate-limit";
+import { isTrustedAppRequest } from "@/lib/server/request-guard";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,16 +12,8 @@ export async function POST(request: NextRequest) {
   const token = process.env.BOT_API_TOKEN;
   if (!base || !token) return NextResponse.json({ error: "bot_service_not_configured", serverTime: now }, { status: 503 });
 
-  const origin = request.headers.get("origin");
-  if (request.headers.get("sec-fetch-site") === "cross-site") {
-    return NextResponse.json({ error: "forbidden", serverTime: now }, { status: 403 });
-  }
-  if (origin) {
-    try {
-      if (new URL(origin).host !== request.nextUrl.host) return NextResponse.json({ error: "forbidden", serverTime: now }, { status: 403 });
-    } catch {
-      return NextResponse.json({ error: "forbidden", serverTime: now }, { status: 403 });
-    }
+  if (!isTrustedAppRequest(request, true)) {
+    return NextResponse.json({ error: "forbidden", serverTime: now }, { status: 403, headers: { "Cache-Control": "no-store" } });
   }
   if (!request.headers.get("content-type")?.toLowerCase().includes("application/json")) {
     return NextResponse.json({ error: "unsupported_media_type", serverTime: now }, { status: 415 });
