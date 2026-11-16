@@ -4,7 +4,7 @@ import SideMenu from "@/components/SideMenu";
 
 export const metadata: Metadata = {
   title: "معلومات النظام | BMG",
-  description: "موارد الخادم وإحصائيات التشغيل والجلسات.",
+  description: "موارد الخادم وإحصائيات تشغيل بوت BMG والجلسات.",
 };
 
 const metrics = [
@@ -36,7 +36,7 @@ export default function InfoPage() {
         <div className="min-w-0 flex-1">
           <div className="mb-2 text-[10px] font-bold tracking-[.16em] text-primary">SYSTEM OVERVIEW</div>
           <h1 className="font-display text-2xl font-bold sm:text-3xl">معلومات النظام</h1>
-          <p className="mt-2 text-xs leading-6 text-text-2">نظرة عامة على موارد التشغيل والخدمة والجلسات المسجلة.</p>
+          <p className="mt-2 text-xs leading-6 text-text-2">نظرة عامة على موارد تشغيل BMG والخدمة والجلسات المسجلة.</p>
         </div>
       </header>
 
@@ -56,9 +56,9 @@ export default function InfoPage() {
       </section>
 
       <section className="lg lg-surface mb-4 rounded-2xl p-4 sm:p-5">
-        <SectionTitle icon={ShieldCheck} title="بيانات الخدمة" detail="معلومات تعريفية عن بوابة التشغيل" />
+        <SectionTitle icon={ShieldCheck} title="بيانات الخدمة" detail="معلومات تعريفية عن بوت BMG" />
         <div className="divide-y divide-border/60">
-          <div className="flex items-center justify-between gap-3 py-3 text-xs"><span className="text-text-2">اسم البوت</span><strong dir="ltr">NEZUKO BOT</strong></div>
+          <div className="flex items-center justify-between gap-3 py-3 text-xs"><span className="text-text-2">اسم البوت</span><strong dir="ltr">BMG BOT</strong></div>
           <div className="flex items-center justify-between gap-3 py-3 text-xs"><span className="text-text-2">الجهة الداعمة</span><strong dir="ltr">MONTE</strong></div>
           <div className="flex items-center justify-between gap-3 py-3 text-xs"><span className="text-text-2">حالة البوابة</span><strong className="text-green" dir="ltr">ONLINE · PRIVATE GATEWAY</strong></div>
         </div>
