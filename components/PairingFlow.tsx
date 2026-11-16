@@ -136,10 +136,10 @@ export default function PairingFlow() {
       syncTime(res.serverTime);
 
       if (res.ok) {
-        setSessionId(res.sessionId!);
+        setSessionId(res.sessionId);
         setCode(res.code || null);
-        setExpiresAt(res.expiresAt!);
-        setCooldownUntil(res.nextAllowedAt!);
+        setExpiresAt(res.expiresAt);
+        setCooldownUntil(res.nextAllowedAt);
         setVerifyState("awaiting");
         setStep(2);
         return;
@@ -161,6 +161,10 @@ export default function PairingFlow() {
       }
       if (res.error === "ip_limit") {
         setRateLimit("تم تقييد الشبكة مؤقتًا. حاول لاحقًا.");
+        return;
+      }
+      if (res.error === "invalid_response") {
+        setError("استجابة الخادم غير مكتملة. لم يتم بدء جلسة الاقتران؛ حاول مرة أخرى.");
         return;
       }
       setError("حدث خطأ غير متوقع. حاول لاحقًا.");
