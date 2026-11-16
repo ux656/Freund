@@ -6,9 +6,16 @@ import PageHeader from "@/components/ui/PageHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
 import ErrorState from "@/components/ui/ErrorState";
 import LoadingState from "@/components/ui/LoadingState";
+import { requestJson, readApiString, type ApiPayload } from "@/lib/api-client";
 import PageEntrance from "./PageEntrance";
 
-type CheckResult = { ok?: boolean; reachable?: boolean; serviceStatus?: string; checkedAt?: string; error?: string };
+type CheckResult = ApiPayload & {
+  ok?: boolean;
+  reachable?: boolean;
+  serviceStatus?: string;
+  checkedAt?: string;
+  error?: string;
+};
 
 function formatTime(value?: string) {
   if (!value) return "لم يتم الفحص بعد";
@@ -29,13 +36,19 @@ export default function Servers() {
     setChecking(true);
     setCheckError("");
     try {
-      const response = await fetch("/api/dashboard/status", { cache: "no-store" });
-      const result = await response.json().catch(() => ({})) as CheckResult;
-      const online = response.ok && result?.ok === true && result?.reachable === true;
+      const { response, data } = await requestJson<CheckResult>(
+        "/api/dashboard/status",
+        { cache: "no-store" },
+      );
+      const online = response.ok && data.ok === true && data.reachable === true;
       setReachable(online);
-      setServiceStatus(online ? (result.serviceStatus || "ONLINE") : "UNAVAILABLE");
-      setCheckedAt(result.checkedAt || new Date().toISOString());
-      if (!online) setCheckError(result.error === "bot_service_not_configured" ? "إعدادات الاتصال بالخادم غير مكتملة." : "تعذر الوصول إلى بوابة الخادم. أعد المحاولة بعد قليل.");
+      setServiceStatus(online ? (readApiString(data.serviceStatus) || "ONLINE") : "UNAVAILABLE");
+      setCheckedAt(readApiString(data.checkedAt) || new Date().toISOString());
+      if (!online) {
+        setCheckError(data.error === "bot_service_not_configured"
+          ? "إعدادات الاتصال بالخادم غير مكتملة."
+          : "تعذر الوصول إلى بوابة الخادم. أعد المحاولة بعد قليل.");
+      }
     } catch {
       setReachable(false);
       setServiceStatus("UNAVAILABLE");
