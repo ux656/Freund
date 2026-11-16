@@ -17,6 +17,7 @@ export default function BotsPage() {
   }, [query]);
 
   return (
+    <PageEntrance>
     <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-5 pb-20 pt-8">
       <header className="mb-7 flex items-start gap-3">
         <SideMenu mode="dashboard" activePage="bots" />
@@ -64,5 +65,6 @@ export default function BotsPage() {
 
       <p className="mt-4 text-[10px] leading-5 text-text-3">المعروض هو السيرفر المذكور في التقرير المتاح، وليس قائمة حية. عرض جلسات كل بوت وحالتها الفعلية يتطلب ربط API الجلسات.</p>
     </main>
+    </PageEntrance>
   );
 }
