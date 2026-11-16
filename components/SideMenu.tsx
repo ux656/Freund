@@ -77,17 +77,6 @@ export default function SideMenu({
                   <Icon size={17} /><span>{item.label}</span>{active && <span className="mr-auto size-1.5 rounded-full bg-primary" />}
                 </Link>;
               })}
-              {mode === "home" ? (
-                <button type="button" onClick={() => { onNavigate?.("home"); close(); }}
-                  className={`flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-right text-[13px] font-medium transition ${activePage === "home" ? "bg-primary/10 text-primary" : "text-text-2 hover:bg-surface-2 hover:text-text"}`}>
-                  <MessageCircle size={17} /><span>ربط بوت</span>{activePage === "home" && <span className="mr-auto size-1.5 rounded-full bg-primary" />}
-                </button>
-              ) : (
-                <Link href="/#home" onClick={close}
-                  className="flex items-center gap-3 rounded-xl px-3.5 py-3 text-[13px] font-medium text-text-2 transition hover:bg-surface-2 hover:text-text">
-                  <MessageCircle size={17} /><span>ربط بوت</span>
-                </Link>
-              )}
             </nav>
             <div className="mt-5 rounded-xl border border-border/70 bg-surface/70 p-3">
               <div className="flex items-center gap-2 text-xs font-semibold"><Activity size={15} className="text-primary" />BMG Control</div>
