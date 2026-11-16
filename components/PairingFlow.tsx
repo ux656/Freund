@@ -47,7 +47,14 @@ export default function PairingFlow() {
       const rem = Math.max(0, expiresAt - serverNow());
       setRemainingSec(Math.ceil(rem / 1000));
       if (rem <= 0) {
-        clearInterval(timerRef.current!);
+        if (timerRef.current) clearInterval(timerRef.current);
+        timerRef.current = null;
+
+        // Stop polling once the local expiry countdown reaches zero.
+        // A completed session should not keep generating status requests.
+        if (pollRef.current) clearInterval(pollRef.current);
+        pollRef.current = null;
+
         if (verifyState === "awaiting") setVerifyState("expired");
       }
     }, 1000);
