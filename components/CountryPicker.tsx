@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { Check, ChevronDown, Search, X } from "lucide-react";
 
 export type Country = { name: string; code: string; flag: string };
@@ -11,16 +12,24 @@ export const COUNTRIES: Country[] = [
 
 export default function CountryPicker({ value, onChange }: { value: Country; onChange: (country: Country) => void }) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [query, setQuery] = useState("");
+  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [open]);
   const filtered = useMemo(() => COUNTRIES.filter(c => (c.name + c.code).toLowerCase().includes(query.trim().toLowerCase())), [query]);
   return (
     <>
       <button type="button" onClick={() => { setOpen(true); setQuery(""); }} aria-label="اختيار الدولة" aria-expanded={open} className="flex shrink-0 items-center gap-2 border-r border-border px-3 py-3.5 text-sm hover:bg-surface-2">
         <span className="text-xl">{value.flag}</span><span dir="ltr" className="font-semibold">+{value.code}</span><ChevronDown size={14} className="text-text-3" />
       </button>
-      {open && (
-        <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/55 sm:items-center" onClick={() => setOpen(false)}>
-          <section role="dialog" aria-modal="true" aria-label="اختيار الدولة" onClick={e => e.stopPropagation()} className="flex max-h-[82dvh] w-full max-w-lg flex-col rounded-t-[26px] border border-border bg-surface shadow-2xl sm:rounded-[26px]">
+      {open && mounted && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-end justify-center bg-black/55" onClick={() => setOpen(false)}>
+          <section role="dialog" aria-modal="true" aria-label="اختيار الدولة" onClick={e => e.stopPropagation()} className="flex max-h-[85dvh] w-full max-w-lg flex-col rounded-t-[26px] border border-border bg-surface pb-[env(safe-area-inset-bottom)] shadow-2xl">
             <div className="flex items-center justify-between border-b border-border px-4 py-4"><h2 className="text-sm font-bold">اختر الدولة أو المنطقة</h2><button type="button" onClick={() => setOpen(false)} className="grid size-8 place-items-center rounded-full hover:bg-surface-2" aria-label="إغلاق"><X size={17}/></button></div>
             <div className="relative p-3"><Search size={16} className="absolute right-6 top-1/2 -translate-y-1/2 text-text-3"/><input autoFocus value={query} onChange={e => setQuery(e.target.value)} placeholder="ابحث عن دولة أو مفتاح الاتصال" className="w-full rounded-xl border border-input bg-input py-3 pr-10 pl-3 text-sm outline-none focus:border-primary"/></div>
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-5">
@@ -30,7 +39,8 @@ export default function CountryPicker({ value, onChange }: { value: Country; onC
               {!filtered.length && <p className="py-8 text-center text-sm text-text-3">لا توجد دولة مطابقة</p>}
             </div>
           </section>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
