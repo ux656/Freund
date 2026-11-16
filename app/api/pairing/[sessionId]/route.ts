@@ -6,7 +6,13 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest, context: { params: { sessionId: string } }) {
-  if (!isTrustedAppRequest(request)) {\n    return NextResponse.json({ error: "forbidden" }, { status: 403, headers: { "Cache-Control": "no-store" } });\n  }\n  const sessionId = context.params.sessionId;
+  if (!isTrustedAppRequest(request)) {
+    return NextResponse.json(
+      { error: "forbidden" },
+      { status: 403, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+  const sessionId = context.params.sessionId;
   if (!/^[a-zA-Z0-9_-]{8,200}$/.test(sessionId)) {
     return NextResponse.json({ error: "invalid_session" }, { status: 400 });
   }
