@@ -17,15 +17,18 @@ export default function CountryPicker({ value, onChange }: { value: Country; onC
   const triggerRef = useRef<HTMLButtonElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLElement>(null);
+  const wasOpenRef = useRef(false);
 
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     if (!open) {
-      triggerRef.current?.focus();
+      if (wasOpenRef.current) triggerRef.current?.focus();
+      wasOpenRef.current = false;
       return;
     }
 
+    wasOpenRef.current = true;
     const previousOverflow = document.body.style.overflow;
     const focusSearch = window.requestAnimationFrame(() => searchInputRef.current?.focus());
     const handleKeyDown = (event: KeyboardEvent) => {
