@@ -8,12 +8,12 @@ import {
 } from "lucide-react";
 
 const homeItems = [
-  { id: "home", label: "ربط بوت", icon: MessageCircle },
   { id: "about", label: "عن البوت", icon: Info },
   { id: "features", label: "المميزات", icon: Zap },
   { id: "faq", label: "الأسئلة", icon: Info },
   { id: "developers", label: "المطور", icon: Code2 },
   { id: "privacy", label: "الخصوصية", icon: LockKeyhole },
+  { id: "home", label: "ربط بوت", icon: MessageCircle },
 ];
 
 const dashboardItems = [
