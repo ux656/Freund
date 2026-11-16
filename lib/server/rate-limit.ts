@@ -21,7 +21,7 @@ function hash(value: string) {
 function clientIp(request: NextRequest) {
   const forwarded = request.headers.get("x-forwarded-for");
   const values = forwarded?.split(",").map((value) => value.trim()).filter(Boolean) ?? [];
-  const ip = values.at(-1) || request.headers.get("x-real-ip") || "unknown";
+  const ip = values[0] || request.headers.get("x-real-ip") || "unknown";
   return ip.slice(0, 64);
 }
 function cleanup(now: number) {
