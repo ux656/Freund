@@ -1,47 +1,66 @@
 import { NextRequest, NextResponse } from "next/server";
+import { enforcePairingLimits } from "@/lib/server/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-const phoneRequests = new Map<string, number[]>();
-const ipRequests = new Map<string, number[]>();
-const HOUR = 60 * 60 * 1000;
-const COOLDOWN = 60 * 1000;
-
-function takeLimit(map: Map<string, number[]>, key: string, max: number, now: number) {
-  const recent = (map.get(key) || []).filter((time) => now - time < HOUR);
-  if (recent.length >= max) {
-    map.set(key, recent);
-    return { allowed: false, retryAfterMs: HOUR - (now - recent[0]) };
-  }
-  const last = recent[recent.length - 1] || 0;
-  if (last && now - last < COOLDOWN) {
-    map.set(key, recent);
-    return { allowed: false, retryAfterMs: COOLDOWN - (now - last) };
-  }
-  recent.push(now);
-  map.set(key, recent);
-  return { allowed: true, retryAfterMs: 0 };
-}
+const MAX_BODY_BYTES = 2048;
 
 export async function POST(request: NextRequest) {
   const now = Date.now();
-  const body = await request.json().catch(() => ({}));
-  const phone = String(body.phone || "").replace(/\D/g, "");
+  const base = process.env.BOT_API_URL?.replace(/\/+$/, "");
+  const token = process.env.BOT_API_TOKEN;
+  if (!base || !token) return NextResponse.json({ error: "bot_service_not_configured", serverTime: now }, { status: 503 });
+
+  const origin = request.headers.get("origin");
+  if (request.headers.get("sec-fetch-site") === "cross-site") {
+    return NextResponse.json({ error: "forbidden", serverTime: now }, { status: 403 });
+  }
+  if (origin) {
+    try {
+      if (new URL(origin).host !== request.nextUrl.host) return NextResponse.json({ error: "forbidden", serverTime: now }, { status: 403 });
+    } catch {
+      return NextResponse.json({ error: "forbidden", serverTime: now }, { status: 403 });
+    }
+  }
+  if (!request.headers.get("content-type")?.toLowerCase().includes("application/json")) {
+    return NextResponse.json({ error: "unsupported_media_type", serverTime: now }, { status: 415 });
+  }
+  if (Number(request.headers.get("content-length") || 0) > MAX_BODY_BYTES) {
+    return NextResponse.json({ error: "payload_too_large", serverTime: now }, { status: 413 });
+  }
+
+  let raw: string;
+  try {
+    raw = await request.text();
+    if (new TextEncoder().encode(raw).byteLength > MAX_BODY_BYTES) {
+      return NextResponse.json({ error: "payload_too_large", serverTime: now }, { status: 413 });
+    }
+  } catch {
+    return NextResponse.json({ error: "invalid_json", serverTime: now }, { status: 400 });
+  }
+  let body: unknown;
+  try { body = JSON.parse(raw); } catch {
+    return NextResponse.json({ error: "invalid_json", serverTime: now }, { status: 400 });
+  }
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return NextResponse.json({ error: "invalid_request", serverTime: now }, { status: 400 });
+  }
+  const value = (body as Record<string, unknown>).phone;
+  if (typeof value !== "string" || value.length > 32) {
+    return NextResponse.json({ error: "invalid_phone", serverTime: now }, { status: 400 });
+  }
+  const phone = value.replace(/\D/g, "");
   if (!/^\d{7,15}$/.test(phone)) {
     return NextResponse.json({ error: "invalid_phone", serverTime: now }, { status: 400 });
   }
 
-  const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-  const ip = forwarded || request.headers.get("x-real-ip") || "unknown";
-  const phoneLimit = takeLimit(phoneRequests, phone, 3, now);
-  if (!phoneLimit.allowed) return NextResponse.json({ error: "cooldown", retryAfterMs: phoneLimit.retryAfterMs, serverTime: now }, { status: 429 });
-  const ipLimit = takeLimit(ipRequests, ip, 4, now);
-  if (!ipLimit.allowed) return NextResponse.json({ error: "ip_limit", retryAfterMs: ipLimit.retryAfterMs, serverTime: now }, { status: 429 });
-
-  const base = process.env.BOT_API_URL?.replace(/\/+$/, "");
-  const token = process.env.BOT_API_TOKEN;
-  if (!base || !token) return NextResponse.json({ error: "bot_service_not_configured", serverTime: now }, { status: 503 });
+  const limit = enforcePairingLimits(request, phone);
+  if (!limit.allowed) {
+    return NextResponse.json(
+      { error: limit.error, retryAfterMs: limit.retryAfterMs, serverTime: now },
+      { status: 429, headers: { "Retry-After": String(Math.ceil(limit.retryAfterMs / 1000)), "Cache-Control": "no-store" } }
+    );
+  }
 
   try {
     const response = await fetch(base + "/api/install", {
@@ -52,17 +71,19 @@ export async function POST(request: NextRequest) {
       signal: AbortSignal.timeout(8_000),
     });
     const data = await response.json().catch(() => ({}));
-    if (!response.ok) return NextResponse.json({ error: data.error || "bot_request_failed", serverTime: Date.now() }, { status: response.status });
-    if (!data.sessionId) return NextResponse.json({ error: "invalid_bot_response", serverTime: Date.now() }, { status: 502 });
-    if (data.status === "failed") return NextResponse.json({ error: data.error || "pairing_failed", serverTime: Date.now() }, { status: 400 });
-
+    if (!response.ok) return NextResponse.json({ error: "bot_request_failed", serverTime: Date.now() }, { status: response.status >= 500 ? 502 : response.status });
+    if (typeof data.sessionId !== "string" || !data.sessionId || data.sessionId.length > 200) {
+      return NextResponse.json({ error: "invalid_bot_response", serverTime: Date.now() }, { status: 502 });
+    }
+    if (data.status === "failed") return NextResponse.json({ error: "pairing_failed", serverTime: Date.now() }, { status: 400 });
+    const serverTime = Date.now();
     return NextResponse.json({
       sessionId: data.sessionId,
-      code: data.code || undefined,
-      expiresAt: data.expiresAt || now + 60_000,
-      nextAllowedAt: now + COOLDOWN,
-      serverTime: Date.now(),
-    });
+      code: typeof data.code === "string" ? data.code : undefined,
+      expiresAt: Number.isFinite(data.expiresAt) ? data.expiresAt : serverTime + 60_000,
+      nextAllowedAt: serverTime + 30_000,
+      serverTime,
+    }, { headers: { "Cache-Control": "no-store, max-age=0", "Pragma": "no-cache" } });
   } catch {
     return NextResponse.json({ error: "bot_unreachable", serverTime: Date.now() }, { status: 502 });
   }
