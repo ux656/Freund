@@ -201,7 +201,8 @@ export default function PairingFlow() {
     setRateLimit("");
   };
 
-  const fullPhoneLength = country.code.length + phone.length;\n  const canGenerate = phone.length >= 4 && fullPhoneLength >= 7 && fullPhoneLength <= 15;
+  const fullPhoneLength = country.code.length + phone.length;
+  const canGenerate = phone.length >= 4 && fullPhoneLength >= 7 && fullPhoneLength <= 15;
 
   return (
     <div className="space-y-5">
