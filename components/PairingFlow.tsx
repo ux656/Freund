@@ -98,10 +98,6 @@ export default function PairingFlow() {
         // or replaced while this request was in flight.
         if (activeSessionRef.current !== sessionId) return;
         syncTime(res.serverTime);
-        if (typeof res.expiresAt === "number" && Number.isFinite(res.expiresAt)) {
-          setExpiresAt(res.expiresAt);
-        }
-        if (res.code) setCode(res.code);
         if (!res.ok) {
           // Only a missing session is terminal. Network, rate-limit, and
           // upstream failures are temporary and must not be shown as expiry.
@@ -113,6 +109,10 @@ export default function PairingFlow() {
           }
           return;
         }
+        if (typeof res.expiresAt === "number" && Number.isFinite(res.expiresAt)) {
+          setExpiresAt(res.expiresAt);
+        }
+        if (res.code) setCode(res.code);
         setRateLimit("");
         if (res.status === "confirmed") {
           setVerifyState("confirmed");
