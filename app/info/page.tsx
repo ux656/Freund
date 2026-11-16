@@ -40,7 +40,7 @@ export default function InfoPage() {
         <SectionTitle icon={Activity} title="موارد النظام" detail="ملخص موارد الخادم حسب التقرير المتاح" />
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {metrics.map(({ label, value, Icon }) => (
-            <article key={label} className="lg lg-surface min-w-0 rounded-2xl p-4">
+            <article key={label} className="lg lg-surface ui-card rounded-2xl p-4">
               <div className="mb-4 flex items-center justify-between gap-2">
                 <span className="text-[11px] text-text-2">{label}</span>
                 <Icon size={16} className="shrink-0 text-primary" />
