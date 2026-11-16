@@ -17,16 +17,21 @@ function readString(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
 }
 
-export interface PairingResult {
-  ok: boolean;
-  sessionId?: string;
-  code?: string;
-  expiresAt?: number;
-  serverTime?: number;
-  nextAllowedAt?: number;
-  error?: string;
-  retryAfterMs?: number;
-}
+export type PairingResult =
+  | {
+      ok: true;
+      sessionId: string;
+      code?: string;
+      expiresAt: number;
+      serverTime: number;
+      nextAllowedAt: number;
+    }
+  | {
+      ok: false;
+      error?: string;
+      retryAfterMs?: number;
+      serverTime?: number;
+    };
 
 export interface SessionStatus {
   ok: boolean;
@@ -56,13 +61,30 @@ export async function requestPairing({ phone }: { phone: string }): Promise<Pair
       };
     }
 
+    const sessionId = readString(data.sessionId);
+    const expiresAt = readNumber(data.expiresAt);
+    const nextAllowedAt = readNumber(data.nextAllowedAt);
+    const serverTime = readNumber(data.serverTime);
+
+    // A successful HTTP response is not enough: the pairing flow needs
+    // all timing/session fields before it can safely start polling.
+    if (
+      !sessionId ||
+      sessionId.length > 200 ||
+      expiresAt === undefined ||
+      nextAllowedAt === undefined ||
+      serverTime === undefined
+    ) {
+      return { ok: false, error: "invalid_response", serverTime: Date.now() };
+    }
+
     return {
       ok: true,
-      sessionId: readString(data.sessionId),
+      sessionId,
       code: readString(data.code),
-      expiresAt: readNumber(data.expiresAt),
-      nextAllowedAt: readNumber(data.nextAllowedAt),
-      serverTime: readNumber(data.serverTime),
+      expiresAt,
+      nextAllowedAt,
+      serverTime,
     };
   } catch {
     return { ok: false, error: "network_error", serverTime: Date.now() };
