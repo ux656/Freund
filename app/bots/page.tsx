@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { ArrowUpLeft, Bot, Search, Server, Wifi } from "lucide-react";
 import SideMenu from "@/components/SideMenu";
+import PageEntrance from "@/components/PageEntrance";
 
 const botServers = [
   { id: "bmg-server", name: "bmg server", description: "WhatsApp SubBot Gateway", status: "ONLINE", kind: "بوابة جلسات واتساب" },
