@@ -8,7 +8,7 @@ const leader = {
   role: "قائد فريق التطوير",
   bio: "مسؤول عن تنظيم الفريق والإشراف على جميع المشاريع.",
   verified: true,
-  contacts: { github: "ahmed", email: "ahmed@example.com" },
+  contacts: { github: "ahmed", email: "ahmed@example.com", website: "/" },
 };
 
 const devs = [
