@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Activity, Clock3, Cpu, RefreshCw, Server, ShieldCheck, Wifi, WifiOff } from "lucide-react";
 import SideMenu from "./SideMenu";
+import PageEntrance from "./PageEntrance";
 
 type CheckResult = { ok?: boolean; reachable?: boolean; serviceStatus?: string; checkedAt?: string };
 
