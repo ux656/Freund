@@ -118,7 +118,7 @@ export default function Servers() {
             <div className="mt-1 text-lg font-bold">{serverInfo.reportedStatus}</div>
             <div className="mt-1 text-[10px] text-text-3">وقت التقرير: {serverInfo.reportedAt}</div>
           </div>
-          <a href="/info" className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl border border-border px-3 py-2.5 text-xs font-semibold text-text transition hover:bg-surface-2">
+          <a href="/servers#system" className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl border border-border px-3 py-2.5 text-xs font-semibold text-text transition hover:bg-surface-2">
             فتح تفاصيل النظام <ExternalLink size={13} />
           </a>
         </article>
@@ -133,6 +133,33 @@ export default function Servers() {
           </div>
           <span className="rounded-lg bg-surface-2 px-3 py-2 text-xs font-mono">{serviceStatus || "CHECKING"}</span>
         </div>
+      </section>
+
+      <section id="system" className="mb-5 scroll-mt-6">
+        <div className="mb-3 flex items-center gap-2"><Cpu size={17} className="text-primary" /><h2 className="text-sm font-bold">معلومات النظام</h2><span className="text-[10px] text-text-3">حسب التقرير المرسل</span></div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          {[
+            ["أنوية المعالج", "16 Core", Cpu],
+            ["المساحة الفاضية", "425.58 GB", HardDrive],
+            ["استهلاك المعالج", "9.73", Activity],
+            ["استهلاك الرام", "83.83 GB", Smartphone],
+            ["مدعوم من", "MONTE", ShieldCheck],
+            ["حالة السيرفر", "ONLINE · PRIVATE GATEWAY", Server],
+          ].map(([label, value, Icon]: any) => (
+            <article key={label} className="lg lg-surface min-w-0 rounded-2xl border border-border/70 p-4">
+              <div className="mb-3 flex items-center justify-between gap-2 text-[11px] text-text-2">
+                <span>{label}</span><Icon size={16} className="shrink-0 text-primary" />
+              </div>
+              <div className="break-words text-base font-bold">{value}</div>
+            </article>
+          ))}
+        </div>
+        <div id="bots" className="mt-3 grid grid-cols-3 gap-3 scroll-mt-6">
+          <article className="lg lg-surface rounded-2xl border border-border/70 p-3 text-center"><Bot size={17} className="mx-auto mb-2 text-primary" /><div className="text-xl font-bold">3</div><div className="mt-1 text-[10px] text-text-3">بوتات نشطة</div></article>
+          <article className="lg lg-surface rounded-2xl border border-border/70 p-3 text-center"><Activity size={17} className="mx-auto mb-2 text-primary" /><div className="text-xl font-bold">84</div><div className="mt-1 text-[10px] text-text-3">جروب</div></article>
+          <article className="lg lg-surface rounded-2xl border border-border/70 p-3 text-center"><Smartphone size={17} className="mx-auto mb-2 text-primary" /><div className="text-xl font-bold">23</div><div className="mt-1 text-[10px] text-text-3">جلسة مباشرة</div></article>
+        </div>
+        <p className="mt-3 text-[10px] leading-5 text-text-3">هذه الأرقام من التقرير الذي أرسلته وليست قراءات مباشرة من الخادم. لم يتم تحديد وحدة قياس قيمة استهلاك المعالج (9.73)، لذلك عُرضت كما وردت دون إضافة نسبة مئوية.</p>
       </section>
     </main>
   );
