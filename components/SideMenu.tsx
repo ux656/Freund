@@ -77,6 +77,13 @@ export default function SideMenu({
                   <Icon size={17} /><span>{item.label}</span>{active && <span className="mr-auto size-1.5 rounded-full bg-primary" />}
                 </Link>;
               })}
+              {mode === "home" && (
+                <Link href="/dashboard" onClick={close}
+                  className="mt-3 flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 px-3.5 py-3 text-[13px] font-semibold text-primary transition hover:bg-primary/10">
+                  <Home size={17} />
+                  <span>لوحة التحكم</span>
+                </Link>
+              )}
             </nav>
             <div className="mt-5 rounded-xl border border-border/70 bg-surface/70 p-3">
               <div className="flex items-center gap-2 text-xs font-semibold"><Activity size={15} className="text-primary" />BMG Control</div>
