@@ -1,0 +1,82 @@
+import { createHash } from "node:crypto";
+import { NextRequest } from "next/server";
+
+type Bucket = { hits: number[]; lastAt: number };
+type Store = { buckets: Map<string, Bucket>; lastSweep: number };
+declare global { var __freundRateLimitStore: Store | undefined; }
+
+const HOUR = 60 * 60 * 1000;
+const COOLDOWN = 30 * 1000;
+const PHONE_MAX = 5;
+const IP_MAX = 12;
+const POLL_WINDOW = 60 * 1000;
+const POLL_MAX = 100;
+
+function getStore(): Store {
+  return (globalThis.__freundRateLimitStore ??= { buckets: new Map(), lastSweep: 0 });
+}
+function hash(value: string) {
+  return createHash("sha256").update(value).digest("hex");
+}
+function clientIp(request: NextRequest) {
+  const forwarded = request.headers.get("x-forwarded-for");
+  const values = forwarded?.split(",").map((value) => value.trim()).filter(Boolean) ?? [];
+  const ip = values.at(-1) || request.headers.get("x-real-ip") || "unknown";
+  return ip.slice(0, 64);
+}
+function cleanup(now: number) {
+  const state = getStore();
+  if (now - state.lastSweep < 60_000) return;
+  state.lastSweep = now;
+  for (const [key, bucket] of state.buckets) {
+    bucket.hits = bucket.hits.filter((time) => now - time < HOUR);
+    if (!bucket.hits.length && now - bucket.lastAt >= HOUR) state.buckets.delete(key);
+  }
+  if (state.buckets.size > 20_000) {
+    const oldest = [...state.buckets.entries()].sort((a, b) => a[1].lastAt - b[1].lastAt);
+    for (const [key] of oldest.slice(0, state.buckets.size - 15_000)) state.buckets.delete(key);
+  }
+}
+function inspect(key: string, max: number, now: number, windowMs = HOUR, cooldownMs = COOLDOWN) {
+  const state = getStore();
+  const bucket = state.buckets.get(key) || { hits: [], lastAt: 0 };
+  bucket.hits = bucket.hits.filter((time) => now - time < windowMs);
+  if (bucket.hits.length >= max) {
+    state.buckets.set(key, bucket);
+    return { allowed: false as const, retryAfterMs: Math.max(1000, windowMs - (now - bucket.hits[0])) };
+  }
+  if (bucket.lastAt && now - bucket.lastAt < cooldownMs) {
+    state.buckets.set(key, bucket);
+    return { allowed: false as const, retryAfterMs: cooldownMs - (now - bucket.lastAt) };
+  }
+  return { allowed: true as const, bucket };
+}
+function record(key: string, bucket: Bucket, now: number) {
+  bucket.hits.push(now);
+  bucket.lastAt = now;
+  getStore().buckets.set(key, bucket);
+}
+
+export function enforcePairingLimits(request: NextRequest, phone: string) {
+  const now = Date.now();
+  cleanup(now);
+  const phoneKey = "phone:" + hash(phone);
+  const ipKey = "ip:" + hash(clientIp(request));
+  const phoneCheck = inspect(phoneKey, PHONE_MAX, now);
+  if (!phoneCheck.allowed) return { allowed: false as const, error: "phone_limit", retryAfterMs: phoneCheck.retryAfterMs };
+  const ipCheck = inspect(ipKey, IP_MAX, now);
+  if (!ipCheck.allowed) return { allowed: false as const, error: ipCheck.retryAfterMs <= COOLDOWN ? "cooldown" : "ip_limit", retryAfterMs: ipCheck.retryAfterMs };
+  record(phoneKey, phoneCheck.bucket, now);
+  record(ipKey, ipCheck.bucket, now);
+  return { allowed: true as const };
+}
+
+export function enforceSessionPollLimit(request: NextRequest) {
+  const now = Date.now();
+  cleanup(now);
+  const key = "poll:" + hash(clientIp(request));
+  const result = inspect(key, POLL_MAX, now, POLL_WINDOW, 0);
+  if (!result.allowed) return result;
+  record(key, result.bucket, now);
+  return { allowed: true as const };
+}
