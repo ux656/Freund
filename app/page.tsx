@@ -11,6 +11,7 @@ import Developers from "@/components/Developers";
 import Privacy from "@/components/Privacy";
 import Footer from "@/components/Footer";
 import BotAssistant from "@/components/BotAssistant";
+import PageEntrance from "@/components/PageEntrance";
 
 export default function Home() {
   const [activePage, setActivePage] = useState("home");
@@ -25,6 +26,7 @@ export default function Home() {
   return (
     <>
       <Navbar activePage={activePage} onNavigate={setActivePage} />
+      <PageEntrance key={activePage}>
       <main className="flex-1 max-w-3xl mx-auto w-full px-5 pb-20 pt-12">
         {activePage === "home" && (
           <div id="home" className="space-y-8">
@@ -38,6 +40,7 @@ export default function Home() {
         {activePage === "developers" && <div id="developers"><Developers /></div>}
         {activePage === "privacy" && <div id="privacy"><Privacy /></div>}
       </main>
+      </PageEntrance>
       <Footer />
       <BotAssistant />
     </>
