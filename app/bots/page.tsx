@@ -5,7 +5,7 @@ import { ArrowUpLeft, Bot, Search, Server, Wifi } from "lucide-react";
 import SideMenu from "@/components/SideMenu";
 
 const botServers = [
-  { id: "nezuko-server-1", name: "nezuko server 1", description: "WhatsApp SubBot Gateway", status: "ONLINE", kind: "بوابة جلسات واتساب" },
+  { id: "bmg-server", name: "bmg server", description: "WhatsApp SubBot Gateway", status: "ONLINE", kind: "بوابة جلسات واتساب" },
 ];
 
 export default function BotsPage() {
