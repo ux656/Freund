@@ -2,7 +2,6 @@
 
 import { motion } from "framer-motion";
 import { ShieldCheck, Clock, CheckCircle2 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 export default function Hero() {
   return (
