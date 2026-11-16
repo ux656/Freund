@@ -31,6 +31,7 @@ export default function PairingFlow() {
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const confirmationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const serverNow = () => Date.now() + serverOffsetRef.current;
   const syncTime = (t?: number) => {
@@ -49,7 +50,7 @@ export default function PairingFlow() {
         clearInterval(timerRef.current!);
         if (verifyState === "awaiting") setVerifyState("expired");
       }
-    }, 200);
+    }, 1000);
     return () => clearInterval(timerRef.current!);
   }, [sessionId, expiresAt, verifyState]);
 
@@ -90,7 +91,11 @@ export default function PairingFlow() {
         if (res.status === "confirmed") {
           setVerifyState("confirmed");
           stopPolling();
-          setTimeout(() => setStep(3), 800);
+          if (confirmationTimeoutRef.current) clearTimeout(confirmationTimeoutRef.current);
+          confirmationTimeoutRef.current = setTimeout(() => {
+            confirmationTimeoutRef.current = null;
+            setStep(3);
+          }, 800);
           return;
         }
         if (res.status === "expired") {
@@ -192,6 +197,8 @@ export default function PairingFlow() {
 
   const reset = () => {
     stopPolling();
+    if (confirmationTimeoutRef.current) clearTimeout(confirmationTimeoutRef.current);
+    confirmationTimeoutRef.current = null;
     isVerifyingRef.current = false;
     setIsRequesting(false);
     setStep(1);
@@ -205,6 +212,11 @@ export default function PairingFlow() {
     setError("");
     setRateLimit("");
   };
+
+  useEffect(() => () => {
+    if (confirmationTimeoutRef.current) clearTimeout(confirmationTimeoutRef.current);
+    stopPolling();
+  }, [stopPolling]);
 
   const fullPhoneLength = country.code.length + phone.length;
   const canGenerate = phone.length >= 4 && fullPhoneLength >= 7 && fullPhoneLength <= 15;
