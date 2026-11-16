@@ -36,15 +36,18 @@ export default function SideMenu({
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLElement>(null);
+  const wasOpenRef = useRef(false);
   const reduceMotion = useReducedMotion();
   const close = () => setOpen(false);
 
   useEffect(() => {
     if (!open) {
-      triggerRef.current?.focus();
+      if (wasOpenRef.current) triggerRef.current?.focus();
+      wasOpenRef.current = false;
       return;
     }
 
+    wasOpenRef.current = true;
     const frame = window.requestAnimationFrame(() => {
       const first = panelRef.current?.querySelector<HTMLElement>(
         'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
