@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Activity, Clock3, RefreshCw, Server, ShieldCheck, Wifi, WifiOff } from "lucide-react";
+import { Activity, Clock3, Cpu, RefreshCw, Server, ShieldCheck, Wifi, WifiOff } from "lucide-react";
 import SideMenu from "./SideMenu";
 
 type CheckResult = { ok?: boolean; reachable?: boolean; serviceStatus?: string; checkedAt?: string };
@@ -76,7 +76,7 @@ export default function Servers() {
       </section>
 
       <section className="lg lg-surface mt-4 rounded-2xl p-4 sm:p-5">
-        <div className="mb-2 flex items-center gap-2 text-primary"><ShieldCheck size={16} /><h2 className="text-sm font-bold text-text">معلومات النظام</h2></div>
+        <div className="mb-2 flex items-center gap-2 text-primary"><Cpu size={16} /><h2 className="text-sm font-bold text-text">معلومات النظام</h2></div>
         <p className="text-xs leading-6 text-text-2">تفاصيل موارد التشغيل والإحصائيات والجلسات في صفحة مستقلة.</p>
         <a href="/info" className="mt-3 inline-flex items-center gap-2 rounded-xl border border-border px-3.5 py-2.5 text-xs font-semibold text-text transition hover:bg-surface-2">فتح معلومات النظام</a>
       </section>
