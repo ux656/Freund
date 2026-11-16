@@ -36,6 +36,7 @@ export default function PairingFlow() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const confirmationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const serverNow = () => Date.now() + serverOffsetRef.current;
   const syncTime = (t?: number) => {
@@ -71,7 +72,11 @@ export default function PairingFlow() {
     cooldownRef.current = setInterval(() => {
       const rem = Math.max(0, cooldownUntil - serverNow());
       setCooldownSec(Math.ceil(rem / 1000));
-      if (rem <= 0) clearInterval(cooldownRef.current!);
+      if (rem <= 0) {
+        if (cooldownRef.current) clearInterval(cooldownRef.current);
+        cooldownRef.current = null;
+        setCooldownSec(0);
+      }
     }, 500);
     return () => clearInterval(cooldownRef.current!);
   }, [cooldownUntil]);
@@ -228,7 +233,11 @@ export default function PairingFlow() {
     try {
       await navigator.clipboard.writeText(code);
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+      copyTimeoutRef.current = setTimeout(() => {
+        copyTimeoutRef.current = null;
+        setCopied(false);
+      }, 2000);
     } catch {}
   };
 
@@ -240,6 +249,9 @@ export default function PairingFlow() {
     activeSessionRef.current = null;
     if (confirmationTimeoutRef.current) clearTimeout(confirmationTimeoutRef.current);
     confirmationTimeoutRef.current = null;
+    if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+    copyTimeoutRef.current = null;
+    setCopied(false);
     isVerifyingRef.current = false;
     setIsRequesting(false);
     setStep(1);
@@ -258,6 +270,7 @@ export default function PairingFlow() {
     requestGenerationRef.current += 1;
     requestInFlightRef.current = false;
     if (confirmationTimeoutRef.current) clearTimeout(confirmationTimeoutRef.current);
+    if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
     stopPolling();
   }, [stopPolling]);
 
