@@ -148,6 +148,7 @@ export default function PairingFlow() {
       setCaptchaB(b);
       setCaptchaExpected(a + b);
       if (res.error === "captcha_wrong") setRateLimit("الإجابة غير صحيحة. حاول مرة أخرى.");
+      setIsRequesting(false);
       return;
     }
     if (res.error === "cooldown") {
