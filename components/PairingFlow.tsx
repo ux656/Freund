@@ -314,8 +314,7 @@ export default function PairingFlow() {
             <button
               onClick={handleGenerate}
               disabled={!canGenerate || isRequesting}
-              className={cn(
-                "relative w-full overflow-hidden rounded-glass-sm border border-[#B5543A] bg-gradient-to-b from-[#E5876B] via-primary to-primary-hover px-5 py-3.5 text-sm font-semibold text-white shadow-lg transition-all",
+              className={cn("ui-interactive relative w-full overflow-hidden rounded-glass-sm border border-[#B5543A] bg-gradient-to-b from-[#E5876B] via-primary to-primary-hover px-5 py-3.5 text-sm font-semibold text-white shadow-lg transition-all",
                 "hover:-translate-y-px hover:shadow-xl active:translate-y-px disabled:cursor-not-allowed disabled:opacity-35 disabled:shadow-none"
               )}
             >
@@ -490,7 +489,7 @@ export default function PairingFlow() {
             </div>
             <button
               onClick={reset}
-              className="w-full rounded-glass-sm border border-[#B5543A] bg-gradient-to-b from-[#E5876B] via-primary to-primary-hover px-5 py-3.5 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-px"
+              className="ui-interactive w-full rounded-glass-sm border border-[#B5543A] bg-gradient-to-b from-[#E5876B] via-primary to-primary-hover px-5 py-3.5 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-px"
             >
               تنصيب رقم آخر
             </button>
