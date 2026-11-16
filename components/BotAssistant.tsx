@@ -8,6 +8,8 @@ type AssistantAction = "link" | "security" | "commands" | "human";
 
 type AssistantMessage = { role: "bot" | "user"; text: string };
 
+const MAX_MESSAGES = 40;
+
 const responses: Record<AssistantAction, string> = {
   link: "اذهب لصفحة الربط، أدخل رقمك، ثم أدخل رمز الاقتران في واتساب من: الإعدادات ← الأجهزة المرتبطة ← ربط جهاز.",
   security: "بياناتك آمنة. الاتصال مشفر ولا نحتفظ برقمك بعد انتهاء الجلسة.",
@@ -46,10 +48,10 @@ export default function BotAssistant() {
   }, []);
 
   const ask = (action: AssistantAction, label: string) => {
-    setMessages((m) => [...m, { role: "user", text: label }]);
+    setMessages((current) => [...current, { role: "user", text: label }].slice(-MAX_MESSAGES));
     const timeout: number = window.setTimeout(() => {
       replyTimeoutsRef.current.delete(timeout);
-      setMessages((m) => [...m, { role: "bot", text: responses[action] }]);
+      setMessages((current) => [...current, { role: "bot", text: responses[action] }].slice(-MAX_MESSAGES));
     }, 450);
     replyTimeoutsRef.current.add(timeout);
   };
