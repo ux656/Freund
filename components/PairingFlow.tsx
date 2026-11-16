@@ -16,7 +16,7 @@ export default function PairingFlow() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [code, setCode] = useState<string | null>(null);
   const [expiresAt, setExpiresAt] = useState(0);
-  const [serverOffset, setServerOffset] = useState(0);
+  const serverOffsetRef = useRef(0);
   const [cooldownUntil, setCooldownUntil] = useState(0);
   const [remainingSec, setRemainingSec] = useState(60);
   const [cooldownSec, setCooldownSec] = useState(0);
@@ -32,9 +32,11 @@ export default function PairingFlow() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const serverNow = () => Date.now() + serverOffset;
+  const serverNow = () => Date.now() + serverOffsetRef.current;
   const syncTime = (t?: number) => {
-    if (typeof t === "number") setServerOffset(t - Date.now());
+    if (typeof t === "number" && Number.isFinite(t)) {
+      serverOffsetRef.current = t - Date.now();
+    }
   };
 
   /* ===== Timer ===== */
@@ -76,6 +78,9 @@ export default function PairingFlow() {
       try {
         const res = await checkSession({ sessionId });
         syncTime(res.serverTime);
+        if (typeof res.expiresAt === "number" && Number.isFinite(res.expiresAt)) {
+          setExpiresAt(res.expiresAt);
+        }
         if (res.code) setCode(res.code);
         if (!res.ok) {
           setVerifyState("expired");
