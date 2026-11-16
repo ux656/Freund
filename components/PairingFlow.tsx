@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Copy, Check, Loader2, AlertCircle, Smartphone, KeyRound, ShieldCheck } from "lucide-react";
+import { Copy, Check, Loader2, Smartphone, KeyRound, ShieldCheck } from "lucide-react";
+import CountryPicker, { COUNTRIES, type Country } from "@/components/CountryPicker";
 import { cn } from "@/lib/utils";
 import { requestPairing, checkSession } from "@/lib/mock-api";
 
@@ -11,6 +12,7 @@ type Step = 1 | 2 | 3;
 export default function PairingFlow() {
   const [step, setStep] = useState<Step>(1);
   const [phone, setPhone] = useState("");
+  const [country, setCountry] = useState<Country>(COUNTRIES[0]);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [code, setCode] = useState<string | null>(null);
   const [expiresAt, setExpiresAt] = useState(0);
@@ -119,7 +121,7 @@ export default function PairingFlow() {
     setRateLimit("");
 
     try {
-      const res = await requestPairing({ phone });
+      const res = await requestPairing({ phone: country.code + phone });
       syncTime(res.serverTime);
 
       if (res.ok) {
@@ -188,6 +190,7 @@ export default function PairingFlow() {
     setIsRequesting(false);
     setStep(1);
     setPhone("");
+    setCountry(COUNTRIES[0]);
     setSessionId(null);
     setCode(null);
     setExpiresAt(0);
@@ -195,8 +198,6 @@ export default function PairingFlow() {
     setVerifyState("idle");
     setError("");
     setRateLimit("");
-    setCaptchaExpected(null);
-    setCaptchaInput("");
   };
 
   const canGenerate = phone.replace(/\D/g, "").length >= 10;
@@ -258,21 +259,30 @@ export default function PairingFlow() {
                 رقم الهاتف مع كود الدولة
               </label>
               <div className="flex items-center overflow-hidden rounded-glass-sm border border-input bg-input" dir="ltr">
+                <CountryPicker value={country} onChange={(selected) => {
+                  setCountry(selected);
+                  setError("");
+                }} />
                 <input
                   type="tel"
                   value={phone}
                   onChange={(e) => {
-                    const digits = e.target.value.replace(/\D/g, "").slice(0, 15);
-                    setPhone(digits);
+                    let digits = e.target.value.replace(/[^0-9]/g, "");
+                    if (digits.startsWith(country.code) && digits.length > country.code.length + 6) {
+                      digits = digits.slice(country.code.length);
+                    }
+                    setPhone(digits.slice(0, 15 - country.code.length));
                     setError("");
                   }}
-                  placeholder="20xxxxxxxxx"
+                  placeholder="رقم الهاتف"
                   inputMode="numeric"
-                  maxLength={16}
-                  className="flex-1 bg-transparent px-4 py-3.5 font-body text-base font-medium tracking-wider text-text outline-none placeholder:text-text-3"
+                  autoComplete="tel-national"
+                  maxLength={15 - country.code.length}
+                  className="min-w-0 flex-1 bg-transparent px-3 py-3.5 font-body text-base font-medium tracking-wider text-text outline-none placeholder:text-text-3"
                 />
                 {phone && (
                   <button
+                    type="button"
                     onClick={() => setPhone("")}
                     className="mr-2 grid size-6 place-items-center rounded-full bg-surface-3 text-text-2 hover:bg-text-3 hover:text-text"
                     aria-label="مسح"
@@ -281,10 +291,6 @@ export default function PairingFlow() {
                   </button>
                 )}
               </div>
-              <p className="mt-2 flex items-center gap-1.5 text-[11.5px] text-text-3">
-                <AlertCircle size={12} className="opacity-70" />
-                اكتب كود الدولة ثم رقمك — بدون + أو مسافات
-              </p>
               {error && (
                 <p role="alert" className="mt-2 text-[11.5px] font-medium text-danger">
                   {error}
