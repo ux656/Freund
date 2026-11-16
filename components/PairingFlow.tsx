@@ -24,10 +24,6 @@ export default function PairingFlow() {
   const [isRequesting, setIsRequesting] = useState(false);
   const [error, setError] = useState("");
   const [rateLimit, setRateLimit] = useState("");
-  const [captchaExpected, setCaptchaExpected] = useState<number | null>(null);
-  const [captchaA, setCaptchaA] = useState(0);
-  const [captchaB, setCaptchaB] = useState(0);
-  const [captchaInput, setCaptchaInput] = useState("");
   const [copied, setCopied] = useState(false);
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -136,28 +132,22 @@ export default function PairingFlow() {
         setExpiresAt(res.expiresAt!);
         setCooldownUntil(res.nextAllowedAt!);
         setVerifyState("awaiting");
-        setCaptchaExpected(null);
-        setCaptchaInput("");
         setStep(2);
         return;
       }
 
-      if (res.error === "captcha_required" || res.error === "captcha_wrong") {
-        const a = Math.floor(Math.random() * 8) + 2;
-        const b = Math.floor(Math.random() * 8) + 2;
-        setCaptchaA(a);
-        setCaptchaB(b);
-        setCaptchaExpected(a + b);
-        if (res.error === "captcha_wrong") setRateLimit("الإجابة غير صحيحة. حاول مرة أخرى.");
-        return;
-      }
       if (res.error === "cooldown") {
         setCooldownUntil(serverNow() + (res.retryAfterMs || 0));
         setRateLimit(`انتظر ${Math.ceil((res.retryAfterMs || 0) / 1000)} ثانية قبل المحاولة مرة أخرى.`);
         return;
       }
       if (res.error === "phone_limit") {
-        setRateLimit("وصلت إلى الحد المسموح لهذا الرقم خلال الساعة. ابدأ اقترانًا جديدًا بعد انتهاء المهلة.");
+        stopPolling();
+        setSessionId(null);
+        setCode(null);
+        setExpiresAt(0);
+        setStep(1);
+        setRateLimit("استهلكت المحاولات الخمس لهذا الرقم خلال الساعة. يمكنك بدء اقتران جديد بعد انتهاء المهلة.");
         return;
       }
       if (res.error === "ip_limit") {
@@ -184,8 +174,6 @@ export default function PairingFlow() {
     setVerifyState("idle");
     setError("");
     setRateLimit("");
-    setCaptchaExpected(null);
-    setCaptchaInput("");
     void handleGenerate();
   };
 
@@ -307,30 +295,6 @@ export default function PairingFlow() {
                 </p>
               )}
             </div>
-
-            {/* CAPTCHA */}
-            {captchaExpected !== null && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                className="lg lg-surface rounded-glass p-4"
-              >
-                <label className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-text-2">
-                  تحقّق بشري مطلوب
-                </label>
-                <div className="mb-3 text-center font-display text-xl font-bold tracking-widest text-text" dir="ltr">
-                  {captchaA} + {captchaB} = ?
-                </div>
-                <input
-                  type="number"
-                  value={captchaInput}
-                  onChange={(e) => setCaptchaInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleGenerate()}
-                  placeholder="أدخل الإجابة"
-                  className="w-full rounded-glass-sm border border-input bg-input px-4 py-3 text-center text-base font-semibold text-text outline-none focus:border-primary"
-                />
-              </motion.div>
-            )}
 
             {rateLimit && (
               <p role="alert" className="rounded-glass-sm border border-danger/30 bg-danger/10 px-3.5 py-2.5 text-[12.5px] font-medium text-danger">
