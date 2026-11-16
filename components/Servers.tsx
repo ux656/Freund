@@ -43,6 +43,7 @@ export default function Servers() {
   const status = reachable === null ? "جارٍ الفحص" : reachable ? "ONLINE" : "OFFLINE";
 
   return (
+    <PageEntrance>
     <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-5 pb-20 pt-8">
       <header className="mb-7 flex items-start gap-3">
         <SideMenu mode="dashboard" activePage="servers" />
@@ -82,5 +83,6 @@ export default function Servers() {
         <a href="/info" className="mt-3 inline-flex items-center gap-2 rounded-xl border border-border px-3.5 py-2.5 text-xs font-semibold text-text transition hover:bg-surface-2">فتح معلومات النظام</a>
       </section>
     </main>
+    </PageEntrance>
   );
 }
