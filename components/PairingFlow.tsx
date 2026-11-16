@@ -77,7 +77,7 @@ export default function PairingFlow() {
         cooldownRef.current = null;
         setCooldownSec(0);
       }
-    }, 500);
+    }, 1000);
     return () => clearInterval(cooldownRef.current!);
   }, [cooldownUntil]);
 
@@ -161,7 +161,7 @@ export default function PairingFlow() {
     setRateLimit("");
 
     try {
-      const nationalPhone = phone.replace(/\D/g, "").replace(/^0+/, "");
+      const nationalPhone = phone.replace(/\\D/g, "").replace(/^0+/, "");
       const res = await requestPairing({ phone: country.code + nationalPhone });
       // A reset or newer request invalidates this response.
       if (generation !== requestGenerationRef.current) return;
