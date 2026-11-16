@@ -167,3 +167,30 @@ html:not(.dark) .lg {
     border-width: 0;
   }
 }
+
+
+/* Unified interaction feedback */
+@layer components {
+  .ui-interactive {
+    transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+    transition-duration: 160ms;
+    transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .ui-interactive:active:not(:disabled) {
+    transform: translateY(1px) scale(0.985);
+  }
+
+  .ui-interactive:disabled {
+    cursor: not-allowed;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
