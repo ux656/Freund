@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Activity, Clock3, Cpu, ExternalLink, HardDrive, RefreshCw, Server, ShieldCheck, Smartphone, Wifi, WifiOff } from "lucide-react";
+import { Activity, Clock3, ExternalLink, RefreshCw, Server, ShieldCheck, Wifi, WifiOff } from "lucide-react";
 import SideMenu from "./SideMenu";
 
 type CheckResult = {
@@ -49,14 +49,7 @@ export default function Servers() {
 
   const statusLabel = reachable === null ? "جارٍ الفحص" : reachable ? "ONLINE" : "OFFLINE";
 
-  const metrics = [
-    { label: "أنوية المعالج", value: "غير متاح", Icon: Cpu },
-    { label: "المساحة المتاحة", value: "غير متاح", Icon: HardDrive },
-    { label: "استهلاك المعالج", value: "غير متاح", Icon: Activity },
-    { label: "استهلاك الذاكرة", value: "غير متاح", Icon: Smartphone },
-    { label: "البوتات النشطة", value: "غير متاح", Icon: Server },
-    { label: "الجلسات المباشرة", value: "غير متاح", Icon: Wifi },
-  ];
+
 
   return (
     <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-6xl px-4 pb-16 pt-7 sm:px-6">
@@ -125,24 +118,10 @@ export default function Servers() {
         </article>
       </section>
 
-      <section id="system" className="mb-5 scroll-mt-6">
-        <div className="mb-3 flex items-center gap-2"><ShieldCheck size={17} className="text-primary" /><h2 className="text-sm font-bold">معلومات النظام</h2></div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {metrics.map(({ label, value, Icon }) => (
-            <article key={label} className="lg lg-surface min-w-0 rounded-2xl border border-border/70 p-4">
-              <div className="mb-3 flex items-center justify-between gap-2 text-[11px] text-text-2">
-                <span>{label}</span><Icon size={16} className="shrink-0 text-primary" />
-              </div>
-              <div className="break-words text-base font-bold">{value}</div>
-            </article>
-          ))}
-        </div>
-        <p className="mt-3 text-[10px] leading-5 text-text-3">تفاصيل المعالج والذاكرة والتخزين وأعداد البوتات والجلسات لا يوفرها فحص الحالة الحالي؛ ستظهر بعد ربط واجهة بيانات النظام الفعلية.</p>
-      </section>
-
-      <section id="bots" className="scroll-mt-6 lg lg-surface rounded-2xl border border-border/70 p-4 sm:p-5">
-        <div className="mb-2 flex items-center gap-2"><Server size={17} className="text-primary" /><h2 className="text-sm font-bold">البوتات والجلسات</h2></div>
-        <p className="text-xs leading-6 text-text-2">قائمة البوتات وعدد الجلسات غير متاحة من endpoint الفحص الحالي. لم تتم إضافة أرقام تقديرية أو جلسات وهمية.</p>
+      <section className="lg lg-surface rounded-2xl border border-border/70 p-4 sm:p-5">
+        <div className="mb-2 flex items-center gap-2"><ShieldCheck size={17} className="text-primary" /><h2 className="text-sm font-bold">معلومات النظام</h2></div>
+        <p className="text-xs leading-6 text-text-2">تفاصيل موارد السيرفر والإحصائيات موجودة في صفحة مستقلة.</p>
+        <a href="/info" className="mt-3 inline-flex items-center gap-2 rounded-xl border border-border px-3 py-2.5 text-xs font-semibold text-text transition hover:bg-surface-2">فتح معلومات النظام <ExternalLink size={13} /></a>
       </section>
     </main>
   );
