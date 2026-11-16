@@ -121,7 +121,8 @@ export default function PairingFlow() {
     setRateLimit("");
 
     try {
-      const nationalPhone = phone.replace(/\\D/g, "").replace(/^0+/, "");\n      const res = await requestPairing({ phone: country.code + nationalPhone });
+      const nationalPhone = phone.replace(/\D/g, "").replace(/^0+/, "");
+      const res = await requestPairing({ phone: country.code + nationalPhone });
       syncTime(res.serverTime);
 
       if (res.ok) {
