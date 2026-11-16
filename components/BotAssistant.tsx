@@ -46,7 +46,7 @@ export default function BotAssistant() {
     <>
       <button
         onClick={() => setOpen(!open)}
-        className="fixed bottom-5 left-5 z-50 grid size-[60px] place-items-center rounded-full border border-white/10 bg-[#202020] shadow-xl transition-transform hover:scale-105"
+        className="ui-interactive fixed bottom-5 left-5 z-50 grid size-[60px] place-items-center rounded-full border border-white/10 bg-[#202020] shadow-xl transition-transform hover:scale-105"
         aria-label="فتح مساعد Reboot"
         aria-expanded={open}
       >
@@ -77,7 +77,7 @@ export default function BotAssistant() {
               <button
                 onClick={() => setOpen(false)}
                 aria-label="إغلاق المحادثة"
-                className="grid size-8 place-items-center rounded-full text-text-2 transition-colors hover:bg-white/5"
+                className="ui-interactive grid size-8 place-items-center rounded-full text-text-2 transition-colors hover:bg-white/5"
               >
                 <X size={17} />
               </button>
@@ -103,7 +103,7 @@ export default function BotAssistant() {
                 <button
                   key={a.action}
                   onClick={() => ask(a.action, a.label)}
-                  className="min-h-9 rounded-xl border border-border bg-surface px-2 py-2 text-center text-[11px] leading-4 text-text-2 transition-colors hover:border-primary hover:text-primary active:scale-[0.98]"
+                  className="ui-interactive min-h-9 rounded-xl border border-border bg-surface px-2 py-2 text-center text-[11px] leading-4 text-text-2 transition-colors hover:border-primary hover:text-primary active:scale-[0.98]"
                 >
                   {a.label}
                 </button>
