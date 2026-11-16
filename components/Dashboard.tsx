@@ -130,7 +130,7 @@ export default function Dashboard() {
     <main className="mx-auto min-h-[75dvh] w-full max-w-6xl px-4 pb-16 pt-7 sm:px-6">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3">
-          <SideMenu mode="dashboard" activePage="dashboard" />
+          <SideMenu mode="dashboard" activePage="servers" />
           <div className="min-w-0">
           <div className="mb-2 flex items-center gap-2 text-[10px] font-bold tracking-[.16em] text-primary">
             <span className="size-2 rounded-full bg-primary" />
@@ -140,11 +140,16 @@ export default function Dashboard() {
           <p className="mt-1.5 text-xs text-text-2">مراقبة حالة خادم تشغيل BMG والموارد والبوتات المرتبطة به.</p>
           </div>
         </div>
-        <button type="button" onClick={() => void refresh()} disabled={refreshing}
-          className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-3.5 py-2.5 text-xs font-semibold text-text transition hover:bg-surface-2 disabled:opacity-50">
-          <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} />
-          تحديث الفحص
-        </button>
+        <div className="flex items-center gap-2">
+          <a href="#system" className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2.5 text-xs font-semibold text-text transition hover:bg-surface-2">
+            <Cpu size={14} /> فتح تفاصيل النظام
+          </a>
+          <button type="button" onClick={() => void refresh()} disabled={refreshing}
+            className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-3.5 py-2.5 text-xs font-semibold text-text transition hover:bg-surface-2 disabled:opacity-50">
+            <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} />
+            تحديث الفحص
+          </button>
+        </div>
       </div>
 
       {error && (
