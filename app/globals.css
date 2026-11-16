@@ -171,6 +171,13 @@ html:not(.dark) .lg {
 
 /* Unified interaction feedback */
 @layer components {
+  .ui-card {
+    min-width: 0;
+    border: 1px solid rgb(var(--theme-border) / 0.7);
+    border-radius: 1rem;
+    background: rgb(var(--theme-surface) / 0.5);
+  }
+
   .ui-interactive {
     transition-property: color, background-color, border-color, box-shadow, transform, opacity;
     transition-duration: 160ms;
