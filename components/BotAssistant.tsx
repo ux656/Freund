@@ -4,14 +4,18 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
-const responses: Record<string, string> = {
+type AssistantAction = "link" | "security" | "commands" | "human";
+
+type AssistantMessage = { role: "bot" | "user"; text: string };
+
+const responses: Record<AssistantAction, string> = {
   link: "اذهب لصفحة الربط، أدخل رقمك، ثم أدخل رمز الاقتران في واتساب من: الإعدادات ← الأجهزة المرتبطة ← ربط جهاز.",
   security: "بياناتك آمنة. الاتصال مشفر ولا نحتفظ برقمك بعد انتهاء الجلسة.",
   commands: "يدعم البوت 5 أوامر أساسية حالياً. المزيد قادم قريباً.",
   human: "تواصل مع فريق التطوير من صفحة المطورين.",
 };
 
-const actions = [
+const actions: { action: AssistantAction; label: string }[] = [
   { action: "link", label: "كيف أربط الرقم؟" },
   { action: "security", label: "هل بياناتي آمنة؟" },
   { action: "commands", label: "ما هي الأوامر؟" },
@@ -32,7 +36,7 @@ function RebootMascot({ className = "h-9 w-12" }: { className?: string }) {
 export default function BotAssistant() {
   const [open, setOpen] = useState(false);
   const replyTimeoutsRef = useRef<Set<number>>(new Set());
-  const [messages, setMessages] = useState<{ role: "bot" | "user"; text: string }[]>([
+  const [messages, setMessages] = useState<AssistantMessage[]>([
     { role: "bot", text: "مرحباً! أنا Reboot. كيف يمكنني مساعدتك؟" },
   ]);
 
@@ -41,11 +45,11 @@ export default function BotAssistant() {
     replyTimeoutsRef.current.clear();
   }, []);
 
-  const ask = (action: string, label: string) => {
+  const ask = (action: AssistantAction, label: string) => {
     setMessages((m) => [...m, { role: "user", text: label }]);
     const timeout: number = window.setTimeout(() => {
       replyTimeoutsRef.current.delete(timeout);
-      setMessages((m) => [...m, { role: "bot", text: responses[action] || "عذراً، لم أفهم." }]);
+      setMessages((m) => [...m, { role: "bot", text: responses[action] }]);
     }, 450);
     replyTimeoutsRef.current.add(timeout);
   };
