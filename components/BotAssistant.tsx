@@ -37,6 +37,7 @@ function RebootMascot({ className = "h-9 w-12" }: { className?: string }) {
 
 export default function BotAssistant() {
   const [open, setOpen] = useState(false);
+  const panelId = "reboot-assistant-panel";
   const replyTimeoutsRef = useRef<Set<number>>(new Set());
   const [messages, setMessages] = useState<AssistantMessage[]>([
     { role: "bot", text: "مرحباً! أنا Reboot. كيف يمكنني مساعدتك؟" },
@@ -63,6 +64,7 @@ export default function BotAssistant() {
         className="ui-interactive fixed bottom-5 left-5 z-50 grid size-[60px] place-items-center rounded-full border border-white/10 bg-[#202020] shadow-xl transition-transform hover:scale-105"
         aria-label="فتح مساعد Reboot"
         aria-expanded={open}
+        aria-controls={panelId}
       >
         <RebootMascot className="h-10 w-[52px]" />
       </button>
@@ -73,6 +75,10 @@ export default function BotAssistant() {
             initial={{ opacity: 0, y: 14, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 14, scale: 0.97 }}
+            id={panelId}
+            role="dialog"
+            aria-label="مساعد Reboot"
+            aria-modal="false"
             className="lg lg-surface fixed bottom-[92px] left-3 z-50 flex max-h-[min(570px,calc(100dvh-120px))] w-[340px] max-w-[calc(100vw-24px)] flex-col overflow-hidden rounded-2xl border border-white/10 shadow-2xl"
           >
             <div className="flex shrink-0 items-center justify-between border-b border-border bg-surface-2 px-3 py-2.5">
@@ -97,7 +103,7 @@ export default function BotAssistant() {
               </button>
             </div>
 
-            <div className="flex min-h-0 max-h-[32vh] flex-col gap-2 overflow-y-auto bg-bg p-3">
+            <div role="log" aria-label="رسائل المحادثة" aria-live="polite" aria-relevant="additions" className="flex min-h-0 max-h-[32vh] flex-col gap-2 overflow-y-auto bg-bg p-3">
               {messages.map((m, i) => (
                 <div
                   key={i}
