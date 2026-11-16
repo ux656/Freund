@@ -1,18 +1,7 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 import ThemeToggle from "./ui/ThemeToggle";
-import Link from "next/link";
-
-const links = [
-  { id: "home", label: "الربط" },
-  { id: "about", label: "عن البوت" },
-  { id: "features", label: "المميزات" },
-  { id: "faq", label: "الأسئلة" },
-  { id: "developers", label: "المطورون" },
-  { id: "privacy", label: "الخصوصية" },
-];
+import SideMenu from "./SideMenu";
 
 export default function Navbar({
   activePage,
@@ -22,42 +11,14 @@ export default function Navbar({
   onNavigate: (id: string) => void;
 }) {
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between gap-3 px-5 py-3.5 lg:px-8">
-      <nav
-        className={cn(
-          "lg lg-regular flex min-w-0 flex-1 items-center gap-0.5 overflow-x-auto rounded-pill px-1.5 py-1.5",
-          "scrollbar-none"
-        )}
-        aria-label="التنقل الرئيسي"
-      >
-        {links.map((link) => (
-          <button
-            key={link.id}
-            onClick={() => onNavigate(link.id)}
-            className={cn(
-              "relative shrink-0 whitespace-nowrap rounded-pill px-3 py-1.5 text-xs font-medium transition-colors",
-              "text-text-2 hover:bg-[var(--hover)] hover:text-text",
-              activePage === link.id && "bg-[var(--hover)] text-text"
-            )}
-          >
-            {link.label}
-            {activePage === link.id && (
-              <motion.span
-                layoutId="nav-active"
-                className="absolute inset-0 rounded-pill bg-white/10 dark:bg-white/10"
-                transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                style={{ zIndex: -1 }}
-              />
-            )}
-          </button>
-        ))}
-      </nav>
-      <Link
-        href="/dashboard"
-        className="shrink-0 rounded-pill border border-primary/25 bg-primary/10 px-3 py-2 text-xs font-semibold text-primary transition hover:bg-primary/15"
-      >
-        لوحة التحكم
-      </Link>
+    <header className="sticky top-0 z-50 flex items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+      <div className="flex min-w-0 items-center gap-3">
+        <SideMenu mode="home" activePage={activePage} onNavigate={onNavigate} />
+        <div className="min-w-0">
+          <div className="truncate text-sm font-bold tracking-wide">BMG BOT</div>
+          <div className="text-[10px] text-text-3">WhatsApp automation</div>
+        </div>
+      </div>
       <ThemeToggle />
     </header>
   );
