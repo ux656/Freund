@@ -1,7 +1,6 @@
 "use client";
 
 import { Github, Mail, MessageCircle, Linkedin, Twitter } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 const leader = {
   name: "أحمد محمود",
