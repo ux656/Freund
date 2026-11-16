@@ -97,7 +97,7 @@ export default function Servers() {
           <span className="flex items-center gap-1.5"><Clock3 size={12} />آخر فحص</span><span>{formatTime(checkedAt)}</span>
         </div>
         <div className="ui-card mt-3 p-3"><div className="mb-1 flex items-center gap-2 text-[10px] text-text-3"><Activity size={12} />استجابة الخدمة</div><div className="text-sm font-bold" dir="ltr">{serviceStatus || "CHECKING"}</div></div>
-        {checkError && <div className="mt-3"><ErrorState>{checkError}</ErrorState></div>}
+        {checkError && <div className="mt-3"><ErrorState onRetry={() => void checkServer()} retryLabel="إعادة فحص الخادم">{checkError}</ErrorState></div>}
       </section>
       )}
 
