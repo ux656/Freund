@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import SideMenu from "@/components/SideMenu";
 
 export default function PageHeader({ eyebrow, title, description, activePage, action }: {
@@ -5,7 +6,7 @@ export default function PageHeader({ eyebrow, title, description, activePage, ac
   title: string;
   description: string;
   activePage: string;
-  action?: React.ReactNode;
+  action?: ReactNode;
 }) {
   return (
     <header className="mb-7 flex items-start gap-3">
