@@ -35,7 +35,7 @@ export default function BotsPage() {
         </div>
         <label className="mb-4 flex items-center gap-2 rounded-xl border border-border bg-surface/70 px-3.5 py-3">
           <Search size={15} className="text-text-3" />
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن سيرفر..." className="w-full bg-transparent text-xs text-text outline-none placeholder:text-text-3" />
+          <input type="search" aria-label="البحث عن سيرفر" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن سيرفر..." className="w-full bg-transparent text-xs text-text outline-none placeholder:text-text-3" />
         </label>
 
         <div className="space-y-3">
