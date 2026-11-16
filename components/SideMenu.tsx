@@ -18,9 +18,9 @@ const homeItems = [
 
 const dashboardItems = [
   { id: "servers", label: "السيرفرات", href: "/servers", icon: Server },
-  { id: "bots", label: "البوتات", href: "/servers#bots", icon: Bot },
+  { id: "bots", label: "البوتات", href: "/bots", icon: Bot },
   { id: "pairing", label: "ربط بوت", href: "/#home", icon: MessageCircle },
-  { id: "system", label: "معلومات النظام", href: "/servers#system", icon: Cpu },
+  { id: "system", label: "معلومات النظام", href: "/info", icon: Cpu },
   { id: "developers", label: "المطور", href: "/#developers", icon: Code2 },
 ];
 
