@@ -73,12 +73,12 @@ export default function SideMenu({
             <nav className="flex-1 space-y-1 overflow-y-auto" aria-label="القائمة الجانبية">
               {mode === "home" ? (
                 <button type="button" onClick={() => { onNavigate?.("home"); close(); }}
-                  className={`flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-right text-[13px] font-medium transition ${activePage === "home" ? "bg-primary/10 text-primary" : "text-text-2 hover:bg-surface-2 hover:text-text"}`}>
+                  className={`ui-interactive flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-right text-[13px] font-medium transition ${activePage === "home" ? "bg-primary/10 text-primary" : "text-text-2 hover:bg-surface-2 hover:text-text"}`}>
                   <MessageCircle size={17} /><span>ربط بوت</span>{activePage === "home" && <span className="mr-auto size-1.5 rounded-full bg-primary" />}
                 </button>
               ) : (
                 <Link href="/#home" onClick={close}
-                  className="flex items-center gap-3 rounded-xl px-3.5 py-3 text-[13px] font-medium text-text-2 transition hover:bg-surface-2 hover:text-text">
+                  className="ui-interactive flex items-center gap-3 rounded-xl px-3.5 py-3 text-[13px] font-medium text-text-2 transition hover:bg-surface-2 hover:text-text">
                   <MessageCircle size={17} /><span>ربط بوت</span>
                 </Link>
               )}
@@ -86,7 +86,7 @@ export default function SideMenu({
                 const Icon = item.icon;
                 const active = activePage === item.id;
                 return mode === "home" ? <button key={item.id} type="button" onClick={() => { onNavigate?.(item.id); close(); }}
-                  className={`flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-right text-[13px] font-medium transition ${active ? "bg-primary/10 text-primary" : "text-text-2 hover:bg-surface-2 hover:text-text"}`}>
+                  className={`ui-interactive flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-right text-[13px] font-medium transition ${active ? "bg-primary/10 text-primary" : "text-text-2 hover:bg-surface-2 hover:text-text"}`}>
                   <Icon size={17} /><span>{item.label}</span>{active && <span className="mr-auto size-1.5 rounded-full bg-primary" />}
                 </button> : <Link key={item.id} href={`/#${item.id}`} onClick={close}
                   className="flex items-center gap-3 rounded-xl px-3.5 py-3 text-[13px] font-medium text-text-2 transition hover:bg-surface-2 hover:text-text">
@@ -97,7 +97,8 @@ export default function SideMenu({
                 const Icon = item.icon;
                 const active = activePage === item.id;
                 return <Link key={item.id} href={item.href} onClick={close}
-                  className={`flex items-center gap-3 rounded-xl px-3.5 py-3 text-[13px] font-medium transition ${active ? "bg-primary/10 text-primary" : "text-text-2 hover:bg-surface-2 hover:text-text"}`}>
+                  aria-current={active ? "page" : undefined}
+                  className={`ui-interactive flex items-center gap-3 rounded-xl px-3.5 py-3 text-[13px] font-medium transition ${active ? "bg-primary/10 text-primary" : "text-text-2 hover:bg-surface-2 hover:text-text"}`}>
                   <Icon size={17} /><span>{item.label}</span>{active && <span className="mr-auto size-1.5 rounded-full bg-primary" />}
                 </Link>;
               })}
