@@ -59,7 +59,7 @@ export default function SideMenu({
             </div>
             <div className="mb-3 px-2 text-[10px] font-bold tracking-wider text-text-3">التنقل بين الصفحات</div>
             <nav className="flex-1 space-y-1 overflow-y-auto" aria-label="القائمة الجانبية">
-              {homeItems.map((item) => {
+              {homeItems.filter((item) => mode === "home" || item.id !== "home").map((item) => {
                 const Icon = item.icon;
                 const active = activePage === item.id;
                 return mode === "home" ? <button key={item.id} type="button" onClick={() => { onNavigate?.(item.id); close(); }}
