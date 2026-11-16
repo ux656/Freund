@@ -25,6 +25,8 @@ export default function PairingFlow() {
   const isVerifyingRef = useRef(false);
   const activeSessionRef = useRef<string | null>(null);
   const [isRequesting, setIsRequesting] = useState(false);
+  const requestGenerationRef = useRef(0);
+  const requestInFlightRef = useRef(false);
   const [error, setError] = useState("");
   const [rateLimit, setRateLimit] = useState("");
   const [copied, setCopied] = useState(false);
@@ -150,7 +152,9 @@ export default function PairingFlow() {
 
   /* ===== Generate ===== */
   const handleGenerate = async () => {
-    if (isRequesting) return;
+    if (requestInFlightRef.current) return;
+    requestInFlightRef.current = true;
+    const generation = ++requestGenerationRef.current;
     setIsRequesting(true);
     setError("");
     setRateLimit("");
@@ -158,6 +162,8 @@ export default function PairingFlow() {
     try {
       const nationalPhone = phone.replace(/\D/g, "").replace(/^0+/, "");
       const res = await requestPairing({ phone: country.code + nationalPhone });
+      // A reset or newer request invalidates this response.
+      if (generation !== requestGenerationRef.current) return;
       syncTime(res.serverTime);
 
       if (res.ok) {
@@ -198,7 +204,10 @@ export default function PairingFlow() {
     } catch {
       setError("تعذر الاتصال بالخادم. تحقق من اتصالك وحاول مرة أخرى.");
     } finally {
-      setIsRequesting(false);
+      if (generation === requestGenerationRef.current) {
+        requestInFlightRef.current = false;
+        setIsRequesting(false);
+      }
     }
   };
 
@@ -228,6 +237,9 @@ export default function PairingFlow() {
   };
 
   const reset = () => {
+    // Invalidate any pairing request that is still awaiting the server.
+    requestGenerationRef.current += 1;
+    requestInFlightRef.current = false;
     stopPolling();
     activeSessionRef.current = null;
     if (confirmationTimeoutRef.current) clearTimeout(confirmationTimeoutRef.current);
@@ -247,6 +259,8 @@ export default function PairingFlow() {
   };
 
   useEffect(() => () => {
+    requestGenerationRef.current += 1;
+    requestInFlightRef.current = false;
     if (confirmationTimeoutRef.current) clearTimeout(confirmationTimeoutRef.current);
     stopPolling();
   }, [stopPolling]);
