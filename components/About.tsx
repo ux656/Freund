@@ -33,13 +33,13 @@ export default function About() {
         <div className="relative">
           <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/[0.08] px-3 py-1.5 text-[11px] text-primary">
             <span className="size-1.5 rounded-full bg-primary" />
-            تعرّف على Freund
+            تعرّف على BMG
           </span>
           <h1 className="max-w-xl font-display text-3xl font-bold leading-tight sm:text-4xl">
             ربط أبسط، وتجربة أوضح
           </h1>
           <p className="mt-4 max-w-xl text-sm leading-8 text-text-2 sm:text-base">
-            Freund واجهة تساعدك على بدء عملية ربط رقم واتساب بخطوات مرتبة،
+            BMG بوت تساعدك على بدء عملية ربط رقم واتساب بخطوات مرتبة،
             مع توضيح ما تحتاج إليه في كل مرحلة.
           </p>
           <div className="mt-6 flex flex-wrap gap-2">
