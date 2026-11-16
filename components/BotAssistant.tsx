@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
@@ -31,15 +31,23 @@ function RebootMascot({ className = "h-9 w-12" }: { className?: string }) {
 
 export default function BotAssistant() {
   const [open, setOpen] = useState(false);
+  const replyTimeoutsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
   const [messages, setMessages] = useState<{ role: "bot" | "user"; text: string }[]>([
     { role: "bot", text: "مرحباً! أنا Reboot. كيف يمكنني مساعدتك؟" },
   ]);
 
+  useEffect(() => () => {
+    replyTimeoutsRef.current.forEach((timeout) => window.clearTimeout(timeout));
+    replyTimeoutsRef.current.clear();
+  }, []);
+
   const ask = (action: string, label: string) => {
     setMessages((m) => [...m, { role: "user", text: label }]);
-    window.setTimeout(() => {
+    const timeout = window.setTimeout(() => {
+      replyTimeoutsRef.current.delete(timeout);
       setMessages((m) => [...m, { role: "bot", text: responses[action] || "عذراً، لم أفهم." }]);
     }, 450);
+    replyTimeoutsRef.current.add(timeout);
   };
 
   return (
