@@ -91,10 +91,22 @@ export default function PairingFlow() {
         }
         if (res.code) setCode(res.code);
         if (!res.ok) {
-          setVerifyState("expired");
-          stopPolling();
+          // Only a missing session is terminal. Network, rate-limit, and
+          // upstream failures are temporary and must not be shown as expiry.
+          if (res.error === "session_not_found") {
+            setVerifyState("expired");
+            stopPolling();
+          } else if (!auto) {
+            const waitSeconds = Math.ceil((res.retryAfterMs || 0) / 1000);
+            setRateLimit(
+              res.error === "too_many_checks" && waitSeconds > 0
+                ? `طلبات التحقق كثيرة. أعد المحاولة بعد ${waitSeconds} ثانية.`
+                : "تعذر التحقق مؤقتًا. ستستمر محاولة التحقق تلقائيًا."
+            );
+          }
           return;
         }
+        setRateLimit("");
         if (res.status === "confirmed") {
           setVerifyState("confirmed");
           stopPolling();
