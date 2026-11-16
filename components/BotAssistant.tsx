@@ -31,7 +31,7 @@ function RebootMascot({ className = "h-9 w-12" }: { className?: string }) {
 
 export default function BotAssistant() {
   const [open, setOpen] = useState(false);
-  const replyTimeoutsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+  const replyTimeoutsRef = useRef<Set<ReturnType<typeof window.setTimeout>>>(new Set());
   const [messages, setMessages] = useState<{ role: "bot" | "user"; text: string }[]>([
     { role: "bot", text: "مرحباً! أنا Reboot. كيف يمكنني مساعدتك؟" },
   ]);
