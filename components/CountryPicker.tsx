@@ -71,7 +71,13 @@ export default function CountryPicker({ value, onChange }: { value: Country; onC
     };
   }, [open]);
 
-  const filtered = useMemo(() => COUNTRIES.filter(c => (c.name + c.code).toLowerCase().includes(query.trim().toLowerCase())), [query]);
+  const filtered = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    if (!normalizedQuery) return COUNTRIES;
+    return COUNTRIES.filter((country) =>
+      (country.name + country.code).toLowerCase().includes(normalizedQuery)
+    );
+  }, [query]);
 
   return (
     <>
