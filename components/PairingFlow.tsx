@@ -121,54 +121,72 @@ export default function PairingFlow() {
     setIsRequesting(true);
     setError("");
     setRateLimit("");
-    const res = await requestPairing({
-      phone,
-      captchaAnswer: captchaExpected !== null ? captchaInput : undefined,
-      captchaExpected: captchaExpected ?? undefined,
-    });
-    syncTime(res.serverTime);
 
-    if (res.ok) {
-      setSessionId(res.sessionId!);
-      setCode(res.code || null);
-      setExpiresAt(res.expiresAt!);
-      setCooldownUntil(res.nextAllowedAt!);
-      setVerifyState("awaiting");
-      setCaptchaExpected(null);
-      setCaptchaInput("");
-      setStep(2);
-      setIsRequesting(false);
-      return;
-    }
+    try {
+      const res = await requestPairing({
+        phone,
+        captchaAnswer: captchaExpected !== null ? captchaInput : undefined,
+        captchaExpected: captchaExpected ?? undefined,
+      });
+      syncTime(res.serverTime);
 
-    if (res.error === "captcha_required" || res.error === "captcha_wrong") {
-      const a = Math.floor(Math.random() * 8) + 2;
-      const b = Math.floor(Math.random() * 8) + 2;
-      setCaptchaA(a);
-      setCaptchaB(b);
-      setCaptchaExpected(a + b);
-      if (res.error === "captcha_wrong") setRateLimit("الإجابة غير صحيحة. حاول مرة أخرى.");
+      if (res.ok) {
+        setSessionId(res.sessionId!);
+        setCode(res.code || null);
+        setExpiresAt(res.expiresAt!);
+        setCooldownUntil(res.nextAllowedAt!);
+        setVerifyState("awaiting");
+        setCaptchaExpected(null);
+        setCaptchaInput("");
+        setStep(2);
+        return;
+      }
+
+      if (res.error === "captcha_required" || res.error === "captcha_wrong") {
+        const a = Math.floor(Math.random() * 8) + 2;
+        const b = Math.floor(Math.random() * 8) + 2;
+        setCaptchaA(a);
+        setCaptchaB(b);
+        setCaptchaExpected(a + b);
+        if (res.error === "captcha_wrong") setRateLimit("الإجابة غير صحيحة. حاول مرة أخرى.");
+        return;
+      }
+      if (res.error === "cooldown") {
+        setCooldownUntil(serverNow() + (res.retryAfterMs || 0));
+        setRateLimit(`انتظر ${Math.ceil((res.retryAfterMs || 0) / 1000)} ثانية قبل طلب رمز جديد.`);
+        return;
+      }
+      if (res.error === "phone_limit") {
+        setRateLimit(`تجاوزت الحد المسموح (${MOCK_LIMITS.perPhoneHourly} رموز/ساعة لهذا الرقم).`);
+        return;
+      }
+      if (res.error === "ip_limit") {
+        setRateLimit("تم تقييد الشبكة مؤقتًا. حاول لاحقًا.");
+        return;
+      }
+      setError("حدث خطأ غير متوقع. حاول لاحقًا.");
+    } catch {
+      setError("تعذر الاتصال بالخادم. تحقق من اتصالك وحاول مرة أخرى.");
+    } finally {
       setIsRequesting(false);
-      return;
     }
-    if (res.error === "cooldown") {
-      setCooldownUntil(serverNow() + (res.retryAfterMs || 0));
-      setRateLimit(`انتظر ${Math.ceil((res.retryAfterMs || 0) / 1000)} ثانية قبل طلب رمز جديد.`);
-      setIsRequesting(false);
-      return;
-    }
-    if (res.error === "phone_limit") {
-      setRateLimit(`تجاوزت الحد المسموح (${MOCK_LIMITS.perPhoneHourly} رموز/ساعة لهذا الرقم).`);
-      setIsRequesting(false);
-      return;
-    }
-    if (res.error === "ip_limit") {
-      setRateLimit("تم تقييد الشبكة مؤقتًا. حاول لاحقًا.");
-      setIsRequesting(false);
-      return;
-    }
-    setError("حدث خطأ غير متوقع. حاول لاحقًا.");
-    setIsRequesting(false);
+  };
+
+  const handleRetry = () => {
+    if (isRequesting || cooldownSec > 0 || !phone) return;
+
+    stopPolling();
+    isVerifyingRef.current = false;
+    setSessionId(null);
+    setCode(null);
+    setExpiresAt(0);
+    setRemainingSec(60);
+    setVerifyState("idle");
+    setError("");
+    setRateLimit("");
+    setCaptchaExpected(null);
+    setCaptchaInput("");
+    void handleGenerate();
   };
 
   const copyCode = async () => {
@@ -458,11 +476,15 @@ export default function PairingFlow() {
             </button>
 
             <button
-              onClick={reset}
-              disabled={cooldownSec > 0}
+              onClick={handleRetry}
+              disabled={cooldownSec > 0 || isRequesting}
               className="w-full rounded-glass-sm border border-border bg-surface px-5 py-3 text-[13px] font-medium text-text-2 transition-all hover:bg-surface-2 hover:text-text disabled:cursor-not-allowed disabled:opacity-40"
             >
-              {cooldownSec > 0 ? `انتظر ${cooldownSec} ثانية` : "لم ينجح؟ طلب رمز جديد"}
+              {isRequesting
+                ? "جاري طلب رمز جديد..."
+                : cooldownSec > 0
+                  ? `انتظر ${cooldownSec} ثانية`
+                  : "لم ينجح؟ طلب رمز جديد"}
             </button>
           </motion.div>
         )}
