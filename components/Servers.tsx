@@ -5,6 +5,7 @@ import { Activity, Clock3, Cpu, RefreshCw, Server, ShieldCheck, Wifi, WifiOff } 
 import PageHeader from "@/components/ui/PageHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
 import ErrorState from "@/components/ui/ErrorState";
+import LoadingState from "@/components/ui/LoadingState";
 import PageEntrance from "./PageEntrance";
 
 type CheckResult = { ok?: boolean; reachable?: boolean; serviceStatus?: string; checkedAt?: string; error?: string };
@@ -17,7 +18,8 @@ function formatTime(value?: string) {
 }
 
 export default function Servers() {
-  const [checking, setChecking] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const [hasChecked, setHasChecked] = useState(false);
   const [reachable, setReachable] = useState<boolean | null>(null);
   const [serviceStatus, setServiceStatus] = useState("");
   const [checkedAt, setCheckedAt] = useState("");
@@ -41,6 +43,7 @@ export default function Servers() {
       setCheckError("حدث خطأ أثناء الاتصال. تحقق من الشبكة ثم أعد الفحص.");
     } finally {
       setChecking(false);
+      setHasChecked(true);
     }
   }, []);
 
@@ -57,7 +60,13 @@ export default function Servers() {
         </button>
       } />
 
+      {!hasChecked ? (
+        <section className="lg lg-surface rounded-2xl p-4 sm:p-5" aria-label="تحميل حالة الخادم">
+          <LoadingState label="جارٍ فحص اتصال خادم BMG..." />
+        </section>
+      ) : (
       <section aria-live="polite" aria-busy={checking} className={`lg lg-surface rounded-2xl p-4 transition-all duration-300 sm:p-5 ${checking ? "ring-1 ring-primary/20" : ""}`}>
+
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <span className="grid size-11 place-items-center rounded-xl bg-primary/10 text-primary"><Server size={21} /></span>
@@ -77,6 +86,7 @@ export default function Servers() {
         <div className="mt-3 rounded-xl bg-surface/60 p-3"><div className="mb-1 flex items-center gap-2 text-[10px] text-text-3"><Activity size={12} />استجابة الخدمة</div><div className="text-sm font-bold" dir="ltr">{serviceStatus || "CHECKING"}</div></div>
         {checkError && <div className="mt-3"><ErrorState>{checkError}</ErrorState></div>}
       </section>
+      )}
 
       <section className="lg lg-surface mt-4 rounded-2xl p-4 sm:p-5">
         <div className="mb-2 flex items-center gap-2 text-primary"><Cpu size={16} /><h2 className="text-sm font-bold text-text">معلومات النظام</h2></div>
