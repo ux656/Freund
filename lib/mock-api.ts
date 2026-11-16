@@ -18,10 +18,12 @@ export type PairingResult =
       serverTime?: number;
     };
 
+export type SessionState = "awaiting" | "confirmed" | "expired";
+
 export type SessionStatus =
   | {
       ok: true;
-      status: "awaiting" | "confirmed" | "expired";
+      status: SessionState;
       code?: string;
       expiresAt?: number;
       serverTime?: number;
@@ -104,7 +106,7 @@ export async function checkSession({ sessionId }: { sessionId: string }): Promis
     }
 
     const rawStatus = readApiString(data.status);
-    const status: SessionStatus["status"] | undefined =
+    const status: SessionState | undefined =
       rawStatus === "linked"
         ? "confirmed"
         : rawStatus === "expired" || rawStatus === "failed"
