@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import ThemeToggle from "./ui/ThemeToggle";
+import Link from "next/link";
 
 const links = [
   { id: "home", label: "الربط" },
@@ -51,6 +52,12 @@ export default function Navbar({
           </button>
         ))}
       </nav>
+      <Link
+        href="/dashboard"
+        className="shrink-0 rounded-pill border border-primary/25 bg-primary/10 px-3 py-2 text-xs font-semibold text-primary transition hover:bg-primary/15"
+      >
+        لوحة التحكم
+      </Link>
       <ThemeToggle />
     </header>
   );
