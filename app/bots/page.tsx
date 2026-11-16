@@ -20,35 +20,35 @@ export default function BotsPage() {
 
   return (
     <PageEntrance>
-    <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-5 pb-20 pt-8">
+    <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-4 pb-20 pt-6 sm:px-5 sm:pt-8">
       <PageHeader eyebrow="BOT MANAGEMENT" title="جلسات البوتات" description="السيرفرات وبوابات الربط المسجلة لتشغيل البوتات الفرعية." activePage="bots" />
 
-      <a href="/#home" className="mb-5 flex items-center justify-between rounded-2xl border border-primary/25 bg-primary/5 p-4 transition hover:bg-primary/10">
-        <span className="flex items-center gap-3"><span className="grid size-10 place-items-center rounded-xl bg-primary/10 text-primary"><Bot size={19} /></span><span><strong className="block text-xs">ربط بوت جديد</strong><span className="mt-1 block text-[10px] text-text-3">الانتقال إلى خطوات ربط واتساب</span></span></span>
-        <ArrowUpLeft size={17} className="text-primary" />
+      <a href="/#home" className="ui-interactive mb-5 flex min-w-0 items-center justify-between gap-3 rounded-2xl border border-primary/25 bg-primary/5 p-3.5 hover:bg-primary/10 sm:p-4">
+        <span className="flex min-w-0 items-center gap-3"><span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary"><Bot size={19} /></span><span className="min-w-0"><strong className="block text-xs">ربط بوت جديد</strong><span className="mt-1 block text-[10px] text-text-3">الانتقال إلى خطوات ربط واتساب</span></span></span>
+        <ArrowUpLeft size={17} className="shrink-0 text-primary" />
       </a>
 
-      <section className="lg lg-surface rounded-2xl p-4 sm:p-5">
-        <div className="mb-4 flex items-center justify-between gap-3">
+      <section className="lg lg-surface rounded-2xl p-3.5 sm:p-5">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <div><h2 className="text-sm font-bold">السيرفرات المسجلة</h2><p className="mt-1 text-[11px] text-text-3">بوابات تشغيل جلسات البوت</p></div>
           <StatusBadge>{botServers.length} سيرفر</StatusBadge>
         </div>
-        <label className="mb-4 flex items-center gap-2 rounded-xl border border-border bg-surface/70 px-3.5 py-3">
-          <Search size={15} className="text-text-3" />
-          <input type="search" aria-label="البحث عن سيرفر" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن سيرفر..." className="w-full bg-transparent text-xs text-text outline-none placeholder:text-text-3" />
+        <label className="mb-4 flex min-h-11 items-center gap-2 rounded-xl border border-border bg-surface/70 px-3.5 py-2.5 focus-within:border-primary/60">
+          <Search size={15} className="shrink-0 text-text-3" />
+          <input type="search" aria-label="البحث عن سيرفر" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث عن سيرفر..." className="min-w-0 w-full bg-transparent text-xs text-text outline-none placeholder:text-text-3" />
         </label>
 
         <div className="space-y-3">
           {filtered.map((server) => (
-            <article key={server.id} className="ui-card p-4">
-              <div className="flex items-start justify-between gap-3">
+            <article key={server.id} className="ui-card p-3.5 sm:p-4">
+              <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
                   <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary"><Server size={19} /></span>
-                  <div className="min-w-0"><h3 className="truncate text-xs font-bold" dir="ltr">{server.name}</h3><p className="mt-1 text-[10px] text-text-3">{server.description}</p></div>
+                  <div className="min-w-0"><h3 className="truncate text-xs font-bold" dir="ltr">{server.name}</h3><p className="mt-1 break-words text-[10px] text-text-3">{server.description}</p></div>
                 </div>
                 <StatusBadge tone="success" dir="ltr"><Wifi size={11} />{server.status}</StatusBadge>
               </div>
-              <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3 text-[10px]">
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-3 text-[10px]">
                 <span className="text-text-3">{server.kind}</span>
                 <span className="text-text-2" dir="ltr">GATEWAY</span>
               </div>
