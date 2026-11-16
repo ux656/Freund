@@ -3,8 +3,8 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "ربط البوت برقم واتساب",
-  description: "اربط رقمك بواتساب وابدأ الآن — واجهة زجاجية سائلة",
+  title: "BMG Bot | ربط واتساب",
+  description: "اربط رقمك ببوت BMG عبر واتساب.",
 };
 
 export const viewport: Viewport = {
