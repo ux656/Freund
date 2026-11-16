@@ -49,10 +49,12 @@ export default function BotAssistant() {
   }, []);
 
   const ask = (action: AssistantAction, label: string) => {
-    setMessages((current) => [...current, { role: "user", text: label }].slice(-MAX_MESSAGES));
+    const userMessage: AssistantMessage = { role: "user", text: label };
+    setMessages((current) => [...current, userMessage].slice(-MAX_MESSAGES));
     const timeout: number = window.setTimeout(() => {
       replyTimeoutsRef.current.delete(timeout);
-      setMessages((current) => [...current, { role: "bot", text: responses[action] }].slice(-MAX_MESSAGES));
+      const botMessage: AssistantMessage = { role: "bot", text: responses[action] };
+      setMessages((current) => [...current, botMessage].slice(-MAX_MESSAGES));
     }, 450);
     replyTimeoutsRef.current.add(timeout);
   };
@@ -106,7 +108,7 @@ export default function BotAssistant() {
             <div role="log" aria-label="رسائل المحادثة" aria-live="polite" aria-relevant="additions" className="flex min-h-0 max-h-[32vh] flex-col gap-2 overflow-y-auto bg-bg p-3">
               {messages.map((m, i) => (
                 <div
-                  key={i}
+                  key={`${m.role}-${i}`}
                   className={
                     m.role === "bot"
                       ? "max-w-[88%] self-start rounded-2xl rounded-br-sm border border-border bg-surface px-3 py-2 text-xs leading-6"
@@ -122,6 +124,7 @@ export default function BotAssistant() {
               {actions.map((a) => (
                 <button
                   key={a.action}
+                  type="button"
                   onClick={() => ask(a.action, a.label)}
                   className="ui-interactive min-h-9 rounded-xl border border-border bg-surface px-2 py-2 text-center text-[11px] leading-4 text-text-2 transition-colors hover:border-primary hover:text-primary active:scale-[0.98]"
                 >
