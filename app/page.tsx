@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import PairingFlow from "@/components/PairingFlow";
@@ -15,21 +15,28 @@ import BotAssistant from "@/components/BotAssistant";
 export default function Home() {
   const [activePage, setActivePage] = useState("home");
 
+  useEffect(() => {
+    const section = window.location.hash.slice(1);
+    if (["home", "about", "features", "faq", "developers", "privacy"].includes(section)) {
+      setActivePage(section);
+    }
+  }, []);
+
   return (
     <>
       <Navbar activePage={activePage} onNavigate={setActivePage} />
       <main className="flex-1 max-w-3xl mx-auto w-full px-5 pb-20 pt-12">
         {activePage === "home" && (
-          <div className="space-y-8">
+          <div id="home" className="space-y-8">
             <Hero />
             <PairingFlow />
           </div>
         )}
-        {activePage === "about" && <About />}
-        {activePage === "features" && <Features />}
-        {activePage === "faq" && <FAQ />}
-        {activePage === "developers" && <Developers />}
-        {activePage === "privacy" && <Privacy />}
+        {activePage === "about" && <div id="about"><About /></div>}
+        {activePage === "features" && <div id="features"><Features /></div>}
+        {activePage === "faq" && <div id="faq"><FAQ /></div>}
+        {activePage === "developers" && <div id="developers"><Developers /></div>}
+        {activePage === "privacy" && <div id="privacy"><Privacy /></div>}
       </main>
       <Footer />
       <BotAssistant />
