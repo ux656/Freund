@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  Activity, Bot, Code2, Cpu, Home, Info, LockKeyhole,
+  Activity, Bot, Code2, Cpu, Info, LockKeyhole,
   Menu, MessageCircle, Server, X, Zap
 } from "lucide-react";
 
@@ -19,9 +19,7 @@ const homeItems = [
 const dashboardItems = [
   { id: "servers", label: "السيرفرات", href: "/servers", icon: Server },
   { id: "bots", label: "البوتات", href: "/bots", icon: Bot },
-  { id: "pairing", label: "ربط بوت", href: "/#home", icon: MessageCircle },
   { id: "system", label: "معلومات النظام", href: "/info", icon: Cpu },
-  { id: "developers", label: "المطور", href: "/#developers", icon: Code2 },
 ];
 
 export default function SideMenu({
@@ -59,16 +57,17 @@ export default function SideMenu({
               <button type="button" onClick={close} aria-label="إغلاق القائمة"
                 className="grid size-9 place-items-center rounded-xl text-text-2 transition hover:bg-surface-2"><X size={18} /></button>
             </div>
-            <div className="mb-3 px-2 text-[10px] font-bold tracking-wider text-text-3">{mode === "dashboard" ? "إدارة البوت" : "التنقل"}</div>
-            <nav className="flex-1 space-y-1" aria-label="القائمة الجانبية">
-              {mode === "home" ? homeItems.map((item) => {
+            <div className="mb-3 px-2 text-[10px] font-bold tracking-wider text-text-3">التنقل بين الصفحات</div>
+            <nav className="flex-1 space-y-1 overflow-y-auto" aria-label="القائمة الجانبية">
+              {mode === "home" && homeItems.map((item) => {
                 const Icon = item.icon;
                 const active = activePage === item.id;
                 return <button key={item.id} type="button" onClick={() => { onNavigate?.(item.id); close(); }}
                   className={`flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-right text-[13px] font-medium transition ${active ? "bg-primary/10 text-primary" : "text-text-2 hover:bg-surface-2 hover:text-text"}`}>
                   <Icon size={17} /><span>{item.label}</span>{active && <span className="mr-auto size-1.5 rounded-full bg-primary" />}
                 </button>;
-              }) : dashboardItems.map((item) => {
+              })}
+              {dashboardItems.map((item) => {
                 const Icon = item.icon;
                 const active = activePage === item.id;
                 return <Link key={item.id} href={item.href} onClick={close}
@@ -76,11 +75,10 @@ export default function SideMenu({
                   <Icon size={17} /><span>{item.label}</span>{active && <span className="mr-auto size-1.5 rounded-full bg-primary" />}
                 </Link>;
               })}
-              {mode === "home" && (
-                <Link href="/servers" onClick={close}
-                  className="mt-3 flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 px-3.5 py-3 text-[13px] font-semibold text-primary transition hover:bg-primary/10">
-                  <Home size={17} />
-                  <span>سيرفرات التشغيل</span>
+              {mode === "dashboard" && (
+                <Link href="/#home" onClick={close}
+                  className="flex items-center gap-3 rounded-xl px-3.5 py-3 text-[13px] font-medium text-text-2 transition hover:bg-surface-2 hover:text-text">
+                  <MessageCircle size={17} /><span>ربط بوت</span>
                 </Link>
               )}
             </nav>
