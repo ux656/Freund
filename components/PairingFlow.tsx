@@ -6,6 +6,7 @@ import { Copy, Check, Loader2, Smartphone, KeyRound, ShieldCheck } from "lucide-
 import CountryPicker, { COUNTRIES, type Country } from "@/components/CountryPicker";
 import { cn } from "@/lib/utils";
 import { requestPairing, checkSession } from "@/lib/mock-api";
+import { getPairingRequestErrorMessage, getSessionCheckErrorMessage } from "@/lib/api-client";
 
 type Step = 1 | 2 | 3;
 
@@ -103,12 +104,7 @@ export default function PairingFlow() {
             setVerifyState("expired");
             stopPolling();
           } else if (!auto) {
-            const waitSeconds = Math.ceil((res.retryAfterMs || 0) / 1000);
-            setRateLimit(
-              res.error === "too_many_checks" && waitSeconds > 0
-                ? `طلبات التحقق كثيرة. أعد المحاولة بعد ${waitSeconds} ثانية.`
-                : "تعذر التحقق مؤقتًا. ستستمر محاولة التحقق تلقائيًا."
-            );
+            setRateLimit(getSessionCheckErrorMessage(res.error, res.retryAfterMs));
           }
           return;
         }
@@ -179,7 +175,7 @@ export default function PairingFlow() {
 
       if (res.error === "cooldown") {
         setCooldownUntil(serverNow() + (res.retryAfterMs || 0));
-        setRateLimit(`انتظر ${Math.ceil((res.retryAfterMs || 0) / 1000)} ثانية قبل المحاولة مرة أخرى.`);
+        setRateLimit(getPairingRequestErrorMessage(res.error, res.retryAfterMs));
         return;
       }
       if (res.error === "phone_limit") {
@@ -189,20 +185,20 @@ export default function PairingFlow() {
         setCode(null);
         setExpiresAt(0);
         setStep(1);
-        setRateLimit("استهلكت المحاولات الخمس لهذا الرقم خلال الساعة. يمكنك بدء اقتران جديد بعد انتهاء المهلة.");
+        setRateLimit(getPairingRequestErrorMessage(res.error, res.retryAfterMs));
         return;
       }
       if (res.error === "ip_limit") {
-        setRateLimit("تم تقييد الشبكة مؤقتًا. حاول لاحقًا.");
+        setRateLimit(getPairingRequestErrorMessage(res.error, res.retryAfterMs));
         return;
       }
       if (res.error === "invalid_response") {
-        setError("استجابة الخادم غير مكتملة. لم يتم بدء جلسة الاقتران؛ حاول مرة أخرى.");
+        setError(getPairingRequestErrorMessage(res.error, res.retryAfterMs));
         return;
       }
-      setError("حدث خطأ غير متوقع. حاول لاحقًا.");
+      setError(getPairingRequestErrorMessage(res.error, res.retryAfterMs));
     } catch {
-      setError("تعذر الاتصال بالخادم. تحقق من اتصالك وحاول مرة أخرى.");
+      setError(getPairingRequestErrorMessage("network_error"));
     } finally {
       if (generation === requestGenerationRef.current) {
         requestInFlightRef.current = false;
