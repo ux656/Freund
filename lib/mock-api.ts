@@ -40,6 +40,7 @@ export interface SessionStatus {
   expiresAt?: number;
   serverTime?: number;
   error?: string;
+  retryAfterMs?: number;
 }
 
 export async function requestPairing({ phone }: { phone: string }): Promise<PairingResult> {
@@ -102,7 +103,14 @@ export async function checkSession({ sessionId }: { sessionId: string }): Promis
     if (!response.ok) {
       return {
         ok: false,
-        error: readString(data.error) || "session_not_found",
+        error: readString(data.error) || (
+          response.status === 404
+            ? "session_not_found"
+            : response.status === 429
+              ? "too_many_checks"
+              : "session_check_failed"
+        ),
+        retryAfterMs: readNumber(data.retryAfterMs),
         serverTime: readNumber(data.serverTime) || Date.now(),
       };
     }
