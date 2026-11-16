@@ -17,11 +17,10 @@ const homeItems = [
 ];
 
 const dashboardItems = [
-  { id: "dashboard", label: "لوحة التحكم", href: "/dashboard", icon: Home },
-  { id: "servers", label: "السيرفرات", href: "/dashboard#servers", icon: Server },
-  { id: "bots", label: "البوتات", href: "/dashboard#bots", icon: Bot },
+  { id: "servers", label: "السيرفرات", href: "/servers", icon: Server },
+  { id: "bots", label: "البوتات", href: "/servers#bots", icon: Bot },
   { id: "pairing", label: "ربط بوت", href: "/#home", icon: MessageCircle },
-  { id: "system", label: "معلومات النظام", href: "/dashboard#system", icon: Cpu },
+  { id: "system", label: "معلومات النظام", href: "/info", icon: Cpu },
   { id: "developers", label: "المطور", href: "/#developers", icon: Code2 },
 ];
 
@@ -78,10 +77,10 @@ export default function SideMenu({
                 </Link>;
               })}
               {mode === "home" && (
-                <Link href="/dashboard" onClick={close}
+                <Link href="/servers" onClick={close}
                   className="mt-3 flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 px-3.5 py-3 text-[13px] font-semibold text-primary transition hover:bg-primary/10">
                   <Home size={17} />
-                  <span>لوحة التحكم</span>
+                  <span>سيرفرات التشغيل</span>
                 </Link>
               )}
             </nav>
