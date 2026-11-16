@@ -18,15 +18,20 @@ export type PairingResult =
       serverTime?: number;
     };
 
-export interface SessionStatus {
-  ok: boolean;
-  status?: "awaiting" | "confirmed" | "expired";
-  code?: string;
-  expiresAt?: number;
-  serverTime?: number;
-  error?: string;
-  retryAfterMs?: number;
-}
+export type SessionStatus =
+  | {
+      ok: true;
+      status: "awaiting" | "confirmed" | "expired";
+      code?: string;
+      expiresAt?: number;
+      serverTime?: number;
+    }
+  | {
+      ok: false;
+      error?: string;
+      retryAfterMs?: number;
+      serverTime?: number;
+    };
 
 export async function requestPairing({ phone }: { phone: string }): Promise<PairingResult> {
   try {
@@ -98,11 +103,23 @@ export async function checkSession({ sessionId }: { sessionId: string }): Promis
       };
     }
 
-    const status = data.status === "linked"
-      ? "confirmed"
-      : data.status === "expired" || data.status === "failed"
-        ? "expired"
-        : "awaiting";
+    const rawStatus = readApiString(data.status);
+    const status: SessionStatus["status"] | undefined =
+      rawStatus === "linked"
+        ? "confirmed"
+        : rawStatus === "expired" || rawStatus === "failed"
+          ? "expired"
+          : rawStatus === "pending" || rawStatus === "awaiting"
+            ? "awaiting"
+            : undefined;
+
+    if (!status) {
+      return {
+        ok: false,
+        error: "invalid_response",
+        serverTime: readApiNumber(data.serverTime) || Date.now(),
+      };
+    }
 
     return {
       ok: true,
