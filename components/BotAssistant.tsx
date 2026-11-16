@@ -31,7 +31,7 @@ function RebootMascot({ className = "h-9 w-12" }: { className?: string }) {
 
 export default function BotAssistant() {
   const [open, setOpen] = useState(false);
-  const replyTimeoutsRef = useRef<Set<ReturnType<typeof window.setTimeout>>>(new Set());
+  const replyTimeoutsRef = useRef<Set<number>>(new Set());
   const [messages, setMessages] = useState<{ role: "bot" | "user"; text: string }[]>([
     { role: "bot", text: "مرحباً! أنا Reboot. كيف يمكنني مساعدتك؟" },
   ]);
@@ -43,7 +43,7 @@ export default function BotAssistant() {
 
   const ask = (action: string, label: string) => {
     setMessages((m) => [...m, { role: "user", text: label }]);
-    const timeout = window.setTimeout(() => {
+    const timeout: number = window.setTimeout(() => {
       replyTimeoutsRef.current.delete(timeout);
       setMessages((m) => [...m, { role: "bot", text: responses[action] || "عذراً، لم أفهم." }]);
     }, 450);
