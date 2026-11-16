@@ -59,7 +59,7 @@ export default function InfoPage() {
         <SectionTitle icon={ShieldCheck} title="بيانات الخدمة" detail="معلومات تعريفية عن بوت BMG" />
         <div className="divide-y divide-border/60">
           <div className="flex items-center justify-between gap-3 py-3 text-xs"><span className="text-text-2">اسم البوت</span><strong dir="ltr">BMG BOT</strong></div>
-          <div className="flex items-center justify-between gap-3 py-3 text-xs"><span className="text-text-2">الجهة الداعمة</span><strong dir="ltr">MONTE</strong></div>
+          <div className="flex items-center justify-between gap-3 py-3 text-xs"><span className="text-text-2">الجهة الداعمة</span><strong dir="ltr">BMG</strong></div>
           <div className="flex items-center justify-between gap-3 py-3 text-xs"><span className="text-text-2">حالة البوابة</span><strong className="text-green" dir="ltr">ONLINE · PRIVATE GATEWAY</strong></div>
         </div>
       </section>
