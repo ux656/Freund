@@ -69,13 +69,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "invalid_bot_response", serverTime: Date.now() }, { status: 502 });
     }
     if (data.status === "failed") return NextResponse.json({ error: "pairing_failed", serverTime: Date.now() }, { status: 400 });
-    const serverTime = Date.now();
+    const botServerTime = data.serverTime;
+    const botExpiresAt = data.expiresAt;
+    if (!Number.isFinite(botServerTime) || !Number.isFinite(botExpiresAt)) {
+      return NextResponse.json({ error: "invalid_bot_time", serverTime: Date.now() }, { status: 502 });
+    }
     return NextResponse.json({
       sessionId: data.sessionId,
       code: typeof data.code === "string" ? data.code : undefined,
-      expiresAt: Number.isFinite(data.expiresAt) ? Math.min(data.expiresAt, serverTime + 60_000) : serverTime + 60_000,
-      nextAllowedAt: serverTime + 60_000,
-      serverTime,
+      expiresAt: botExpiresAt,
+      nextAllowedAt: botServerTime + 60_000,
+      serverTime: botServerTime,
     }, { headers: { "Cache-Control": "no-store, max-age=0", "Pragma": "no-cache" } });
   } catch {
     return NextResponse.json({ error: "bot_unreachable", serverTime: Date.now() }, { status: 502 });
