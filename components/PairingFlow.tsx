@@ -330,7 +330,7 @@ export default function PairingFlow() {
             className="space-y-4"
           >
             <div className="lg lg-surface rounded-glass p-5">
-              <label className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-text-2">
+              <label htmlFor="pairing-phone" className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-text-2">
                 رقم الهاتف مع كود الدولة
               </label>
               <div className="flex items-center overflow-hidden rounded-glass-sm border border-input bg-input" dir="ltr">
@@ -339,6 +339,7 @@ export default function PairingFlow() {
                   setError("");
                 }} />
                 <input
+                  id="pairing-phone"
                   type="tel"
                   value={phone}
                   onChange={(e) => {
@@ -402,9 +403,19 @@ export default function PairingFlow() {
           >
             {/* Code panel */}
             <div
+              role="button"
+              tabIndex={code ? 0 : -1}
+              aria-label={code ? "نسخ رمز الاقتران" : "جاري استلام رمز الاقتران"}
+              aria-disabled={!code}
               onClick={copyCode}
+              onKeyDown={(event) => {
+                if (code && (event.key === "Enter" || event.key === " ")) {
+                  event.preventDefault();
+                  void copyCode();
+                }
+              }}
               className={cn(
-                "lg lg-surface cursor-pointer rounded-glass p-5 text-center transition-transform active:scale-[0.995]",
+                "lg lg-surface cursor-pointer rounded-glass p-5 text-center transition-transform active:scale-[0.995] focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary",
                 !code && "cursor-default"
               )}
             >
