@@ -28,10 +28,10 @@ function cleanup(now: number) {
   const state = getStore();
   if (now - state.lastSweep < 60_000) return;
   state.lastSweep = now;
-  for (const [key, bucket] of state.buckets) {
+  state.buckets.forEach((bucket, key) => {
     bucket.hits = bucket.hits.filter((time) => now - time < HOUR);
     if (!bucket.hits.length && now - bucket.lastAt >= HOUR) state.buckets.delete(key);
-  }
+  });
   if (state.buckets.size > 20_000) {
     const oldest = [...state.buckets.entries()].sort((a, b) => a[1].lastAt - b[1].lastAt);
     for (const [key] of oldest.slice(0, state.buckets.size - 15_000)) state.buckets.delete(key);
