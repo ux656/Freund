@@ -18,8 +18,17 @@ export default function CountryPicker({ value, onChange }: { value: Country; onC
   useEffect(() => {
     if (!open) return;
     const previousOverflow = document.body.style.overflow;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = previousOverflow; };
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, [open]);
   const filtered = useMemo(() => COUNTRIES.filter(c => (c.name + c.code).toLowerCase().includes(query.trim().toLowerCase())), [query]);
   return (
