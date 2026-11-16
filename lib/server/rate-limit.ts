@@ -33,8 +33,10 @@ function cleanup(now: number) {
     if (!bucket.hits.length && now - bucket.lastAt >= HOUR) state.buckets.delete(key);
   });
   if (state.buckets.size > 20_000) {
-    const oldest = [...state.buckets.entries()].sort((a, b) => a[1].lastAt - b[1].lastAt);
-    for (const [key] of oldest.slice(0, state.buckets.size - 15_000)) state.buckets.delete(key);
+    const oldest: [string, Bucket][] = [];
+    state.buckets.forEach((bucket, key) => oldest.push([key, bucket]));
+    oldest.sort((a, b) => a[1].lastAt - b[1].lastAt);
+    oldest.slice(0, state.buckets.size - 15_000).forEach(([key]) => state.buckets.delete(key));
   }
 }
 function inspect(key: string, max: number, now: number, windowMs = HOUR, cooldownMs = COOLDOWN) {
