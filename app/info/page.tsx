@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Activity, Cpu, HardDrive, MemoryStick, Server, Smartphone, Users, Wifi, ShieldCheck } from "lucide-react";
-import SideMenu from "@/components/SideMenu";
+import PageHeader from "@/components/ui/PageHeader";
+import StatusBadge from "@/components/ui/StatusBadge";
 import PageEntrance from "@/components/PageEntrance";
 
 export const metadata: Metadata = {
@@ -33,14 +34,7 @@ export default function InfoPage() {
   return (
     <PageEntrance>
     <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-5 pb-20 pt-8">
-      <header className="mb-7 flex items-start gap-3">
-        <SideMenu mode="dashboard" activePage="system" />
-        <div className="min-w-0 flex-1">
-          <div className="mb-2 text-[10px] font-bold tracking-[.16em] text-primary">SYSTEM OVERVIEW</div>
-          <h1 className="font-display text-2xl font-bold sm:text-3xl">معلومات النظام</h1>
-          <p className="mt-2 text-xs leading-6 text-text-2">نظرة عامة على موارد تشغيل BMG والخدمة والجلسات المسجلة.</p>
-        </div>
-      </header>
+      <PageHeader eyebrow="SYSTEM OVERVIEW" title="معلومات النظام" description="نظرة عامة على موارد تشغيل BMG والخدمة والجلسات المسجلة." activePage="system" />
 
       <section className="mb-6">
         <SectionTitle icon={Activity} title="موارد النظام" detail="ملخص موارد الخادم حسب التقرير المتاح" />
@@ -62,7 +56,7 @@ export default function InfoPage() {
         <div className="divide-y divide-border/60">
           <div className="flex items-center justify-between gap-3 py-3 text-xs"><span className="text-text-2">اسم البوت</span><strong dir="ltr">BMG BOT</strong></div>
           <div className="flex items-center justify-between gap-3 py-3 text-xs"><span className="text-text-2">الجهة الداعمة</span><strong dir="ltr">BMG</strong></div>
-          <div className="flex items-center justify-between gap-3 py-3 text-xs"><span className="text-text-2">حالة البوابة</span><strong className="text-green" dir="ltr">ONLINE · PRIVATE GATEWAY</strong></div>
+          <div className="flex items-center justify-between gap-3 py-3 text-xs"><span className="text-text-2">حالة البوابة</span><StatusBadge tone="success" dir="ltr">ONLINE · PRIVATE GATEWAY</StatusBadge></div>
         </div>
       </section>
 
@@ -72,7 +66,7 @@ export default function InfoPage() {
           {sessions.map((session) => (
             <div key={session} className="flex items-center justify-between rounded-xl border border-border/60 bg-surface/60 px-3.5 py-3">
               <span className="font-mono text-xs tracking-wider" dir="ltr">{session}</span>
-              <span className="rounded-full bg-surface-2 px-2.5 py-1 text-[10px] font-semibold text-text-2" dir="ltr">STANDBY</span>
+              <StatusBadge dir="ltr">STANDBY</StatusBadge>
             </div>
           ))}
         </div>
