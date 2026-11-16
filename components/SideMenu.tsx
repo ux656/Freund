@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import {
@@ -34,21 +34,60 @@ export default function SideMenu({
   onNavigate?: (id: string) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
   const reduceMotion = useReducedMotion();
   const close = () => setOpen(false);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      triggerRef.current?.focus();
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      const first = panelRef.current?.querySelector<HTMLElement>(
+        'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+      );
+      first?.focus();
+    });
+
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") close();
+      if (event.key === "Escape") {
+        event.preventDefault();
+        close();
+        return;
+      }
+      if (event.key !== "Tab") return;
+
+      const focusable = panelRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+      );
+      if (!focusable?.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      const inside = active instanceof Node && panelRef.current?.contains(active);
+
+      if (!inside || (event.shiftKey && active === first)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
+
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("keydown", onKeyDown);
+    };
   }, [open]);
 
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} aria-label="فتح القائمة الجانبية"
+      <button ref={triggerRef} type="button" onClick={() => setOpen(true)} aria-label="فتح القائمة الجانبية"
         aria-expanded={open}
         className="ui-interactive inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-surface/80 text-text transition hover:border-primary/40 hover:bg-primary/10">
         <Menu size={19} />
@@ -58,7 +97,7 @@ export default function SideMenu({
         <motion.div className="fixed inset-0 z-[100]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0 : 0.18 }}>
           <button type="button" aria-label="إغلاق القائمة" onClick={close}
             className="absolute inset-0 h-full w-full cursor-default bg-black/55 backdrop-blur-[2px]" />
-          <motion.aside dir="rtl" role="dialog" aria-modal="true" aria-label="القائمة الرئيسية"
+          <motion.aside ref={panelRef} dir="rtl" role="dialog" aria-modal="true" aria-label="القائمة الرئيسية"
             initial={reduceMotion ? false : { x: "100%" }} animate={{ x: 0 }} exit={reduceMotion ? { opacity: 0 } : { x: "100%" }} transition={{ type: "spring", stiffness: 340, damping: 34 }}
             className="absolute inset-y-0 right-0 flex w-[min(84vw,310px)] flex-col border-l border-border/70 bg-[#F9F9F7] p-4 text-text shadow-2xl dark:bg-[#171717]">
             <div className="mb-7 flex items-center justify-between">
