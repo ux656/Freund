@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       sessionId: data.sessionId,
       code: typeof data.code === "string" ? data.code : undefined,
-      expiresAt: Number.isFinite(data.expiresAt) ? data.expiresAt : serverTime + 60_000,
+      expiresAt: Number.isFinite(data.expiresAt) ? Math.min(data.expiresAt, serverTime + 60_000) : serverTime + 60_000,
       nextAllowedAt: serverTime + 30_000,
       serverTime,
     }, { headers: { "Cache-Control": "no-store, max-age=0", "Pragma": "no-cache" } });
