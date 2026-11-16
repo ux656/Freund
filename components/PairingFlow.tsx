@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Copy, Check, Loader2, AlertCircle, Smartphone, KeyRound, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { requestPairing, checkSession, MOCK_LIMITS } from "@/lib/mock-api";
+import { requestPairing, checkSession } from "@/lib/mock-api";
 
 type Step = 1 | 2 | 3;
 
@@ -153,11 +153,11 @@ export default function PairingFlow() {
       }
       if (res.error === "cooldown") {
         setCooldownUntil(serverNow() + (res.retryAfterMs || 0));
-        setRateLimit(`انتظر ${Math.ceil((res.retryAfterMs || 0) / 1000)} ثانية قبل طلب رمز جديد.`);
+        setRateLimit(`انتظر ${Math.ceil((res.retryAfterMs || 0) / 1000)} ثانية قبل المحاولة مرة أخرى.`);
         return;
       }
       if (res.error === "phone_limit") {
-        setRateLimit(`تجاوزت الحد المسموح (${MOCK_LIMITS.perPhoneHourly} رموز/ساعة لهذا الرقم).`);
+        setRateLimit("وصلت إلى الحد المسموح لهذا الرقم خلال الساعة. ابدأ اقترانًا جديدًا بعد انتهاء المهلة.");
         return;
       }
       if (res.error === "ip_limit") {
