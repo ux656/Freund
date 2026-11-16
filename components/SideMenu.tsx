@@ -48,6 +48,8 @@ export default function SideMenu({
     }
 
     wasOpenRef.current = true;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     const frame = window.requestAnimationFrame(() => {
       const first = panelRef.current?.querySelector<HTMLElement>(
         'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
@@ -84,6 +86,7 @@ export default function SideMenu({
     window.addEventListener("keydown", onKeyDown);
     return () => {
       window.cancelAnimationFrame(frame);
+      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);
