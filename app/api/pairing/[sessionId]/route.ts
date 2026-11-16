@@ -35,7 +35,7 @@ export async function GET(request: NextRequest, context: { params: { sessionId: 
       status: data.status,
       code: typeof data.code === "string" ? data.code : undefined,
       expiresAt: data.expiresAt,
-      serverTime: data.serverTime || Date.now(),
+      serverTime: Number.isFinite(data.serverTime) ? data.serverTime : undefined,
     }, { headers: { "Cache-Control": "no-store, max-age=0" } });
   } catch {
     return NextResponse.json({ error: "bot_unreachable", serverTime: Date.now() }, { status: 502 });
