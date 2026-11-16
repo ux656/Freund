@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import {
   Activity, Bot, Code2, Cpu, Info, LockKeyhole,
@@ -31,20 +32,32 @@ export default function SideMenu({
   onNavigate?: (id: string) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
   const close = () => setOpen(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") close();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open]);
 
   return (
     <>
       <button type="button" onClick={() => setOpen(true)} aria-label="فتح القائمة الجانبية"
         aria-expanded={open}
-        className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-surface/80 text-text transition hover:border-primary/40 hover:bg-primary/10">
+        className="ui-interactive inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-surface/80 text-text transition hover:border-primary/40 hover:bg-primary/10">
         <Menu size={19} />
       </button>
+      <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-[100]">
+        <motion.div className="fixed inset-0 z-[100]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0 : 0.18 }}>
           <button type="button" aria-label="إغلاق القائمة" onClick={close}
             className="absolute inset-0 h-full w-full cursor-default bg-black/55 backdrop-blur-[2px]" />
-          <aside dir="rtl" role="dialog" aria-modal="true" aria-label="القائمة الرئيسية"
+          <motion.aside dir="rtl" role="dialog" aria-modal="true" aria-label="القائمة الرئيسية"
+            initial={reduceMotion ? false : { x: "100%" }} animate={{ x: 0 }} exit={reduceMotion ? { opacity: 0 } : { x: "100%" }} transition={{ type: "spring", stiffness: 340, damping: 34 }}
             className="absolute inset-y-0 right-0 flex w-[min(84vw,310px)] flex-col border-l border-border/70 bg-[#F9F9F7] p-4 text-text shadow-2xl dark:bg-[#171717]">
             <div className="mb-7 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -54,7 +67,7 @@ export default function SideMenu({
                 <div><div className="text-sm font-bold tracking-wide">BMG BOT</div><div className="mt-0.5 text-[10px] text-text-3">مركز التحكم</div></div>
               </div>
               <button type="button" onClick={close} aria-label="إغلاق القائمة"
-                className="grid size-9 place-items-center rounded-xl text-text-2 transition hover:bg-surface-2"><X size={18} /></button>
+                className="ui-interactive grid size-9 place-items-center rounded-xl text-text-2 transition hover:bg-surface-2"><X size={18} /></button>
             </div>
             <div className="mb-3 px-2 text-[10px] font-bold tracking-wider text-text-3">التنقل بين الصفحات</div>
             <nav className="flex-1 space-y-1 overflow-y-auto" aria-label="القائمة الجانبية">
@@ -93,9 +106,10 @@ export default function SideMenu({
               <div className="flex items-center gap-2 text-xs font-semibold"><Activity size={15} className="text-primary" />BMG Control</div>
               <p className="mt-1.5 text-[10px] leading-5 text-text-3">إدارة ومتابعة خدمات البوت من مكان واحد.</p>
             </div>
-          </aside>
-        </div>
+          </motion.aside>
+        </motion.div>
       )}
+      </AnimatePresence>
     </>
   );
 }
