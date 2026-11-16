@@ -23,6 +23,7 @@ export default function PairingFlow() {
   const [verifyState, setVerifyState] = useState<"idle" | "awaiting" | "confirmed" | "expired">("idle");
   const [isVerifying, setIsVerifying] = useState(false);
   const isVerifyingRef = useRef(false);
+  const activeSessionRef = useRef<string | null>(null);
   const [isRequesting, setIsRequesting] = useState(false);
   const [error, setError] = useState("");
   const [rateLimit, setRateLimit] = useState("");
@@ -85,6 +86,9 @@ export default function PairingFlow() {
       setIsVerifying(true);
       try {
         const res = await checkSession({ sessionId });
+        // Ignore a response belonging to a session the user has already reset
+        // or replaced while this request was in flight.
+        if (activeSessionRef.current !== sessionId) return;
         syncTime(res.serverTime);
         if (typeof res.expiresAt === "number" && Number.isFinite(res.expiresAt)) {
           setExpiresAt(res.expiresAt);
@@ -126,8 +130,10 @@ export default function PairingFlow() {
           setRateLimit("لم يتم التأكيد بعد. تأكد من إدخال الرمز في واتساب.");
         }
       } finally {
-        isVerifyingRef.current = false;
-        setIsVerifying(false);
+        if (activeSessionRef.current === sessionId) {
+          isVerifyingRef.current = false;
+          setIsVerifying(false);
+        }
       }
     },
     [sessionId, stopPolling]
@@ -155,6 +161,7 @@ export default function PairingFlow() {
       syncTime(res.serverTime);
 
       if (res.ok) {
+        activeSessionRef.current = res.sessionId;
         setSessionId(res.sessionId);
         setCode(res.code || null);
         setExpiresAt(res.expiresAt);
@@ -171,6 +178,7 @@ export default function PairingFlow() {
       }
       if (res.error === "phone_limit") {
         stopPolling();
+        activeSessionRef.current = null;
         setSessionId(null);
         setCode(null);
         setExpiresAt(0);
@@ -198,6 +206,7 @@ export default function PairingFlow() {
     if (isRequesting || cooldownSec > 0 || !phone) return;
 
     stopPolling();
+    activeSessionRef.current = null;
     isVerifyingRef.current = false;
     setSessionId(null);
     setCode(null);
@@ -220,6 +229,7 @@ export default function PairingFlow() {
 
   const reset = () => {
     stopPolling();
+    activeSessionRef.current = null;
     if (confirmationTimeoutRef.current) clearTimeout(confirmationTimeoutRef.current);
     confirmationTimeoutRef.current = null;
     isVerifyingRef.current = false;
