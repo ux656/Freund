@@ -5,6 +5,11 @@ import { cn } from "@/lib/utils";
 export const metadata: Metadata = {
   title: "BMG Bot | ربط واتساب",
   description: "اربط رقمك ببوت BMG عبر واتساب.",
+  icons: {
+    icon: [{ url: "/reboot.png", type: "image/png" }],
+    shortcut: ["/reboot.png"],
+    apple: [{ url: "/reboot.png", type: "image/png" }],
+  },
 };
 
 export const viewport: Viewport = {
