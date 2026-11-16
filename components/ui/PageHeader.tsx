@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
-import SideMenu from "@/components/SideMenu";
+import SideMenu, { type DashboardPageId } from "@/components/SideMenu";
 
 export default function PageHeader({ eyebrow, title, description, activePage, action }: {
   eyebrow: string;
   title: string;
   description: string;
-  activePage: string;
+  activePage: DashboardPageId;
   action?: ReactNode;
 }) {
   return (
