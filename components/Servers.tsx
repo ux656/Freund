@@ -90,13 +90,13 @@ export default function Servers() {
           </StatusBadge>
         </div>
         <div className="mt-5 grid grid-cols-2 gap-3">
-          <div className="rounded-xl border border-border/60 bg-surface/60 p-3"><div className="mb-2 text-[10px] text-text-3">نوع الاتصال</div><div className="text-xs font-semibold">بوابة الخادم</div></div>
-          <div className="rounded-xl border border-border/60 bg-surface/60 p-3"><div className="mb-2 text-[10px] text-text-3">نتيجة الفحص</div><div className="flex items-center gap-1.5 text-xs font-semibold">{reachable === false ? <WifiOff size={13} className="text-danger" /> : <ShieldCheck size={13} className="text-green" />}{reachable === null ? "بانتظار الفحص" : reachable ? "البوابة تستجيب" : "تعذر الاتصال"}</div></div>
+          <div className="ui-card p-3"><div className="mb-2 text-[10px] text-text-3">نوع الاتصال</div><div className="text-xs font-semibold">بوابة الخادم</div></div>
+          <div className="ui-card p-3"><div className="mb-2 text-[10px] text-text-3">نتيجة الفحص</div><div className="flex items-center gap-1.5 text-xs font-semibold">{reachable === false ? <WifiOff size={13} className="text-danger" /> : <ShieldCheck size={13} className="text-green" />}{reachable === null ? "بانتظار الفحص" : reachable ? "البوابة تستجيب" : "تعذر الاتصال"}</div></div>
         </div>
         <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-3 text-[10px] text-text-3">
           <span className="flex items-center gap-1.5"><Clock3 size={12} />آخر فحص</span><span>{formatTime(checkedAt)}</span>
         </div>
-        <div className="mt-3 rounded-xl bg-surface/60 p-3"><div className="mb-1 flex items-center gap-2 text-[10px] text-text-3"><Activity size={12} />استجابة الخدمة</div><div className="text-sm font-bold" dir="ltr">{serviceStatus || "CHECKING"}</div></div>
+        <div className="ui-card mt-3 p-3"><div className="mb-1 flex items-center gap-2 text-[10px] text-text-3"><Activity size={12} />استجابة الخدمة</div><div className="text-sm font-bold" dir="ltr">{serviceStatus || "CHECKING"}</div></div>
         {checkError && <div className="mt-3"><ErrorState>{checkError}</ErrorState></div>}
       </section>
       )}
