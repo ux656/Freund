@@ -95,6 +95,8 @@ export default function SideMenu({
     <>
       <button ref={triggerRef} type="button" onClick={() => setOpen(true)} aria-label="فتح القائمة الجانبية"
         aria-expanded={open}
+        aria-haspopup="dialog"
+        aria-controls="bmg-main-navigation"
         className="ui-interactive inline-flex size-10 shrink-0 items-center justify-center rounded-xl border border-border/70 bg-surface/80 text-text transition hover:border-primary/40 hover:bg-primary/10">
         <Menu size={19} />
       </button>
@@ -103,8 +105,8 @@ export default function SideMenu({
         <motion.div className="fixed inset-0 z-[100]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: reduceMotion ? 0 : 0.18 }}>
           <button type="button" aria-label="إغلاق القائمة" onClick={close}
             className="absolute inset-0 h-full w-full cursor-default bg-black/55 backdrop-blur-[2px]" />
-          <motion.aside ref={panelRef} dir="rtl" role="dialog" aria-modal="true" aria-label="القائمة الرئيسية"
-            initial={reduceMotion ? false : { x: "100%" }} animate={{ x: 0 }} exit={reduceMotion ? { opacity: 0 } : { x: "100%" }} transition={{ type: "spring", stiffness: 340, damping: 34 }}
+          <motion.aside id="bmg-main-navigation" ref={panelRef} dir="rtl" role="dialog" aria-modal="true" aria-label="القائمة الرئيسية"
+            initial={reduceMotion ? false : { x: "100%" }} animate={{ x: 0 }} exit={reduceMotion ? { opacity: 0 } : { x: "100%" }} transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 340, damping: 34 }}
             className="absolute inset-y-0 right-0 flex w-[min(84vw,310px)] flex-col border-l border-border/70 bg-[#F9F9F7] p-4 text-text shadow-2xl dark:bg-[#171717]">
             <div className="mb-7 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -136,7 +138,7 @@ export default function SideMenu({
                   className={`ui-interactive flex w-full items-center gap-3 rounded-xl px-3.5 py-3 text-right text-[13px] font-medium transition ${active ? "bg-primary/10 text-primary" : "text-text-2 hover:bg-surface-2 hover:text-text"}`}>
                   <Icon size={17} /><span>{item.label}</span>{active && <span className="mr-auto size-1.5 rounded-full bg-primary" />}
                 </button> : <Link key={item.id} href={`/#${item.id}`} onClick={close}
-                  className="flex items-center gap-3 rounded-xl px-3.5 py-3 text-[13px] font-medium text-text-2 transition hover:bg-surface-2 hover:text-text">
+                  className="ui-interactive flex items-center gap-3 rounded-xl px-3.5 py-3 text-[13px] font-medium text-text-2 transition hover:bg-surface-2 hover:text-text">
                   <Icon size={17} /><span>{item.label}</span>
                 </Link>;
               })}
