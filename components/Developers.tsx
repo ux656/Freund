@@ -1,6 +1,6 @@
 "use client";
 
-import { Github, Mail, Globe, MessageCircle, Linkedin, Twitter } from "lucide-react";
+import { Github, Mail, MessageCircle, Linkedin, Twitter } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const leader = {
@@ -17,7 +17,7 @@ const devs = [
   { name: "نورا حسن", role: "مهندس بيانات", contacts: { telegram: "nora", github: "nora" } },
 ];
 
-const iconMap = { github: Github, email: Mail, website: Globe, telegram: MessageCircle, linkedin: Linkedin, twitter: Twitter };
+const iconMap = { github: Github, email: Mail, telegram: MessageCircle, linkedin: Linkedin, twitter: Twitter };
 
 function ContactIcons({ contacts }: { contacts: Record<string, string | undefined> }) {
   return (
@@ -29,7 +29,7 @@ function ContactIcons({ contacts }: { contacts: Record<string, string | undefine
           k === "email" ? `mailto:${v}` : k === "github" ? `https://github.com/${v}` : k === "telegram" ? `https://t.me/${v}` : k === "linkedin" ? `https://linkedin.com/in/${v}` : v;
         return (
           <a key={k} href={url} target="_blank" rel="noopener" className="grid size-8 place-items-center rounded-lg border border-border bg-surface-2 text-text-2 transition-colors hover:border-primary/40 hover:text-primary">
-            <Icon size={14} />
+            {k === "website" ? <img src="/reboot.png" alt="Reboot" className="size-5 object-contain" /> : Icon ? <Icon size={14} /> : null}
           </a>
         );
       })}
