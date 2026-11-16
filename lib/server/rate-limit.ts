@@ -6,7 +6,7 @@ type Store = { buckets: Map<string, Bucket>; lastSweep: number };
 declare global { var __freundRateLimitStore: Store | undefined; }
 
 const HOUR = 60 * 60 * 1000;
-const COOLDOWN = 30 * 1000;
+const COOLDOWN = 60 * 1000;
 const PHONE_MAX = 5;
 const IP_MAX = 12;
 const POLL_WINDOW = 60 * 1000;
