@@ -291,7 +291,7 @@ export default function PairingFlow() {
                   <button
                     type="button"
                     onClick={() => setPhone("")}
-                    className="mr-2 grid size-6 place-items-center rounded-full bg-surface-3 text-text-2 hover:bg-text-3 hover:text-text"
+                    className="ui-interactive mr-2 grid size-6 place-items-center rounded-full bg-surface-3 text-text-2 hover:bg-text-3 hover:text-text"
                     aria-label="مسح"
                   >
                     ✕
@@ -441,7 +441,7 @@ export default function PairingFlow() {
             <button
               onClick={() => verify(false)}
               disabled={!sessionId || isVerifying}
-              className="flex w-full items-center justify-center gap-2 rounded-glass-sm border border-[#B5543A] bg-gradient-to-b from-[#E5876B] via-primary to-primary-hover px-5 py-3.5 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-px active:translate-y-px disabled:cursor-not-allowed disabled:opacity-35"
+              className="ui-interactive flex w-full items-center justify-center gap-2 rounded-glass-sm border border-[#B5543A] bg-gradient-to-b from-[#E5876B] via-primary to-primary-hover px-5 py-3.5 text-sm font-semibold text-white shadow-lg transition-all hover:-translate-y-px active:translate-y-px disabled:cursor-not-allowed disabled:opacity-35"
             >
               {isVerifying && <Loader2 size={14} className="animate-spin" />}
               {isVerifying ? "جاري التحقّق..." : "تحقّق الآن"}
@@ -450,7 +450,7 @@ export default function PairingFlow() {
             <button
               onClick={handleRetry}
               disabled={cooldownSec > 0 || isRequesting}
-              className="w-full rounded-glass-sm border border-border bg-surface px-5 py-3 text-[13px] font-medium text-text-2 transition-all hover:bg-surface-2 hover:text-text disabled:cursor-not-allowed disabled:opacity-40"
+              className="ui-interactive w-full rounded-glass-sm border border-border bg-surface px-5 py-3 text-[13px] font-medium text-text-2 transition-all hover:bg-surface-2 hover:text-text disabled:cursor-not-allowed disabled:opacity-40"
             >
               {isRequesting
                 ? "جاري طلب رمز جديد..."
