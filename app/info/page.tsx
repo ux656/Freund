@@ -64,7 +64,7 @@ export default function InfoPage() {
         <SectionTitle icon={Wifi} title="الجلسات المسجلة" detail="معرّفات مخفية كما وردت في التقرير" />
         <div className="space-y-2">
           {sessions.map((session) => (
-            <div key={session} className="flex items-center justify-between rounded-xl border border-border/60 bg-surface/60 px-3.5 py-3">
+            <div key={session} className="ui-card flex items-center justify-between px-3.5 py-3">
               <span className="font-mono text-xs tracking-wider" dir="ltr">{session}</span>
               <StatusBadge dir="ltr">STANDBY</StatusBadge>
             </div>
