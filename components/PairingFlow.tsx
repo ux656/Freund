@@ -20,6 +20,8 @@ export default function PairingFlow() {
   const [cooldownSec, setCooldownSec] = useState(0);
   const [verifyState, setVerifyState] = useState<"idle" | "awaiting" | "confirmed" | "expired">("idle");
   const [isVerifying, setIsVerifying] = useState(false);
+  const isVerifyingRef = useRef(false);
+  const [isRequesting, setIsRequesting] = useState(false);
   const [error, setError] = useState("");
   const [rateLimit, setRateLimit] = useState("");
   const [captchaExpected, setCaptchaExpected] = useState<number | null>(null);
@@ -70,7 +72,8 @@ export default function PairingFlow() {
 
   const verify = useCallback(
     async (auto = false) => {
-      if (!sessionId || isVerifying) return;
+      if (!sessionId || isVerifyingRef.current) return;
+      isVerifyingRef.current = true;
       setIsVerifying(true);
       try {
         const res = await checkSession({ sessionId });
@@ -96,19 +99,26 @@ export default function PairingFlow() {
           setRateLimit("لم يتم التأكيد بعد. تأكد من إدخال الرمز في واتساب.");
         }
       } finally {
+        isVerifyingRef.current = false;
         setIsVerifying(false);
       }
     },
-    [sessionId, isVerifying, stopPolling]
+    [sessionId, stopPolling]
   );
 
-  const startPolling = useCallback(() => {
+  // Start polling only after React has committed the new sessionId.
+  useEffect(() => {
+    if (!sessionId) return;
     stopPolling();
-    pollRef.current = setInterval(() => verify(true), 2000);
-  }, [stopPolling, verify]);
+    void verify(true);
+    pollRef.current = setInterval(() => void verify(true), 1500);
+    return stopPolling;
+  }, [sessionId, verify, stopPolling]);
 
   /* ===== Generate ===== */
   const handleGenerate = async () => {
+    if (isRequesting) return;
+    setIsRequesting(true);
     setError("");
     setRateLimit("");
     const res = await requestPairing({
@@ -120,14 +130,14 @@ export default function PairingFlow() {
 
     if (res.ok) {
       setSessionId(res.sessionId!);
-      setCode(res.code!);
+      setCode(res.code || null);
       setExpiresAt(res.expiresAt!);
       setCooldownUntil(res.nextAllowedAt!);
       setVerifyState("awaiting");
       setCaptchaExpected(null);
       setCaptchaInput("");
       setStep(2);
-      startPolling();
+      setIsRequesting(false);
       return;
     }
 
@@ -143,17 +153,21 @@ export default function PairingFlow() {
     if (res.error === "cooldown") {
       setCooldownUntil(serverNow() + (res.retryAfterMs || 0));
       setRateLimit(`انتظر ${Math.ceil((res.retryAfterMs || 0) / 1000)} ثانية قبل طلب رمز جديد.`);
+      setIsRequesting(false);
       return;
     }
     if (res.error === "phone_limit") {
       setRateLimit(`تجاوزت الحد المسموح (${MOCK_LIMITS.perPhoneHourly} رموز/ساعة لهذا الرقم).`);
+      setIsRequesting(false);
       return;
     }
     if (res.error === "ip_limit") {
       setRateLimit("تم تقييد الشبكة مؤقتًا. حاول لاحقًا.");
+      setIsRequesting(false);
       return;
     }
     setError("حدث خطأ غير متوقع. حاول لاحقًا.");
+    setIsRequesting(false);
   };
 
   const copyCode = async () => {
@@ -167,6 +181,8 @@ export default function PairingFlow() {
 
   const reset = () => {
     stopPolling();
+    isVerifyingRef.current = false;
+    setIsRequesting(false);
     setStep(1);
     setPhone("");
     setSessionId(null);
@@ -305,13 +321,13 @@ export default function PairingFlow() {
 
             <button
               onClick={handleGenerate}
-              disabled={!canGenerate}
+              disabled={!canGenerate || isRequesting}
               className={cn(
                 "relative w-full overflow-hidden rounded-glass-sm border border-[#B5543A] bg-gradient-to-b from-[#E5876B] via-primary to-primary-hover px-5 py-3.5 text-sm font-semibold text-white shadow-lg transition-all",
                 "hover:-translate-y-px hover:shadow-xl active:translate-y-px disabled:cursor-not-allowed disabled:opacity-35 disabled:shadow-none"
               )}
             >
-              توليد رمز الاقتران
+              {isRequesting ? "جاري طلب رمز الاقتران..." : "توليد رمز الاقتران"}
             </button>
           </motion.div>
         )}
@@ -335,7 +351,7 @@ export default function PairingFlow() {
             >
               <div className="mb-3 flex items-center justify-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-text-3">
                 {copied ? <Check size={11} /> : <Copy size={11} />}
-                {copied ? "تم النسخ!" : "رمز الاقتران المكوّن من 8 أرقام"}
+                {copied ? "تم النسخ!" : code ? "رمز الاقتران المكوّن من 8 أرقام" : "جاري استلام رمز الاقتران"}
               </div>
               <div className="flex justify-center gap-1.5" dir="ltr">
                 {code
@@ -353,9 +369,9 @@ export default function PairingFlow() {
                   : Array.from({ length: 8 }).map((_, i) => (
                       <span
                         key={i}
-                        className="grid h-12 w-8 place-items-center rounded-[10px] border border-border bg-surface-2 font-display text-xl text-text-3 sm:h-14 sm:w-10"
+                        className="grid h-12 w-8 place-items-center rounded-[10px] border border-border bg-surface-2 sm:h-14 sm:w-10"
                       >
-                        —
+                        <span className="h-5 w-4 animate-pulse rounded bg-text-3/25" />
                       </span>
                     ))}
               </div>
