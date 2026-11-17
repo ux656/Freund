@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isTrustedAppRequest } from "@/lib/server/request-guard";
+import {
+  listActivityEvents,
+  recordActivityEvents,
+  saveOverviewSnapshot,
+} from "@/lib/server/db/store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -80,6 +85,28 @@ export async function GET(request: NextRequest) {
         status: ["success", "failed", "info"].includes(event?.status) ? event.status : "info",
       })),
     };
+
+    // دمج سجل النشاط المحفوظ في قاعدة البيانات مع البيانات الحية من البوت،
+    // حتى يبقى التاريخ ظاهراً بعد إعادة النشر أو انقطاع البوت (best effort).
+    type ActivityItem = { id: string; type: string; bot: string; command?: string; at: string; status: string };
+    const live: ActivityItem[] = Array.isArray(data.activity) ? data.activity : [];
+    const stored = await listActivityEvents(300);
+    const seen = new Set<string>();
+    const merged: ActivityItem[] = [];
+    for (const event of [...live, ...(stored as unknown as ActivityItem[])]) {
+      if (!event?.id || seen.has(event.id)) continue;
+      seen.add(event.id);
+      merged.push(event);
+    }
+    merged.sort((a, b) => (Date.parse(b.at) || 0) - (Date.parse(a.at) || 0));
+    data.activity = merged.slice(0, 300);
+
+    void recordActivityEvents(data.activity);
+    void saveOverviewSnapshot({
+      at: data.checkedAt,
+      bots: { total: data.bots.total, connected: data.bots.connected, disconnected: data.bots.disconnected },
+      sessions: data.sessions,
+    });
 
     return NextResponse.json({ ok: true, data }, {
       headers: { "Cache-Control": "no-store, max-age=0" },

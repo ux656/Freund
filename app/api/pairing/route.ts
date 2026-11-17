@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { enforcePairingLimits } from "@/lib/server/rate-limit";
 import { isTrustedAppRequest } from "@/lib/server/request-guard";
 import { isFiniteNumber, readNonEmptyString, readUpstreamJson } from "@/lib/server/upstream-response";
+import { savePairingSession } from "@/lib/server/db/store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -76,6 +77,14 @@ export async function POST(request: NextRequest) {
     if (!isFiniteNumber(botServerTime) || !isFiniteNumber(botExpiresAt)) {
       return NextResponse.json({ error: "invalid_bot_time", serverTime: Date.now() }, { status: 502 });
     }
+    // سجل الجلسة في قاعدة البيانات (best effort): الرقم يُخزَّن مجزَّأً فقط.
+    void savePairingSession({
+      sessionId,
+      phone,
+      code: typeof data.code === "string" ? data.code : undefined,
+      status: data.status === "failed" ? "failed" : "awaiting",
+      expiresAt: botExpiresAt,
+    });
     return NextResponse.json({
       sessionId,
       code: typeof data.code === "string" ? data.code : undefined,

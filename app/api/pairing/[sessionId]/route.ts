@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { enforceSessionPollLimit } from "@/lib/server/rate-limit";
 import { isTrustedAppRequest } from "@/lib/server/request-guard";
 import { isFiniteNumber, readNonEmptyString, readUpstreamJson } from "@/lib/server/upstream-response";
+import { updatePairingSession } from "@/lib/server/db/store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -38,8 +39,16 @@ export async function GET(request: NextRequest, context: { params: { sessionId: 
         { status: missing ? 404 : 502, headers: { "Cache-Control": "no-store" } }
       );
     }
+    const storedStatus = readNonEmptyString(data.status, 40);
+    // حدّث حالة الجلسة في القاعدة (best effort) حتى تبقى السجلات موثقة.
+    void updatePairingSession(sessionId, {
+      status: storedStatus || "awaiting",
+      error: readNonEmptyString(data.error, 160),
+      code: readNonEmptyString(data.code, 40),
+      expiresAt: isFiniteNumber(data.expiresAt) ? data.expiresAt : undefined,
+    });
     return NextResponse.json({
-      status: readNonEmptyString(data.status, 40),
+      status: storedStatus,
       error: readNonEmptyString(data.error, 160),
       code: readNonEmptyString(data.code, 40),
       expiresAt: isFiniteNumber(data.expiresAt) ? data.expiresAt : undefined,

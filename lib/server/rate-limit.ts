@@ -1,5 +1,7 @@
 import { createHash } from "node:crypto";
 import { NextRequest } from "next/server";
+import { isDbConfigured } from "@/lib/server/db";
+import { loadRateBuckets, saveRateBuckets, type RateBucketMap } from "@/lib/server/db/store";
 
 type Bucket = { hits: number[]; lastAt: number };
 type Store = { buckets: Map<string, Bucket>; lastSweep: number };
@@ -11,6 +13,8 @@ const PHONE_MAX = 5;
 const IP_MAX = 12;
 const POLL_WINDOW = 60 * 1000;
 const POLL_MAX = 100;
+const PERSIST_DELAY_MS = 2_000;
+const MAX_PERSISTED_BUCKETS = 5_000;
 
 function getStore(): Store {
   return (globalThis.__freundRateLimitStore ??= { buckets: new Map(), lastSweep: 0 });
@@ -57,9 +61,61 @@ function record(key: string, bucket: Bucket, now: number) {
   bucket.hits.push(now);
   bucket.lastAt = now;
   getStore().buckets.set(key, bucket);
+  schedulePersist();
+}
+
+// ── مزامنة الحدود مع قاعدة البيانات (best effort) ──
+// الذاكرة تبقى المصدر السريع، والقاعدة تخزّن النسخة لتعود بعد إعادة النشر.
+
+let hydrated = false;
+let hydrating: Promise<void> | null = null;
+let persistTimer: ReturnType<typeof setTimeout> | null = null;
+
+function hydrateFromDb() {
+  if (hydrated || hydrating) return;
+  hydrating = (async () => {
+    try {
+      const stored = await loadRateBuckets();
+      if (stored) {
+        const state = getStore();
+        for (const [key, bucket] of Object.entries(stored)) {
+          if (!bucket || !Array.isArray(bucket.hits) || state.buckets.has(key)) continue;
+          state.buckets.set(key, { hits: [...bucket.hits], lastAt: bucket.lastAt || 0 });
+        }
+      }
+    } catch {
+      /* الذاكرة تبقى كما هي */
+    } finally {
+      hydrated = true;
+      hydrating = null;
+    }
+  })();
+}
+
+function serializeBuckets(now: number): RateBucketMap {
+  const state = getStore();
+  const out: RateBucketMap = {};
+  let count = 0;
+  for (const [key, bucket] of state.buckets) {
+    const hits = bucket.hits.filter(time => now - time < HOUR);
+    if (!hits.length && now - bucket.lastAt >= HOUR) continue;
+    out[key] = { hits, lastAt: bucket.lastAt };
+    if (++count >= MAX_PERSISTED_BUCKETS) break;
+  }
+  return out;
+}
+
+function schedulePersist() {
+  if (!isDbConfigured() || persistTimer) return;
+  persistTimer = setTimeout(() => {
+    persistTimer = null;
+    void saveRateBuckets(serializeBuckets(Date.now()));
+  }, PERSIST_DELAY_MS);
+  persistTimer.unref?.();
 }
 
 export function enforcePairingLimits(request: NextRequest, phone: string) {
+  hydrateFromDb();
   const now = Date.now();
   cleanup(now);
   const phoneKey = "phone:" + hash(phone);
@@ -74,6 +130,7 @@ export function enforcePairingLimits(request: NextRequest, phone: string) {
 }
 
 export function enforceSessionPollLimit(request: NextRequest) {
+  hydrateFromDb();
   const now = Date.now();
   cleanup(now);
   const key = "poll:" + hash(clientIp(request));
