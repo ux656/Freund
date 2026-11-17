@@ -42,7 +42,7 @@ const cats = [
 export default function FAQ() {
   const [search, setSearch] = useState("");
   const [cat, setCat] = useState("all");
-  const [open, setOpen] = useState<number | null>(0);
+  const [open, setOpen] = useState<string | null>(faqs[0]?.q ?? null);
 
   const filtered = faqs.filter(
     (f) =>
@@ -85,25 +85,28 @@ export default function FAQ() {
       </div>
 
       <div className="space-y-0">
-        {filtered.map((f, i) => (
-          <div key={i} className="border-t border-border-soft py-4 first:border-t-0 first:pt-0">
+        {filtered.map((f) => {
+          const answerId = `faq-answer-${faqs.indexOf(f)}`;
+          return (
+          <div key={f.q} className="border-t border-border-soft py-4 first:border-t-0 first:pt-0">
             <button
               type="button"
-              onClick={() => setOpen(open === i ? null : i)}
-              aria-expanded={open === i}
-              aria-controls={`faq-answer-${i}`}
+              onClick={() => setOpen(open === f.q ? null : f.q)}
+              aria-expanded={open === f.q}
+              aria-controls={answerId}
               className="ui-interactive flex w-full items-center justify-between gap-3 text-right text-[14.5px] font-medium"
             >
               {f.q}
-              <span className={cn("text-xl text-text-3 transition-transform", open === i && "rotate-45 text-primary")}>
+              <span className={cn("text-xl text-text-3 transition-transform", open === f.q && "rotate-45 text-primary")}>
                 +
               </span>
             </button>
-            {open === i && (
-              <p id={`faq-answer-${i}`} className="mt-2.5 text-[13.5px] leading-relaxed text-text-2">{f.a}</p>
+            {open === f.q && (
+              <p id={answerId} className="mt-2.5 text-[13.5px] leading-relaxed text-text-2">{f.a}</p>
             )}
           </div>
-        ))}
+          );
+        })}
         {filtered.length === 0 && (
           <p role="status" aria-live="polite" className="py-10 text-center text-sm text-text-3">لا توجد نتائج مطابقة.</p>
         )}
