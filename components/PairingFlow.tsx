@@ -410,22 +410,12 @@ export default function PairingFlow() {
             className="space-y-4"
           >
             {/* Code panel */}
-            <div
-              role="button"
-              tabIndex={code ? 0 : -1}
-              aria-label={code ? "نسخ رمز الاقتران" : "جاري استلام رمز الاقتران"}
-              aria-disabled={!code}
+            <button
+              type="button"
+              disabled={!code}
               onClick={copyCode}
-              onKeyDown={(event) => {
-                if (code && (event.key === "Enter" || event.key === " ")) {
-                  event.preventDefault();
-                  void copyCode();
-                }
-              }}
-              className={cn(
-                "lg lg-surface cursor-pointer rounded-glass p-5 text-center transition-transform active:scale-[0.995] focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary",
-                !code && "cursor-default"
-              )}
+              aria-label={code ? "نسخ رمز الاقتران" : "جاري استلام رمز الاقتران"}
+              className="ui-interactive lg lg-surface w-full cursor-pointer rounded-glass p-5 text-center transition-transform active:scale-[0.995] focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary disabled:cursor-default disabled:active:scale-100"
             >
               <div className="mb-3 flex items-center justify-center gap-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-text-3">
                 {copied ? <Check size={11} /> : <Copy size={11} />}
@@ -475,7 +465,7 @@ export default function PairingFlow() {
                   {remainingSec > 0 ? `${remainingSec} ثانية` : "انتهى الرمز"}
                 </span>
               </div>
-            </div>
+            </button>
 
             {/* Verify status */}
             {verifyState !== "idle" && (
