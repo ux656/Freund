@@ -39,24 +39,24 @@ export default function ActivityPage() {
   return (
     <PageEntrance>
       <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-4 pb-20 pt-5 sm:px-5 sm:pt-7">
-        <header dir="rtl" className="mb-6 flex items-center justify-between gap-3">
-          <div className="min-w-0 text-right">
-            <div className="text-[9px] font-bold tracking-[.2em] text-primary">FREUND · ACTIVITY</div>
-            <h1 className="mt-0.5 truncate font-display text-lg font-bold text-text sm:text-xl">سجل النشاط</h1>
-            <p className="mt-0.5 truncate text-[9px] text-text-3 sm:text-[10px]">مراقبة الاتصالات والأوامر لحظياً</p>
-          </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <button
-              type="button"
-              onClick={() => { setLoading(true); void load(); }}
-              disabled={loading}
-              aria-label="تحديث سجل النشاط"
-              className="ui-interactive grid size-10 place-items-center rounded-full border border-white/[0.12] bg-surface/55 text-text-2 hover:bg-surface disabled:opacity-50"
-            >
-              <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
-            </button>
+        <header dir="rtl" className="mb-6 flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <SideMenu mode="dashboard" activePage="activity" />
+            <div className="min-w-0 text-right">
+              <div className="text-[9px] font-bold tracking-[.2em] text-primary">FREUND · ACTIVITY</div>
+              <h1 className="mt-0.5 truncate font-display text-lg font-bold text-text sm:text-xl">سجل النشاط</h1>
+              <p className="mt-0.5 truncate text-[9px] text-text-3 sm:text-[10px]">مراقبة الاتصالات والأوامر لحظياً</p>
+            </div>
           </div>
+          <button
+            type="button"
+            onClick={() => { setLoading(true); void load(); }}
+            disabled={loading}
+            aria-label="تحديث سجل النشاط"
+            className="ui-interactive grid size-10 shrink-0 place-items-center rounded-full border border-white/[0.12] bg-surface/55 text-text-2 hover:bg-surface disabled:opacity-50"
+          >
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+          </button>
         </header>
 
         {error ? (
@@ -70,7 +70,7 @@ export default function ActivityPage() {
                   <strong className="font-display text-4xl font-semibold tabular-nums tracking-tight text-text sm:text-5xl">{events.length.toLocaleString("en-US")}</strong>
                   <span className="text-xs text-text-2">حدث</span>
                 </div>
-                <div className="mt-1 text-[9px] text-text-3">اختر الفترة لعرض حركة النشاط</div>
+                <div className="mt-1 text-[9px] text-text-3">اسحب على الرسم لاستعراض تفاصيل كل شمعة</div>
               </div>
               <div dir="ltr" className="pb-1 text-right">
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-green/25 bg-green/5 px-3 py-1.5 text-[10px] font-semibold text-green">
