@@ -1,6 +1,6 @@
 "use client";
 
-import { Github, Mail, MessageCircle, Linkedin, Twitter } from "lucide-react";
+import { Github, Mail, MessageCircle, Linkedin, Twitter, Globe } from "lucide-react";
 
 const leader = {
   name: "أحمد محمود",
@@ -16,7 +16,8 @@ const devs = [
   { name: "نورا حسن", role: "مهندس بيانات", contacts: { telegram: "nora", github: "nora" } },
 ];
 
-const iconMap = { github: Github, email: Mail, telegram: MessageCircle, linkedin: Linkedin, twitter: Twitter };
+const iconMap = { github: Github, email: Mail, telegram: MessageCircle, linkedin: Linkedin, twitter: Twitter, website: Globe };
+const contactLabels: Record<string, string> = { github: "GitHub", email: "البريد الإلكتروني", telegram: "تيليجرام", linkedin: "LinkedIn", twitter: "Twitter", website: "الموقع الإلكتروني" };
 
 function ContactIcons({ contacts }: { contacts: Record<string, string | undefined> }) {
   return (
@@ -25,10 +26,10 @@ function ContactIcons({ contacts }: { contacts: Record<string, string | undefine
         const Icon = iconMap[k as keyof typeof iconMap];
         if (!Icon || !v) return null;
         const url =
-          k === "email" ? `mailto:${v}` : k === "github" ? `https://github.com/${v}` : k === "telegram" ? `https://t.me/${v}` : k === "linkedin" ? `https://linkedin.com/in/${v}` : v;
+          k === "email" ? `mailto:${v}` : k === "github" ? `https://github.com/${v}` : k === "telegram" ? `https://t.me/${v}` : k === "linkedin" ? `https://linkedin.com/in/${v}` : k === "twitter" ? `https://twitter.com/${v}` : v;
         return (
-          <a key={k} href={url} target="_blank" rel="noopener" className="grid size-8 place-items-center rounded-lg border border-border bg-surface-2 text-text-2 transition-colors hover:border-primary/40 hover:text-primary">
-            {k === "website" ? <img src="/reboot.png" alt="Reboot" className="size-5 object-contain" /> : Icon ? <Icon size={14} /> : null}
+          <a key={k} href={url} target={k === "email" ? undefined : "_blank"} rel={k === "email" ? undefined : "noopener noreferrer"} aria-label={`${contactLabels[k] ?? k} — ${contacts[k]}`} title={contactLabels[k] ?? k} className="ui-interactive grid size-9 place-items-center rounded-lg border border-border bg-surface-2 text-text-2 transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary">
+            {Icon ? <Icon size={14} aria-hidden="true" /> : null}
           </a>
         );
       })}
