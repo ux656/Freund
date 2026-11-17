@@ -67,7 +67,7 @@ export default function BotAssistant() {
   return (
     <>
       <button
-        onClick={() => setOpen((current) => !current)
+        onClick={() => setOpen((current) => !current)}
         className="ui-interactive fixed bottom-5 left-5 z-50 grid size-[60px] place-items-center rounded-full border border-white/10 bg-[#202020] shadow-xl transition-transform hover:scale-105"
         aria-label="فتح مساعد Reboot"
         aria-expanded={open}
