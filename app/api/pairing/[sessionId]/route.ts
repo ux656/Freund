@@ -40,6 +40,7 @@ export async function GET(request: NextRequest, context: { params: { sessionId: 
     }
     return NextResponse.json({
       status: readNonEmptyString(data.status, 40),
+      error: readNonEmptyString(data.error, 160),
       code: readNonEmptyString(data.code, 40),
       expiresAt: isFiniteNumber(data.expiresAt) ? data.expiresAt : undefined,
       serverTime: isFiniteNumber(data.serverTime) ? data.serverTime : undefined,
