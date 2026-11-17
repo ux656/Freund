@@ -89,7 +89,7 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
       maxRate,
       maxVolume,
       total,
-      high: Math.max(0, ...candles.map((candle) => candle.high)),
+      high: Math.max(0, ...candles.map((candle) => candle.volume)),
       low: Math.min(...candles.map((candle) => candle.volume)),
       average: total / bucketCount,
       duration,
