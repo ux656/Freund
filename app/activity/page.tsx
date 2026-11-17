@@ -60,10 +60,11 @@ export default function ActivityPage() {
           </button>
         </header>
 
-        {error ? (
+        {error && !events.length ? (
           <div role="alert" className="border-y border-danger/25 py-4 text-xs text-danger">{error}</div>
         ) : (
           <>
+            {error && <div role="alert" className="mb-4 border-y border-danger/25 py-4 text-xs text-danger">{error}</div>}
             <section dir="ltr" className="mb-5 flex items-end justify-between gap-3 px-1">
               <div dir="rtl" className="min-w-0 text-left">
                 <div className="text-[10px] text-text-3">إجمالي الأحداث المسجلة</div>
