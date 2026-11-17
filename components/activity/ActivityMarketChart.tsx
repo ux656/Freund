@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, type PointerEvent } from "react";
 import { Activity, BarChart3, Clock3, Gauge } from "lucide-react";
 
 type Event = { id: string; at: string; status: "success" | "failed" | "info" };
@@ -83,9 +83,11 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
       average: total / bucketCount,
       duration,
       start,
+      lastActiveIndex: candles.reduce((last, candle, index) => candle.volume > 0 ? index : last, -1),
     };
   }, [events]);
 
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const left = 24;
   const right = 662;
   const top = 30;
@@ -93,6 +95,18 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
   const volumeTop = 246;
   const volumeBottom = 294;
   const slot = (right - left) / model.candles.length;
+  const selectedIndex = activeIndex === null ? model.lastActiveIndex : activeIndex;
+  const selectedCandle = selectedIndex >= 0 ? model.candles[selectedIndex] : null;
+  const selectedX = selectedCandle ? left + slot * (selectedIndex + 0.5) : 0;
+  const selectedColor = selectedCandle ? COLORS[selectedCandle.status] : COLORS.info;
+  const selectedLabel = selectedCandle?.status === "success" ? "ناجح" : selectedCandle?.status === "failed" ? "فشل" : "معلومات";
+  const handlePointer = (event: PointerEvent<SVGSVGElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    if (!rect.width) return;
+    const chartX = ((event.clientX - rect.left) / rect.width) * 760;
+    const index = Math.floor((chartX - left) / slot);
+    setActiveIndex(Math.max(0, Math.min(model.candles.length - 1, index)));
+  };
   const y = (value: number) => plotBottom - (value / model.maxRate) * (plotBottom - top);
   const volumeY = (value: number) => volumeBottom - (value / model.maxVolume) * (volumeBottom - volumeTop);
   const points = model.candles.map((candle, index) => ({
@@ -123,7 +137,23 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
           <span>الحجم أسفل الرسم</span>
         </div>
 
-        <svg viewBox="0 0 760 326" preserveAspectRatio="none" className="mt-1 block h-[225px] w-full overflow-visible sm:h-[280px]" role="img" aria-label={`رسم شموع لتصنيف أحداث البوت عبر كامل السجل مع متوسط متحرك وأحجام الأحداث`}>
+        <svg
+          viewBox="0 0 760 326"
+          preserveAspectRatio="none"
+          className="mt-1 block h-[225px] w-full touch-pan-y select-none overflow-visible outline-none focus-visible:ring-1 focus-visible:ring-primary/50 sm:h-[280px]"
+          role="group"
+          tabIndex={0}
+          aria-label="رسم تفاعلي. اسحب أفقياً أو استخدم الأسهم لاستعراض الشموع."
+          onPointerDown={(event) => { event.currentTarget.setPointerCapture(event.pointerId); handlePointer(event); }}
+          onPointerMove={handlePointer}
+          onPointerLeave={(event) => { if (event.pointerType === "mouse") setActiveIndex(null); }}
+          onKeyDown={(event) => {
+            if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+            event.preventDefault();
+            const current = selectedIndex < 0 ? 0 : selectedIndex;
+            setActiveIndex(Math.max(0, Math.min(model.candles.length - 1, current + (event.key === "ArrowRight" ? 1 : -1))));
+          }}
+        >
           <defs>
             <linearGradient id="activityArea" x1="0" x2="0" y1="0" y2="1">
               <stop offset="0%" stopColor={COLORS.line} stopOpacity=".20" />
@@ -169,11 +199,13 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
           })}
 
           {model.total > 0 && <path d={linePath} fill="none" stroke={COLORS.line} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" filter="url(#activityGlow)" vectorEffect="non-scaling-stroke" />}
-          {model.total > 0 && <g>
-            <circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r="8" fill={COLORS.line} opacity=".16" />
-            <circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r="4" fill={COLORS.line} stroke="var(--theme-bg, #151515)" strokeWidth="2" />
-            <rect x={Math.max(28, points[points.length - 1].x - 102)} y={Math.max(7, points[points.length - 1].y - 35)} width="88" height="24" rx="12" fill="var(--theme-surface, #292929)" stroke={COLORS.line} strokeOpacity=".7" />
-            <text x={Math.max(28, points[points.length - 1].x - 58)} y={Math.max(23, points[points.length - 1].y - 19)} fill="currentColor" fontSize="11" textAnchor="middle">{model.candles[model.candles.length - 1].average.toFixed(1)}</text>
+          {selectedCandle && <g pointerEvents="none">
+            <line x1={selectedX} x2={selectedX} y1={top} y2={volumeBottom} stroke={selectedColor} strokeWidth="1.2" strokeDasharray="4 4" opacity=".9" />
+            <circle cx={selectedX} cy={y(selectedCandle.close)} r="8" fill={selectedColor} opacity=".2" />
+            <circle cx={selectedX} cy={y(selectedCandle.close)} r="4" fill={selectedColor} stroke="var(--theme-bg, #151515)" strokeWidth="2" />
+            <rect x={Math.max(left, Math.min(right - 112, selectedX - 56))} y="5" width="112" height="37" rx="9" fill="var(--theme-surface, #292929)" stroke={selectedColor} strokeOpacity=".8" />
+            <text x={Math.max(left, Math.min(right - 112, selectedX - 56)) + 56} y="20" fill="currentColor" fontSize="9" textAnchor="middle">{formatAxisTime(selectedCandle.start)}</text>
+            <text x={Math.max(left, Math.min(right - 112, selectedX - 56)) + 56} y="33" fill={selectedColor} fontSize="10" fontWeight="600" textAnchor="middle">{selectedCandle.volume} حدث · {selectedLabel}</text>
           </g>}
 
           <line x1={left} x2={right} y1={volumeBottom} y2={volumeBottom} stroke="currentColor" opacity=".2" />
@@ -184,6 +216,20 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
           })}
           {model.total === 0 && <text x="343" y="125" fill="currentColor" opacity=".6" fontSize="13" textAnchor="middle">لا توجد أحداث في هذه الفترة</text>}
         </svg>
+
+        <div className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/[0.08] bg-black/10 px-3 py-2 text-[9px]">
+          {selectedCandle ? (
+            <>
+              <span className="inline-flex items-center gap-1.5 font-semibold" style={{ color: selectedColor }}>
+                <i className="size-1.5 rounded-full" style={{ background: selectedColor }} />
+                {selectedLabel}
+              </span>
+              <span className="text-text-2">{formatAxisTime(selectedCandle.start)}</span>
+              <span className="text-text-2">عدد الأحداث: <b className="font-mono text-text">{selectedCandle.volume}</b></span>
+              <span className="text-text-2">الإغلاق: <b className="font-mono text-text">{selectedCandle.close}</b></span>
+            </>
+          ) : <span className="text-text-3">لا توجد أحداث لعرض تفاصيلها.</span>}
+        </div>
 
         <div className="mt-1 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[8px] text-text-3">
           <span className="inline-flex items-center gap-1.5"><i className="size-2 rounded-[1px]" style={{ background: COLORS.success }} />ناجح</span>
