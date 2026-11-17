@@ -24,6 +24,7 @@ export type SessionStatus =
   | {
       ok: true;
       status: SessionState;
+      error?: string;
       code?: string;
       expiresAt?: number;
       serverTime?: number;
