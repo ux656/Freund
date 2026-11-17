@@ -1,160 +1,30 @@
 "use client";
-
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Activity, AlertCircle, CheckCircle2, Clock3, RefreshCw, Server, Zap } from "lucide-react";
+import { useCallback,useEffect,useMemo,useState } from "react";
+import { RefreshCw } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
-import EmptyState from "@/components/ui/EmptyState";
 import PageEntrance from "@/components/PageEntrance";
-import { requestJson, type ApiPayload } from "@/lib/api-client";
-
-type ActivityEvent = { id: string; type: string; bot?: string; command?: string; at: string; status: "success" | "failed" | "info" };
-type Overview = ApiPayload & { ok?: boolean; data?: { activity?: ActivityEvent[] } };
-
-const labels: Record<string, string> = {
-  pairing_requested: "بدء طلب ربط",
-  pairing_code_ready: "رمز الاقتران جاهز",
-  pairing_linked: "اكتمل ربط البوت",
-  pairing_failed: "فشل طلب الربط",
-  pairing_expired: "انتهت صلاحية الاقتران",
-  bot_connected: "اتصال بوت فرعي",
-  bot_disconnected: "انقطاع بوت فرعي",
-  main_bot_connected: "اتصال البوت الأساسي",
-  main_bot_disconnected: "انقطاع البوت الأساسي",
-  command_success: "تنفيذ أمر بنجاح",
-  command_failed: "فشل تنفيذ أمر",
-};
-
-const statusLabel = { success: "ناجح", failed: "فشل", info: "معلومة" } as const;
-const statusColor = { success: "#aeb3ad", failed: "#dc858b", info: "#858b91" } as const;
-
-function formatClock(value?: string) {
-  if (!value) return "--:--:--";
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? "--:--:--" : new Intl.DateTimeFormat("ar-EG", { hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(date);
-}
-function formatDate(value?: string) {
-  if (!value) return "—";
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? "وقت غير معروف" : new Intl.DateTimeFormat("ar-EG", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(date);
-}
-
-export default function ActivityPage() {
-  const [events, setEvents] = useState<ActivityEvent[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  const load = useCallback(async () => {
-    setError("");
-    try {
-      const result = await requestJson<Overview>("/api/dashboard/overview", { cache: "no-store" });
-      if (!result.response.ok || result.data.ok !== true || !Array.isArray(result.data.data?.activity)) throw new Error("تعذر تحميل سجل النشاط من الخادم.");
-      setEvents(result.data.data.activity);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "تعذر الاتصال بالخادم.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void load();
-    const timer = setInterval(() => void load(), 15000);
-    return () => clearInterval(timer);
-  }, [load]);
-
-  const stats = useMemo(() => ({
-    success: events.filter((event) => event.status === "success").length,
-    failed: events.filter((event) => event.status === "failed").length,
-    info: events.filter((event) => event.status === "info").length,
-  }), [events]);
-
-  const plotted = useMemo(() => {
-    const source = [...events].slice(0, 24).reverse();
-    const times = source.map((event) => new Date(event.at).getTime()).filter(Number.isFinite);
-    const min = times.length ? Math.min(...times) : 0;
-    const max = times.length ? Math.max(...times) : 0;
-    return source.map((event, index) => {
-      const time = new Date(event.at).getTime();
-      const x = max > min && Number.isFinite(time) ? 18 + ((time - min) / (max - min)) * 564 : source.length > 1 ? 18 + (index / (source.length - 1)) * 564 : 300;
-      const y = event.status === "success" ? 42 : event.status === "info" ? 88 : 134;
-      return { ...event, x, y };
-    });
-  }, [events]);
-
-  const latest = events[0];
-
-  return (
-    <PageEntrance>
-      <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-4 pb-20 pt-5 sm:px-5 sm:pt-7">
-        <PageHeader eyebrow="SYSTEM MONITOR" title="سجل النشاط" description="مراقبة أحداث البوت والاتصالات والأوامر." activePage="activity" action={
-          <button type="button" onClick={() => { setLoading(true); void load(); }} disabled={loading} aria-label="تحديث السجل" className="ui-interactive inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-[11px] font-semibold disabled:opacity-50"><RefreshCw size={13} className={loading ? "animate-spin" : ""} /><span className="hidden sm:inline">تحديث</span></button>
-        } />
-
-        {error ? <div role="alert" className="border-y border-danger/25 py-4 text-xs text-danger">{error}</div> : (
-          <>
-            <section className="mb-6 border-y border-white/[0.10] bg-transparent px-3 py-4 sm:px-5 sm:py-5">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="text-[9px] font-semibold tracking-[.2em] text-text-3">ACTIVITY OVERVIEW</div>
-                  <div className="mt-2 flex items-baseline gap-2">
-                    <strong className="font-display text-3xl font-semibold tabular-nums text-text">{events.length.toLocaleString("en-US")}</strong>
-                    <span className="text-[10px] text-text-3">حدث مسجل</span>
-                  </div>
-                </div>
-                <div className="text-left">
-                  <span className="inline-flex items-center gap-1.5 text-[9px] text-text-3"><span className="size-1.5 animate-pulse rounded-full bg-text-3" /> تحديث تلقائي</span>
-                  <div className="mt-2 font-mono text-[11px] tabular-nums text-text-2" dir="ltr">{formatClock(latest?.at)}</div>
-                  <div className="mt-1 text-[9px] text-text-3">آخر حدث</div>
-                </div>
-              </div>
-
-              <div className="mt-5 grid grid-cols-3 border-y border-white/[0.08] py-3">
-                <div className="border-l border-white/[0.08] px-2 text-center"><div className="text-[9px] text-text-3">ناجح</div><strong className="mt-1 block font-display text-xl font-semibold tabular-nums" style={{ color: statusColor.success }}>{stats.success}</strong></div>
-                <div className="border-l border-white/[0.08] px-2 text-center"><div className="text-[9px] text-text-3">فشل</div><strong className="mt-1 block font-display text-xl font-semibold tabular-nums" style={{ color: statusColor.failed }}>{stats.failed}</strong></div>
-                <div className="px-2 text-center"><div className="text-[9px] text-text-3">معلومات</div><strong className="mt-1 block font-display text-xl font-semibold tabular-nums text-text-2">{stats.info}</strong></div>
-              </div>
-
-              <div className="mt-4 flex items-center justify-between">
-                <h2 className="text-[10px] font-semibold text-text-2">توزيع الأحداث حسب الحالة</h2>
-                <span className="text-[8px] tracking-widest text-text-3">TIMELINE</span>
-              </div>
-              <div className="mt-3 overflow-hidden border-y border-white/[0.06] py-2">
-                <div className="mb-2 flex justify-between text-[8px] text-text-3"><span>الأقدم</span><span>الأحدث</span></div>
-                <svg viewBox="0 0 600 176" preserveAspectRatio="none" className="block h-[150px] w-full overflow-visible" role="img" aria-label="مخطط زمني لحالات أحداث النظام">
-                  {[42, 88, 134].map((y) => <line key={y} x1="8" x2="592" y1={y} y2={y} stroke="currentColor" opacity=".12" strokeDasharray="3 7" />)}
-                  {plotted.length > 1 && <polyline points={plotted.map((p) => `${p.x},${p.y}`).join(" ")} fill="none" stroke="#777d80" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" opacity=".75" vectorEffect="non-scaling-stroke" />}
-                  {plotted.map((point) => <g key={point.id}><circle cx={point.x} cy={point.y} r="5.2" fill={point.status === "failed" ? "#dc858b" : "#aeb3ad"} stroke="var(--background, #111)" strokeWidth="2" /><title>{labels[point.type] || point.type}</title></g>)}
-                </svg>
-                <div className="flex items-center justify-center gap-4 pt-1 text-[8px] text-text-3"><span>● ناجح</span><span>● فشل</span><span>● معلومة</span></div>
-              </div>
-            </section>
-
-            <section>
-              <div className="mb-2 flex items-center justify-between border-b border-white/[0.10] pb-3">
-                <div><h2 className="text-xs font-bold">آخر العمليات</h2><p className="mt-1 text-[9px] text-text-3">تفاصيل الأحداث بترتيب زمني تنازلي</p></div>
-                <span className="font-mono text-[9px] tracking-wider text-text-3">EVENTS · {events.length}</span>
-              </div>
-              {loading && !events.length ? <div className="py-8 text-center text-xs text-text-3">جارٍ تحميل سجل النشاط...</div> : events.length === 0 ? <EmptyState icon={<Activity size={18} />}>لا توجد أحداث مسجلة حتى الآن.</EmptyState> : (
-                <div aria-live="polite">
-                  {events.map((event, index) => (
-                    <article key={event.id} className="grid grid-cols-[26px_minmax(0,1fr)_auto] items-center gap-2 border-b border-white/[0.065] py-3 sm:grid-cols-[32px_minmax(0,1fr)_auto] sm:gap-3">
-                      <span className="grid size-6 place-items-center sm:size-7" style={{ color: event.status === "success" ? "#c9f31d" : statusColor[event.status] }}>
-                        {event.status === "success" ? <CheckCircle2 size={17} strokeWidth={1.8} /> : event.status === "failed" ? <AlertCircle size={17} strokeWidth={1.8} /> : <Zap size={17} strokeWidth={1.8} />}
-                      </span>
-                      <div className="min-w-0">
-                        <div className="flex min-w-0 items-center gap-2"><h3 className="truncate text-[11px] font-semibold text-text">{labels[event.type] || "حدث في النظام"}</h3><span className="hidden shrink-0 text-[8px] sm:inline" style={{ color: statusColor[event.status] }}>{statusLabel[event.status]}</span></div>
-                        <div className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2 text-[9px] text-text-3"><span className="inline-flex items-center gap-1"><Server size={10} />{event.bot || "النظام"}</span>{event.command && <span>الأمر: <b dir="ltr">{event.command}</b></span>}</div>
-                      </div>
-                      <div className="text-left"><div className="font-mono text-[9px] tabular-nums text-text-2" dir="ltr">{formatClock(event.at)}</div><div className="mt-1 text-[8px] text-text-3">{formatDate(event.at)}</div></div>
-                    </article>
-                  ))}
-                </div>
-              )}
-            </section>
-          </>
-        )}
-        <p className="mt-5 border-t border-white/[0.08] pt-3 text-[9px] leading-5 text-text-3">المخطط يعرض توقيت الأحداث وحالاتها الفعلية، ولا يمثل قيماً مالية أو مؤشرات أداء تقديرية. لا يتضمن السجل أرقام الهواتف أو محتوى الرسائل أو رموز الاقتران.</p>
-      </main>
-    </PageEntrance>
-  );
+import ActivityEntries,{type ActivityEvent} from "@/components/activity/ActivityEntries";
+import {requestJson,type ApiPayload} from "@/lib/api-client";
+type Overview=ApiPayload&{ok?:boolean;data?:{activity?:ActivityEvent[]}};
+export default function ActivityPage(){
+ const [events,setEvents]=useState<ActivityEvent[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState("");
+ const load=useCallback(async()=>{setError("");try{const r=await requestJson<Overview>("/api/dashboard/overview",{cache:"no-store"});if(!r.response.ok||r.data.ok!==true||!Array.isArray(r.data.data?.activity))throw new Error("تعذر تحميل سجل النشاط من الخادم.");setEvents(r.data.data.activity)}catch(e){setError(e instanceof Error?e.message:"تعذر الاتصال بالخادم.")}finally{setLoading(false)}},[]);
+ useEffect(()=>{void load();const timer=setInterval(()=>void load(),15000);return()=>clearInterval(timer)},[load]);
+ const stats=useMemo(()=>({success:events.filter(e=>e.status==="success").length,failed:events.filter(e=>e.status==="failed").length,info:events.filter(e=>e.status==="info").length}),[events]);
+ const total=Math.max(events.length,1);
+ return <PageEntrance><main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-4 pb-20 pt-5 sm:px-5 sm:pt-7">
+  <PageHeader eyebrow="SYSTEM MONITOR" title="سجل النشاط" description="مراقبة أحداث البوت والاتصالات والأوامر." activePage="activity" action={<button type="button" onClick={()=>{setLoading(true);void load()}} disabled={loading} aria-label="تحديث السجل" className="ui-interactive inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-[11px] font-semibold disabled:opacity-50"><RefreshCw size={13} className={loading?"animate-spin":""}/><span className="hidden sm:inline">تحديث</span></button>}/>
+  {error?<div role="alert" className="border-y border-danger/25 py-4 text-xs text-danger">{error}</div>:<>
+   <section className="mb-6 border-y border-white/[0.10] px-3 py-4 sm:px-5 sm:py-5">
+    <div className="flex items-start justify-between gap-3"><div><div className="text-[9px] font-semibold tracking-[.2em] text-text-3">ACTIVITY OVERVIEW</div><div className="mt-2 flex items-baseline gap-2"><strong className="font-display text-3xl font-semibold tabular-nums text-text">{events.length.toLocaleString("en-US")}</strong><span className="text-[10px] text-text-3">حدث مسجل</span></div></div><div className="text-left"><span className="inline-flex items-center gap-1.5 text-[9px] text-text-3"><span className="size-1.5 animate-pulse rounded-full bg-text-3"/>تحديث تلقائي</span><div className="mt-2 font-mono text-[11px] tabular-nums text-text-2" dir="ltr">{events[0]?.at?new Intl.DateTimeFormat("ar-EG",{hour:"2-digit",minute:"2-digit",second:"2-digit"}).format(new Date(events[0].at)):"--:--:--"}</div><div className="mt-1 text-[9px] text-text-3">آخر حدث</div></div></div>
+    <div className="mt-5 grid grid-cols-3 border-y border-white/[0.08] py-3"><div className="border-l border-white/[0.08] px-2 text-center"><div className="text-[9px] text-text-3">ناجح</div><strong className="mt-1 block font-display text-xl font-semibold tabular-nums text-text">{stats.success}</strong></div><div className="border-l border-white/[0.08] px-2 text-center"><div className="text-[9px] text-text-3">فشل</div><strong className="mt-1 block font-display text-xl font-semibold tabular-nums text-[#dc858b]">{stats.failed}</strong></div><div className="px-2 text-center"><div className="text-[9px] text-text-3">معلومات</div><strong className="mt-1 block font-display text-xl font-semibold tabular-nums text-text-2">{stats.info}</strong></div></div>
+    <div className="mt-4 flex items-center justify-between"><h2 className="text-[10px] font-semibold text-text-2">ملخص حالات الأحداث</h2><span className="text-[8px] tracking-widest text-text-3">DISTRIBUTION</span></div>
+    <div className="mt-4 space-y-3">
+     {[{label:"ناجح",value:stats.success,color:"#858b86"},{label:"فشل",value:stats.failed,color:"#dc858b"},{label:"معلومة",value:stats.info,color:"#777d82"}].map(item=><div key={item.label} className="grid grid-cols-[48px_minmax(0,1fr)_28px] items-center gap-3"><span className="text-[9px] text-text-3">{item.label}</span><div className="h-1.5 overflow-hidden rounded-full bg-white/[0.07]"><div className="h-full rounded-full transition-[width] duration-500" style={{width:(item.value/total*100)+"%",background:item.color}}/></div><span className="text-left font-mono text-[10px] tabular-nums text-text-2">{item.value}</span></div>)}
+    </div>
+   </section>
+   {loading&&!events.length?<div className="py-8 text-center text-xs text-text-3">جارٍ تحميل سجل النشاط...</div>:<ActivityEntries events={events.slice(0,10)} showMore={events.length>10}/>}
+  </>}
+  <p className="mt-5 border-t border-white/[0.08] pt-3 text-[9px] leading-5 text-text-3">يعرض الملخص عدد الأحداث الفعلية حسب حالتها. لا يتضمن السجل أرقام الهواتف أو محتوى الرسائل أو رموز الاقتران.</p>
+ </main></PageEntrance>
 }
