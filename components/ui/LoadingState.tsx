@@ -4,8 +4,8 @@ function Skeleton({ className = "" }: { className?: string }) {
   return <div aria-hidden="true" className={`animate-pulse rounded-xl bg-surface-2/80 ${className}`} />;
 }
 
-function MetricCards({ count = 3 }: { count?: number }) {
-  return <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
+function MetricCards({ count = 3, columns = 2 }: { count?: number; columns?: 2 | 3 }) {
+  return <div className={`${columns === 3 ? "grid-cols-3" : "grid-cols-2 sm:grid-cols-3"} grid gap-2.5 sm:gap-3`}>
     {Array.from({ length: count }, (_, index) => <div key={index} className="ui-card min-w-0 rounded-xl p-3">
       <Skeleton className="mb-3 h-2.5 w-2/3" /><Skeleton className="h-6 w-1/3 rounded-md" />
     </div>)}
@@ -26,13 +26,13 @@ export default function LoadingState({ label = "جارٍ التحميل...", var
     case "server":
       content = <div className="space-y-4">
         <div className="flex items-center justify-between gap-3"><div className="flex items-center gap-3"><Skeleton className="size-11 rounded-xl" /><div className="space-y-2"><Skeleton className="h-3 w-24" /><Skeleton className="h-2.5 w-32" /></div></div><Skeleton className="h-7 w-20 rounded-full" /></div>
-        <MetricCards />
+        <MetricCards count={2} />
         <div className="flex items-center justify-between border-t border-border/60 pt-3"><Skeleton className="h-2.5 w-20" /><Skeleton className="h-2.5 w-28" /></div>
         <div className="ui-card rounded-xl p-3"><Skeleton className="mb-3 h-2.5 w-28" /><Skeleton className="h-5 w-24" /></div>
       </div>;
       break;
     case "bots-summary":
-      content = <MetricCards />;
+      content = <MetricCards count={3} columns={3} />;
       break;
     case "bots-list":
       content = <div className="space-y-3">{Array.from({ length: 3 }, (_, index) => <div key={index} className="ui-card rounded-xl p-3.5 sm:p-4">
