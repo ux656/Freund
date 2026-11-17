@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { isTrustedAppRequest } from "@/lib/server/request-guard";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,7 +12,10 @@ function numeric(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  if (!isTrustedAppRequest(request)) {
+    return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403, headers: { "Cache-Control": "no-store" } });
+  }
   const base = process.env.BOT_API_URL?.replace(/\/+$/, "");
   const token = process.env.BOT_API_TOKEN;
 
@@ -60,8 +64,7 @@ export async function GET() {
           name: text(bot?.name, 80),
           number: text(bot?.number, 40),
           status: ["connected", "disconnected", "connecting"].includes(bot?.status) ? bot.status : "disconnected",
-          lastCommandAt: text(bot?.lastCommandAt, 40) || null,
-          uptimeMs: numeric(bot?.uptimeMs),
+          lastActiveAt: numeric(bot?.lastActiveAt),
         })),
       },
       sessions: {
@@ -70,8 +73,9 @@ export async function GET() {
       },
       activity: activity.map((event: any, index: number) => ({
         id: text(event?.id, 100) || String(index),
-        bot: text(event?.bot, 80),
-        command: text(event?.command, 100),
+        type: text(event?.type, 48) || "system_event",
+        bot: text(event?.bot, 80) || "النظام",
+        command: text(event?.command, 48),
         at: text(event?.at, 40) || "",
         status: ["success", "failed", "info"].includes(event?.status) ? event.status : "info",
       })),
