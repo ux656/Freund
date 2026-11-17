@@ -18,7 +18,7 @@ export type PairingResult =
       serverTime?: number;
     };
 
-export type SessionState = "awaiting" | "confirmed" | "expired";
+export type SessionState = "awaiting" | "confirmed" | "expired" | "failed";
 
 export type SessionStatus =
   | {
@@ -109,11 +109,13 @@ export async function checkSession({ sessionId }: { sessionId: string }): Promis
     const status: SessionState | undefined =
       rawStatus === "linked"
         ? "confirmed"
-        : rawStatus === "expired" || rawStatus === "failed"
+        : rawStatus === "expired"
           ? "expired"
-          : rawStatus === "pending" || rawStatus === "awaiting"
-            ? "awaiting"
-            : undefined;
+          : rawStatus === "failed"
+            ? "failed"
+            : rawStatus === "starting" || rawStatus === "code_ready" || rawStatus === "pending" || rawStatus === "awaiting"
+              ? "awaiting"
+              : undefined;
 
     if (!status) {
       return {
@@ -126,6 +128,7 @@ export async function checkSession({ sessionId }: { sessionId: string }): Promis
     return {
       ok: true,
       status,
+      error: readApiString(data.error),
       code: readApiString(data.code),
       expiresAt: readApiNumber(data.expiresAt),
       serverTime: readApiNumber(data.serverTime),
