@@ -60,6 +60,7 @@ export default function FAQ() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="ابحث عن سؤال..."
+          aria-label="ابحث في الأسئلة الشائعة"
           className="w-full rounded-glass-sm border border-input bg-input px-4 py-3.5 pl-10 text-sm text-text outline-none focus:border-primary"
         />
       </div>
@@ -68,9 +69,11 @@ export default function FAQ() {
         {cats.map((c) => (
           <button
             key={c.id}
-            onClick={() => setCat(c.id)}
+            type="button"
+            onClick={() => { setCat(c.id); setOpen(null); }}
+            aria-pressed={cat === c.id}
             className={cn(
-              "whitespace-nowrap rounded-pill border px-3.5 py-1.5 text-xs font-medium transition-all",
+              "ui-interactive whitespace-nowrap rounded-pill border px-3.5 py-1.5 text-xs font-medium transition-all",
               cat === c.id
                 ? "border-primary bg-primary text-white"
                 : "border-border text-text-2 hover:bg-surface-2"
@@ -85,8 +88,11 @@ export default function FAQ() {
         {filtered.map((f, i) => (
           <div key={i} className="border-t border-border-soft py-4 first:border-t-0 first:pt-0">
             <button
+              type="button"
               onClick={() => setOpen(open === i ? null : i)}
-              className="flex w-full items-center justify-between gap-3 text-right text-[14.5px] font-medium"
+              aria-expanded={open === i}
+              aria-controls={`faq-answer-${i}`}
+              className="ui-interactive flex w-full items-center justify-between gap-3 text-right text-[14.5px] font-medium"
             >
               {f.q}
               <span className={cn("text-xl text-text-3 transition-transform", open === i && "rotate-45 text-primary")}>
@@ -94,12 +100,12 @@ export default function FAQ() {
               </span>
             </button>
             {open === i && (
-              <p className="mt-2.5 text-[13.5px] leading-relaxed text-text-2">{f.a}</p>
+              <p id={`faq-answer-${i}`} className="mt-2.5 text-[13.5px] leading-relaxed text-text-2">{f.a}</p>
             )}
           </div>
         ))}
         {filtered.length === 0 && (
-          <p className="py-10 text-center text-sm text-text-3">لا توجد نتائج مطابقة.</p>
+          <p role="status" aria-live="polite" className="py-10 text-center text-sm text-text-3">لا توجد نتائج مطابقة.</p>
         )}
       </div>
     </div>
