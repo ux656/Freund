@@ -12,7 +12,7 @@ const faqs = [
   },
   {
     q: "هل رقمي آمن؟",
-    a: "نعم. الاتصال مشفّر بالكامل، ولا نحتفظ برقمك بعد انتهاء جلسة الاقتران. يمكنك إلغاء الربط في أي وقت.",
+    a: "راجع سياسة الخصوصية لمعرفة تفاصيل معالجة البيانات. لا تتضمن المعلومات المتاحة هنا تأكيداً مستقلاً لتفاصيل التشفير أو مدة الاحتفاظ بالبيانات.",
     cat: "security",
   },
   {
@@ -22,12 +22,12 @@ const faqs = [
   },
   {
     q: "لماذا يوجد حد أقصى للطلبات؟",
-    a: "لمنع إساءة الاستخدام وحماية الخدمة من السبام. الحد الحالي: 3 رموز لكل رقم في الساعة.",
+    a: "قد تُفرض حدود على الطلبات للحد من إساءة الاستخدام. يظهر لك وقت الانتظار المتبقي عند تفعيل فترة التهدئة.",
     cat: "security",
   },
   {
     q: "كيف أُبلّغ عن إساءة استخدام رقمي؟",
-    a: "راسلنا على abuse@example.com مع تفاصيل الحالة، وسنتخذ الإجراء اللازم خلال 24 ساعة.",
+    a: "لم تُحدد في هذه الصفحة وسيلة تواصل موثقة للإبلاغ. لا ترسل بياناتك إلى عنوان غير مؤكد؛ استخدم قناة التواصل الرسمية المعلنة من إدارة الخدمة.",
     cat: "report",
   },
 ];
@@ -91,7 +91,7 @@ export default function FAQ() {
           <div key={f.q} className="border-t border-border-soft py-4 first:border-t-0 first:pt-0">
             <button
               type="button"
-              onClick={() => setOpen(open === f.q ? null : f.q)}
+              onClick={() => setOpen((current) => current === f.q ? null : f.q)}
               aria-expanded={open === f.q}
               aria-controls={answerId}
               className="ui-interactive flex w-full items-center justify-between gap-3 text-right text-[14.5px] font-medium"
