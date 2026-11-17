@@ -6,8 +6,6 @@ import { Activity, BarChart3, Clock3, Gauge } from "lucide-react";
 type Event = { id: string; at: string; status: "success" | "failed" | "info" };
 type Candle = { start: number; samples: number[]; open: number; close: number; high: number; low: number; volume: number; average: number; status: Event["status"] };
 
-type RangeKey = "ALL";
-
 const COLORS = { success: "#C9F31D", failed: "#E47F88", info: "#92979B", line: "#D97757" };
 
 function smoothPath(points: { x: number; y: number }[]) {
@@ -28,16 +26,11 @@ function smoothPath(points: { x: number; y: number }[]) {
   return path;
 }
 
-function formatAxisTime(value: number, range: RangeKey) {
-  const options: Intl.DateTimeFormatOptions = range === "1W" || range === "ALL"
-    ? { day: "numeric", month: "short" }
-    : { hour: "2-digit", minute: "2-digit" };
-  return new Intl.DateTimeFormat("ar-EG", options).format(new Date(value));
+function formatAxisTime(value: number) {
+  return new Intl.DateTimeFormat("ar-EG", { day: "numeric", month: "short" }).format(new Date(value));
 }
 
 export default function ActivityMarketChart({ events }: { events: Event[] }) {
-  const range: RangeKey = "ALL";
-
   const model = useMemo(() => {
     const now = Date.now();
     const valid = events
@@ -91,7 +84,7 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
       duration,
       start,
     };
-  }, [events, range]);
+  }, [events]);
 
   const left = 24;
   const right = 662;
@@ -167,7 +160,7 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
             const volumeHeight = volumeBottom - volumeY(candle.volume);
             return (
               <g key={candle.start}>
-                <title>{formatAxisTime(candle.start, range)}: حجم {candle.volume}، التصنيف {candle.status === "success" ? "ناجح" : candle.status === "failed" ? "فشل" : "معلومات"}، افتتاح {candle.open}، أعلى {candle.high}، أدنى {candle.low}، إغلاق {candle.close}</title>
+                <title>{formatAxisTime(candle.start)}: حجم {candle.volume}، التصنيف {candle.status === "success" ? "ناجح" : candle.status === "failed" ? "فشل" : "معلومات"}، افتتاح {candle.open}، أعلى {candle.high}، أدنى {candle.low}، إغلاق {candle.close}</title>
                 <line x1={center} x2={center} y1={y(candle.high)} y2={y(candle.low)} stroke={color} strokeWidth="1.6" />
                 <rect x={center - Math.max(3, slot * .23)} y={bodyTop} width={Math.max(6, slot * .46)} height={bodyHeight} rx="1.5" fill={color} />
                 <rect x={center - Math.max(3, slot * .23)} y={volumeBottom - volumeHeight} width={Math.max(6, slot * .46)} height={Math.max(1, volumeHeight)} rx="1.5" fill={color} opacity=".55" />
@@ -187,7 +180,7 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
           {[0, 9, 18, 27, 35].map((index) => {
             const time = model.start + model.duration * index / 36;
             const x = left + slot * (index + .5);
-            return <text key={index} x={x} y="319" fill="currentColor" opacity=".62" fontSize="10" textAnchor="middle">{formatAxisTime(time, range)}</text>;
+            return <text key={index} x={x} y="319" fill="currentColor" opacity=".62" fontSize="10" textAnchor="middle">{formatAxisTime(time)}</text>;
           })}
           {model.total === 0 && <text x="343" y="125" fill="currentColor" opacity=".6" fontSize="13" textAnchor="middle">لا توجد أحداث في هذه الفترة</text>}
         </svg>
