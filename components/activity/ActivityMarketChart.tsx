@@ -1,21 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Activity, BarChart3, Clock3, Gauge } from "lucide-react";
 
 type Event = { id: string; at: string; status: "success" | "failed" | "info" };
-type RangeKey = "1H" | "6H" | "1D" | "1W" | "ALL";
-type Candle = { start: number; samples: number[]; open: number; close: number; high: number; low: number; volume: number; average: number };
+type Candle = { start: number; samples: number[]; open: number; close: number; high: number; low: number; volume: number; average: number; status: Event["status"] };
 
-const RANGES: { key: RangeKey; label: string; duration: number }[] = [
-  { key: "1H", label: "1H", duration: 60 * 60 * 1000 },
-  { key: "6H", label: "6H", duration: 6 * 60 * 60 * 1000 },
-  { key: "1D", label: "1D", duration: 24 * 60 * 60 * 1000 },
-  { key: "1W", label: "1W", duration: 7 * 24 * 60 * 60 * 1000 },
-  { key: "ALL", label: "ALL", duration: 0 },
-];
+type RangeKey = "ALL";
 
-const COLORS = { up: "#829B8B", down: "#C27E83", flat: "#8D9297", line: "#D97757" };
+const COLORS = { success: "#C9F31D", failed: "#E47F88", info: "#92979B", line: "#D97757" };
 
 function smoothPath(points: { x: number; y: number }[]) {
   if (!points.length) return "";
@@ -43,7 +36,7 @@ function formatAxisTime(value: number, range: RangeKey) {
 }
 
 export default function ActivityMarketChart({ events }: { events: Event[] }) {
-  const [range, setRange] = useState<RangeKey>("1D");
+  const range: RangeKey = "ALL";
 
   const model = useMemo(() => {
     const now = Date.now();
@@ -51,7 +44,7 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
       .map((event) => ({ ...event, timestamp: new Date(event.at).getTime() }))
       .filter((event) => Number.isFinite(event.timestamp) && event.timestamp <= now);
     const oldest = valid.length ? Math.min(...valid.map((event) => event.timestamp)) : now;
-    const duration = range === "ALL" ? Math.max(60 * 60 * 1000, now - oldest) : RANGES.find((item) => item.key === range)!.duration;
+    const duration = Math.max(60 * 60 * 1000, now - oldest);
     const start = now - duration;
     const bucketCount = 36;
     const bucketDuration = duration / bucketCount;
@@ -60,6 +53,7 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
       start: start + index * bucketDuration,
       samples: [0, 0, 0, 0, 0],
       volume: 0,
+      statusCounts: { success: 0, failed: 0, info: 0 },
     }));
 
     const visibleEvents = valid.filter((event) => event.timestamp >= start);
@@ -70,6 +64,7 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
       const sampleIndex = Math.min(4, Math.floor(withinBucket / sampleDuration));
       buckets[bucketIndex].samples[sampleIndex] += 1;
       buckets[bucketIndex].volume += 1;
+      buckets[bucketIndex].statusCounts[event.status] += 1;
     }
 
     const candles: Candle[] = buckets.map((bucket, index) => ({
@@ -79,6 +74,7 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
       high: Math.max(...bucket.samples),
       low: Math.min(...bucket.samples),
       average: candlesAverage(buckets, index),
+      status: bucket.volume === 0 ? "info" : ([["success", bucket.statusCounts.success], ["failed", bucket.statusCounts.failed], ["info", bucket.statusCounts.info]] as [Event["status"], number][]).sort((a, b) => b[1] - a[1])[0][0],
     }));
 
     const maxRate = Math.max(1, ...candles.map((candle) => candle.high), ...candles.map((candle) => candle.average));
@@ -117,25 +113,11 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
 
   return (
     <section className="space-y-3">
-      <div dir="ltr" aria-label="الفترة الزمنية للرسم" className="grid grid-cols-5 gap-1 rounded-2xl border border-white/[0.10] bg-surface/40 p-1.5">
-        {RANGES.map((item) => (
-          <button
-            key={item.key}
-            type="button"
-            onClick={() => setRange(item.key)}
-            aria-pressed={range === item.key}
-            className={`ui-interactive rounded-xl py-2.5 text-[11px] font-semibold tracking-wide sm:text-xs ${range === item.key ? "border border-primary/70 bg-primary/10 text-primary shadow-[0_0_18px_rgba(217,119,87,0.12)]" : "border border-transparent text-text-2 hover:bg-white/[0.04]"}`}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
-
       <div className="overflow-hidden rounded-[25px] border border-white/[0.12] bg-surface/25 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] sm:p-4">
         <div className="mb-3 flex items-start justify-between gap-3">
           <div>
             <h2 className="text-xs font-semibold text-text">حركة النشاط</h2>
-            <p className="mt-1 text-[9px] text-text-3">شموع معدل الأحداث وحجم النشاط</p>
+            <p className="mt-1 text-[9px] text-text-3">شموع تصنيف الأحداث وحجم النشاط</p>
           </div>
           <div className="text-left">
             <span className="block font-mono text-[9px] tracking-wider text-text-3">EVENT FLOW</span>
@@ -148,7 +130,7 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
           <span>الحجم أسفل الرسم</span>
         </div>
 
-        <svg viewBox="0 0 760 326" preserveAspectRatio="none" className="mt-1 block h-[225px] w-full overflow-visible sm:h-[280px]" role="img" aria-label={`رسم شموع لمعدل نشاط البوت خلال ${range} مع متوسط متحرك وأحجام الأحداث`}>
+        <svg viewBox="0 0 760 326" preserveAspectRatio="none" className="mt-1 block h-[225px] w-full overflow-visible sm:h-[280px]" role="img" aria-label={`رسم شموع لتصنيف أحداث البوت عبر كامل السجل مع متوسط متحرك وأحجام الأحداث`}>
           <defs>
             <linearGradient id="activityArea" x1="0" x2="0" y1="0" y2="1">
               <stop offset="0%" stopColor={COLORS.line} stopOpacity=".20" />
@@ -179,15 +161,13 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
           {areaPath && <path d={areaPath} fill="url(#activityArea)" />}
           {model.candles.map((candle, index) => {
             const center = left + slot * (index + 0.5);
-            const rising = candle.close > candle.open;
-            const falling = candle.close < candle.open;
-            const color = rising ? COLORS.up : falling ? COLORS.down : COLORS.flat;
+            const color = COLORS[candle.status];
             const bodyTop = Math.min(y(candle.open), y(candle.close));
             const bodyHeight = Math.max(2, Math.abs(y(candle.open) - y(candle.close)));
             const volumeHeight = volumeBottom - volumeY(candle.volume);
             return (
               <g key={candle.start}>
-                <title>{formatAxisTime(candle.start, range)}: حجم {candle.volume}، افتتاح {candle.open}، أعلى {candle.high}، أدنى {candle.low}، إغلاق {candle.close}</title>
+                <title>{formatAxisTime(candle.start, range)}: حجم {candle.volume}، التصنيف {candle.status === "success" ? "ناجح" : candle.status === "failed" ? "فشل" : "معلومات"}، افتتاح {candle.open}، أعلى {candle.high}، أدنى {candle.low}، إغلاق {candle.close}</title>
                 <line x1={center} x2={center} y1={y(candle.high)} y2={y(candle.low)} stroke={color} strokeWidth="1.6" />
                 <rect x={center - Math.max(3, slot * .23)} y={bodyTop} width={Math.max(6, slot * .46)} height={bodyHeight} rx="1.5" fill={color} />
                 <rect x={center - Math.max(3, slot * .23)} y={volumeBottom - volumeHeight} width={Math.max(6, slot * .46)} height={Math.max(1, volumeHeight)} rx="1.5" fill={color} opacity=".55" />
@@ -212,9 +192,10 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
           {model.total === 0 && <text x="343" y="125" fill="currentColor" opacity=".6" fontSize="13" textAnchor="middle">لا توجد أحداث في هذه الفترة</text>}
         </svg>
 
-        <div className="mt-1 flex items-center justify-center gap-4 text-[8px] text-text-3">
-          <span className="inline-flex items-center gap-1.5"><i className="size-2 rounded-[1px]" style={{ background: COLORS.up }} />نشاط صاعد</span>
-          <span className="inline-flex items-center gap-1.5"><i className="size-2 rounded-[1px]" style={{ background: COLORS.down }} />نشاط هابط</span>
+        <div className="mt-1 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[8px] text-text-3">
+          <span className="inline-flex items-center gap-1.5"><i className="size-2 rounded-[1px]" style={{ background: COLORS.success }} />ناجح</span>
+          <span className="inline-flex items-center gap-1.5"><i className="size-2 rounded-[1px]" style={{ background: COLORS.failed }} />فشل</span>
+          <span className="inline-flex items-center gap-1.5"><i className="size-2 rounded-[1px]" style={{ background: COLORS.info }} />معلومات</span>
           <span className="inline-flex items-center gap-1.5"><i className="h-[2px] w-3 rounded-full" style={{ background: COLORS.line }} />متوسط متحرك</span>
         </div>
       </div>
