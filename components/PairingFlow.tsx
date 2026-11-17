@@ -48,12 +48,12 @@ export default function PairingFlow() {
   /* ===== Timer ===== */
   useEffect(() => {
     if (!sessionId) return;
-    timerRef.current = setInterval(() => {
+    const interval = setInterval(() => {
       const rem = Math.max(0, expiresAt - serverNow());
       setRemainingSec(Math.ceil(rem / 1000));
       if (rem <= 0) {
-        if (timerRef.current) clearInterval(timerRef.current);
-        timerRef.current = null;
+        clearInterval(interval);
+        if (timerRef.current === interval) timerRef.current = null;
 
         // Stop polling once the local expiry countdown reaches zero.
         // A completed session should not keep generating status requests.
@@ -63,22 +63,30 @@ export default function PairingFlow() {
         if (verifyState === "awaiting") setVerifyState("expired");
       }
     }, 1000);
-    return () => clearInterval(timerRef.current!);
+    timerRef.current = interval;
+    return () => {
+      clearInterval(interval);
+      if (timerRef.current === interval) timerRef.current = null;
+    };
   }, [sessionId, expiresAt, verifyState]);
 
   /* ===== Cooldown ===== */
   useEffect(() => {
     if (!cooldownUntil) return;
-    cooldownRef.current = setInterval(() => {
+    const interval = setInterval(() => {
       const rem = Math.max(0, cooldownUntil - serverNow());
       setCooldownSec(Math.ceil(rem / 1000));
       if (rem <= 0) {
-        if (cooldownRef.current) clearInterval(cooldownRef.current);
-        cooldownRef.current = null;
+        clearInterval(interval);
+        if (cooldownRef.current === interval) cooldownRef.current = null;
         setCooldownSec(0);
       }
     }, 1000);
-    return () => clearInterval(cooldownRef.current!);
+    cooldownRef.current = interval;
+    return () => {
+      clearInterval(interval);
+      if (cooldownRef.current === interval) cooldownRef.current = null;
+    };
   }, [cooldownUntil]);
 
   /* ===== Polling ===== */
