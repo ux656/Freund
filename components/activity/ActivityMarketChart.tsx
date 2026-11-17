@@ -201,6 +201,8 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
           {model.total > 0 && <g>
             <circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r="8" fill={COLORS.line} opacity=".16" />
             <circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r="4" fill={COLORS.line} stroke="var(--theme-bg, #151515)" strokeWidth="2" />
+            <rect x={Math.max(28, points[points.length - 1].x - 102)} y={Math.max(7, points[points.length - 1].y - 35)} width="88" height="24" rx="12" fill="var(--theme-surface, #292929)" stroke={COLORS.line} strokeOpacity=".7" />
+            <text x={Math.max(28, points[points.length - 1].x - 58)} y={Math.max(23, points[points.length - 1].y - 19)} fill="currentColor" fontSize="11" textAnchor="middle">{model.candles[model.candles.length - 1].average.toFixed(1)}</text>
           </g>}
 
           <line x1={left} x2={right} y1={volumeBottom} y2={volumeBottom} stroke="currentColor" opacity=".2" />
@@ -250,7 +252,7 @@ function candlesAverage(buckets: { samples: number[] }[], index: number) {
   let total = 0;
   let count = 0;
   for (let cursor = start; cursor <= index; cursor++) {
-    total += buckets[cursor].samples[4];
+    total += buckets[cursor].samples.reduce((sum, value) => sum + value, 0) / buckets[cursor].samples.length;
     count++;
   }
   return count ? total / count : 0;
