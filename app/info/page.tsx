@@ -1,79 +1,91 @@
-import type { Metadata } from "next";
-import { Activity, Cpu, HardDrive, MemoryStick, Server, Smartphone, Users, Wifi, ShieldCheck } from "lucide-react";
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import { Activity, Clock3, Cpu, HardDrive, MemoryStick, Server, Wifi, Zap } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
 import PageEntrance from "@/components/PageEntrance";
+import { requestJson, type ApiPayload } from "@/lib/api-client";
 
-export const metadata: Metadata = {
-  title: "معلومات النظام | BMG",
-  description: "موارد الخادم وإحصائيات تشغيل بوت BMG والجلسات.",
+type Overview = ApiPayload & {
+  ok?: boolean;
+  data?: {
+    checkedAt?: string;
+    service?: { status?: string; uptimeMs?: number | null; latencyMs?: number | null; memory?: { rss?: number | null; heapUsed?: number | null; heapTotal?: number | null } | null };
+    bots?: { total?: number; connected?: number; disconnected?: number };
+    sessions?: { active?: number; pending?: number };
+  };
 };
 
-const metrics = [
-  { label: "أنوية المعالج", value: "16 Core", Icon: Cpu },
-  { label: "المساحة المتاحة", value: "425.58 GB", Icon: HardDrive },
-  { label: "استهلاك المعالج", value: "9.73", Icon: Activity },
-  { label: "استهلاك الذاكرة", value: "83.83 GB", Icon: MemoryStick },
-  { label: "البوتات النشطة", value: "3", Icon: Server },
-  { label: "المجموعات", value: "84", Icon: Users },
-  { label: "الجلسات المباشرة", value: "23", Icon: Smartphone },
-];
-
-const sessions = ["2010######", "2127######", "4869######"];
-
-function SectionTitle({ icon: Icon, title, detail }: { icon: typeof Server; title: string; detail: string }) {
-  return (
-    <div className="mb-4 flex min-w-0 items-center gap-3">
-      <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary"><Icon size={17} /></span>
-      <div className="min-w-0"><h2 className="text-sm font-bold">{title}</h2><p className="mt-1 text-[11px] text-text-3">{detail}</p></div>
-    </div>
-  );
+function formatBytes(value?: number | null) {
+  if (typeof value !== "number") return "غير متاح";
+  return value >= 1024 ** 3 ? (value / 1024 ** 3).toFixed(2) + " GB" : (value / 1024 ** 2).toFixed(1) + " MB";
+}
+function formatDuration(value?: number | null) {
+  if (typeof value !== "number") return "غير متاح";
+  const total = Math.floor(value / 1000);
+  const days = Math.floor(total / 86400);
+  const hours = Math.floor((total % 86400) / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  return days ? days + " يوم و" + hours + " ساعة" : hours ? hours + " ساعة و" + minutes + " دقيقة" : minutes + " دقيقة";
 }
 
 export default function InfoPage() {
+  const [data, setData] = useState<Overview["data"]>();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const result = await requestJson<Overview>("/api/dashboard/overview", { cache: "no-store" });
+      if (!result.response.ok || result.data.ok !== true || !result.data.data) throw new Error("تعذر تحميل بيانات النظام الحقيقية.");
+      setData(result.data.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "تعذر الاتصال بالخادم.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { void load(); }, [load]);
+
+  const metrics = [
+    { label: "مدة تشغيل الخدمة", value: formatDuration(data?.service?.uptimeMs), Icon: Clock3 },
+    { label: "استهلاك الذاكرة", value: formatBytes(data?.service?.memory?.rss), Icon: MemoryStick },
+    { label: "ذاكرة JavaScript", value: formatBytes(data?.service?.memory?.heapUsed), Icon: HardDrive },
+    { label: "زمن استجابة API", value: typeof data?.service?.latencyMs === "number" ? data.service.latencyMs + " ms" : "غير متاح", Icon: Zap },
+    { label: "البوتات المتصلة", value: String(data?.bots?.connected ?? "—"), Icon: Server },
+    { label: "جلسات التنصيب المعلقة", value: String(data?.sessions?.pending ?? "—"), Icon: Cpu },
+  ];
+
   return (
     <PageEntrance>
-    <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-4 pb-20 pt-6 sm:px-5 sm:pt-8">
-      <PageHeader eyebrow="SYSTEM OVERVIEW" title="معلومات النظام" description="نظرة عامة على موارد تشغيل BMG والخدمة والجلسات المسجلة." activePage="system" />
-
-      <section className="mb-6">
-        <SectionTitle icon={Activity} title="موارد النظام" detail="ملخص موارد الخادم حسب التقرير المتاح" />
-        <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
-          {metrics.map(({ label, value, Icon }) => (
-            <article key={label} className="lg lg-surface ui-card min-w-0 rounded-2xl p-3 sm:p-4">
-              <div className="mb-3 flex min-h-8 items-start justify-between gap-2 sm:mb-4">
-                <span className="min-w-0 text-[10px] leading-5 text-text-2 sm:text-[11px]">{label}</span>
-                <Icon size={16} className="shrink-0 text-primary" />
+      <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-4 pb-20 pt-6 sm:px-5 sm:pt-8">
+        <PageHeader eyebrow="SYSTEM OVERVIEW" title="معلومات النظام" description="قراءات مباشرة من خدمة البوت، دون أرقام تقديرية أو بيانات ثابتة." activePage="system" action={
+          <button type="button" onClick={() => void load()} disabled={loading} className="ui-interactive rounded-xl border border-border bg-surface px-3 py-2.5 text-[11px] font-semibold disabled:opacity-50">تحديث</button>
+        } />
+        {error ? <div role="alert" className="rounded-xl border border-danger/25 bg-danger/5 p-4 text-xs text-danger">{error}</div> : loading ? <div className="py-10 text-center text-xs text-text-3">جارٍ تحميل بيانات الخادم...</div> : (
+          <>
+            <section className="mb-6">
+              <div className="mb-4 flex items-center gap-3"><span className="grid size-9 place-items-center rounded-xl bg-primary/10 text-primary"><Activity size={17} /></span><div><h2 className="text-sm font-bold">موارد الخدمة</h2><p className="mt-1 text-[11px] text-text-3">القيم التي يوفرها خادم البوت فعلياً</p></div></div>
+              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
+                {metrics.map(({ label, value, Icon }) => <article key={label} className="lg lg-surface ui-card min-w-0 rounded-2xl p-3 sm:p-4"><div className="mb-3 flex min-h-8 items-start justify-between gap-2"><span className="min-w-0 text-[10px] leading-5 text-text-2">{label}</span><Icon size={16} className="shrink-0 text-primary" /></div><div className="break-words font-display text-lg font-bold sm:text-xl" dir="auto">{value}</div></article>)}
               </div>
-              <div className="break-words font-display text-lg font-bold sm:text-xl" dir="ltr">{value}</div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="lg lg-surface mb-4 rounded-2xl p-3.5 sm:p-5">
-        <SectionTitle icon={ShieldCheck} title="بيانات الخدمة" detail="معلومات تعريفية عن بوت BMG" />
-        <div className="divide-y divide-border/60">
-          <div className="flex flex-wrap items-center justify-between gap-2 py-3 text-xs"><span className="text-text-2">اسم البوت</span><strong dir="ltr">BMG BOT</strong></div>
-          <div className="flex flex-wrap items-center justify-between gap-2 py-3 text-xs"><span className="text-text-2">الجهة الداعمة</span><strong dir="ltr">BMG</strong></div>
-          <div className="flex flex-wrap items-center justify-between gap-2 py-3 text-xs"><span className="text-text-2">حالة البوابة</span><StatusBadge tone="success" dir="ltr">ONLINE · PRIVATE GATEWAY</StatusBadge></div>
-        </div>
-      </section>
-
-      <section className="lg lg-surface rounded-2xl p-3.5 sm:p-5">
-        <SectionTitle icon={Wifi} title="الجلسات المسجلة" detail="معرّفات مخفية كما وردت في التقرير" />
-        <div className="space-y-2">
-          {sessions.map((session) => (
-            <div key={session} className="ui-card flex min-w-0 items-center justify-between gap-3 px-3.5 py-3">
-              <span className="min-w-0 break-all font-mono text-xs tracking-wider" dir="ltr">{session}</span>
-              <StatusBadge dir="ltr">STANDBY</StatusBadge>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <p className="mt-4 text-[10px] leading-5 text-text-3">تنبيه: الأرقام والتفاصيل المعروضة من التقرير المرسل، وليست قراءات مباشرة من خادم BMG. لم يتم ربط مصدر بيانات حي لهذه الصفحة.</p>
-    </main>
+            </section>
+            <section className="lg lg-surface rounded-2xl p-3.5 sm:p-5">
+              <div className="mb-4 flex items-center gap-3"><span className="grid size-9 place-items-center rounded-xl bg-primary/10 text-primary"><Wifi size={17} /></span><div><h2 className="text-sm font-bold">حالة الخدمة والجلسات</h2><p className="mt-1 text-[11px] text-text-3">ملخص الاتصال الحالي</p></div></div>
+              <div className="divide-y divide-border/60">
+                <div className="flex items-center justify-between gap-2 py-3 text-xs"><span className="text-text-2">حالة البوابة</span><StatusBadge tone={data?.service?.status === "online" ? "success" : "danger"} dir="ltr">{data?.service?.status || "UNKNOWN"}</StatusBadge></div>
+                <div className="flex items-center justify-between gap-2 py-3 text-xs"><span className="text-text-2">إجمالي البوتات الفرعية</span><strong>{data?.bots?.total ?? 0}</strong></div>
+                <div className="flex items-center justify-between gap-2 py-3 text-xs"><span className="text-text-2">الجلسات النشطة</span><strong>{data?.sessions?.active ?? 0}</strong></div>
+                <div className="flex items-center justify-between gap-2 py-3 text-xs"><span className="text-text-2">آخر تحديث</span><strong className="text-[10px]">{data?.checkedAt ? new Intl.DateTimeFormat("ar-EG", { dateStyle: "medium", timeStyle: "short" }).format(new Date(data.checkedAt)) : "غير متاح"}</strong></div>
+              </div>
+            </section>
+          </>
+        )}
+      </main>
     </PageEntrance>
   );
 }
