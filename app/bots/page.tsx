@@ -24,11 +24,13 @@ export default function BotsPage() {
   const [bots, setBots] = useState<BotItem[]>([]);
   const [counts, setCounts] = useState({ total: 0, connected: 0, disconnected: 0 });
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const hasLoadedOnce = useRef(false);
 
   const load = useCallback(async () => {
     if (!hasLoadedOnce.current) setLoading(true);
+    else setRefreshing(true);
     setError("");
     try {
       const result = await requestJson<Overview>("/api/dashboard/overview", { cache: "no-store" });
@@ -40,6 +42,7 @@ export default function BotsPage() {
       setError(err instanceof Error ? err.message : "تعذر الاتصال بالخادم.");
     } finally {
       setLoading(false);
+      setRefreshing(false);
       hasLoadedOnce.current = true;
     }
   }, []);
@@ -55,8 +58,8 @@ export default function BotsPage() {
     <PageEntrance>
       <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-4 pb-20 pt-6 sm:px-5 sm:pt-8">
         <PageHeader eyebrow="BOT MANAGEMENT" title="جلسات البوتات" description="حالة جلسات واتساب الفرعية وآخر وقت نشاط مسجل." activePage="bots" action={
-          <button type="button" onClick={() => void load()} disabled={loading} aria-label="تحديث البيانات" className="ui-interactive inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2.5 text-[11px] font-semibold disabled:opacity-50">
-            <RefreshCw size={13} className={loading ? "animate-spin" : ""} /><span className="hidden sm:inline">تحديث</span>
+          <button type="button" onClick={() => void load()} disabled={loading || refreshing} aria-label="تحديث البيانات" className="ui-interactive inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2.5 text-[11px] font-semibold disabled:opacity-50">
+            <RefreshCw size={13} className={loading || refreshing ? "animate-spin" : ""} /><span className="hidden sm:inline">تحديث</span>
           </button>
         } />
 
@@ -75,7 +78,9 @@ export default function BotsPage() {
             <Search size={15} className="shrink-0 text-text-3" />
             <input type="search" aria-label="البحث عن جلسة" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث بمعرّف الجلسة..." className="min-w-0 w-full bg-transparent text-xs text-text outline-none placeholder:text-text-3" />
           </label>
-          {error ? <div role="alert" className="rounded-xl border border-danger/25 bg-danger/5 p-4 text-xs text-danger">{error}</div> : loading ? <LoadingState variant="bots-list" label="جارٍ تحميل جلسات البوتات..." /> : (
+          {error && !bots.length ? <div role="alert" className="rounded-xl border border-danger/25 bg-danger/5 p-4 text-xs text-danger">{error}</div> : loading ? <LoadingState variant="bots-list" label="جارٍ تحميل جلسات البوتات..." /> : (
+            <>
+            {error && <div role="alert" className="mb-3 rounded-xl border border-danger/25 bg-danger/5 p-4 text-xs text-danger">{error}</div>}
             <div className="space-y-3">
               {filtered.map((bot) => (
                 <article key={bot.id} className="ui-card rounded-xl p-3.5 sm:p-4">
@@ -93,6 +98,7 @@ export default function BotsPage() {
               ))}
               {filtered.length === 0 && <EmptyState icon={<Search size={17} />}>{bots.length ? "لا توجد نتائج مطابقة للبحث." : "لا توجد جلسات بوتات مسجلة حالياً."}</EmptyState>}
             </div>
+            </>
           )}
         </section>
         <p className="mt-4 text-[10px] leading-5 text-text-3">لا تعرض الصفحة أرقام الهواتف أو معرّفات واتساب؛ تستخدم معرّفات داخلية غير حساسة.</p>
