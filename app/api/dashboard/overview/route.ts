@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
     }
 
     const items = Array.isArray(raw.bots.items) ? raw.bots.items.slice(0, 100) : [];
-    const activity = raw.activity.slice(0, 20);
+    const activity = raw.activity.slice(0, 300);
 
     const data = {
       checkedAt: text(raw.checkedAt, 40) || new Date().toISOString(),
