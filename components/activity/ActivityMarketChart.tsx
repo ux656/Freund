@@ -219,7 +219,7 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 overflow-hidden rounded-[22px] border border-white/[0.12] bg-surface/35 py-3">
+      <div dir="ltr" className="grid grid-cols-4 overflow-hidden rounded-[22px] border border-white/[0.12] bg-surface/35 py-3">
         <div className="min-w-0 border-l border-white/[0.09] px-1.5 text-center sm:px-3">
           <BarChart3 className="mx-auto mb-1.5 size-4 text-text-2" />
           <div className="truncate text-[8px] text-text-3 sm:text-[10px]">الحجم</div>
