@@ -31,7 +31,7 @@ const features = [
 
 export default function Features() {
   const [active, setActive] = useState(features[0].id);
-  const current = features.find((f) => f.id === active)!;
+  const current = features.find((f) => f.id === active) ?? features[0];
 
   return (
     <div className="space-y-8">
@@ -47,10 +47,11 @@ export default function Features() {
             return (
               <button
                 key={f.id}
+                type="button"
                 onClick={() => setActive(f.id)}
-                onMouseEnter={() => setActive(f.id)}
+                aria-pressed={active === f.id}
                 className={cn(
-                  "lg w-full rounded-glass p-4 text-right transition-all",
+                  "ui-interactive lg w-full rounded-glass p-4 text-right transition-all",
                   active === f.id ? "lg-surface border-primary/30" : "lg-regular hover:border-primary/20"
                 )}
               >
