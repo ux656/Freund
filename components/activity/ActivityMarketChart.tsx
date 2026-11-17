@@ -105,7 +105,8 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
     if (!rect.width) return;
     const chartX = ((event.clientX - rect.left) / rect.width) * 760;
     const index = Math.floor((chartX - left) / slot);
-    setActiveIndex(Math.max(0, Math.min(model.candles.length - 1, index)));
+    const nextIndex = Math.max(0, Math.min(model.candles.length - 1, index));
+    setActiveIndex((current) => current === nextIndex ? current : nextIndex);
   };
   const y = (value: number) => plotBottom - (value / model.maxRate) * (plotBottom - top);
   const volumeY = (value: number) => volumeBottom - (value / model.maxVolume) * (volumeBottom - volumeTop);
