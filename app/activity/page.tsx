@@ -39,12 +39,12 @@ export default function ActivityPage() {
   return (
     <PageEntrance>
       <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-4 pb-20 pt-5 sm:px-5 sm:pt-7">
-        <header className="mb-6 flex items-center justify-between gap-3">
+        <header dir="ltr" className="mb-6 flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <div className="grid size-12 shrink-0 place-items-center rounded-2xl border border-white/[0.14] bg-surface/70 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] sm:size-14">
               <Activity className="size-6 text-primary sm:size-7" />
             </div>
-            <div className="min-w-0">
+            <div dir="rtl" className="min-w-0 text-right">
               <div className="text-[9px] font-bold tracking-[.2em] text-primary">FREUND · ACTIVITY</div>
               <h1 className="mt-0.5 truncate font-display text-lg font-bold text-text sm:text-xl">سجل النشاط</h1>
               <p className="mt-0.5 truncate text-[9px] text-text-3 sm:text-[10px]">مراقبة الاتصالات والأوامر لحظياً</p>
@@ -68,8 +68,8 @@ export default function ActivityPage() {
           <div role="alert" className="border-y border-danger/25 py-4 text-xs text-danger">{error}</div>
         ) : (
           <>
-            <section className="mb-5 flex items-end justify-between gap-3 px-1">
-              <div className="min-w-0">
+            <section dir="ltr" className="mb-5 flex items-end justify-between gap-3 px-1">
+              <div dir="rtl" className="min-w-0 text-left">
                 <div className="text-[10px] text-text-3">إجمالي الأحداث المسجلة</div>
                 <div className="mt-1 flex items-baseline gap-2">
                   <strong className="font-display text-4xl font-semibold tabular-nums tracking-tight text-text sm:text-5xl">{events.length.toLocaleString("en-US")}</strong>
@@ -77,7 +77,7 @@ export default function ActivityPage() {
                 </div>
                 <div className="mt-1 text-[9px] text-text-3">اختر الفترة لعرض حركة النشاط</div>
               </div>
-              <div className="pb-1 text-left">
+              <div dir="ltr" className="pb-1 text-right">
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-green/25 bg-green/5 px-3 py-1.5 text-[10px] font-semibold text-green">
                   <span className="size-1.5 animate-pulse rounded-full bg-green" /> LIVE
                 </span>
