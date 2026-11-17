@@ -10,9 +10,9 @@ export default function Hero() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="mb-5 inline-flex items-center gap-1.5 text-[11px] font-medium text-green"
+        className="mb-5 inline-flex items-center gap-1.5 text-[11px] font-medium text-primary"
       >
-        <span className="size-1.5 animate-pulse-soft rounded-full bg-green" />
+        <span className="size-1.5 rounded-full bg-primary" />
         خدمة ربط واتساب
       </motion.div>
 
