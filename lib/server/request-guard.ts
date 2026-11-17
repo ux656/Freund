@@ -1,6 +1,9 @@
 import { NextRequest } from "next/server";
 
-const DEFAULT_ORIGINS = ["https://freund-brown.vercel.app"];
+const DEFAULT_ORIGINS = [
+  "https://freund-olive.vercel.app",
+  "https://sup.bmg-inc.web.id"
+];
 
 function allowedOrigins() {
   const configured = (process.env.APP_ALLOWED_ORIGINS || "")
