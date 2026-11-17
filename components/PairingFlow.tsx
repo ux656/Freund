@@ -21,7 +21,7 @@ export default function PairingFlow() {
   const [cooldownUntil, setCooldownUntil] = useState(0);
   const [remainingSec, setRemainingSec] = useState(60);
   const [cooldownSec, setCooldownSec] = useState(0);
-  const [verifyState, setVerifyState] = useState<"idle" | "awaiting" | "confirmed" | "expired">("idle");
+  const [verifyState, setVerifyState] = useState<"idle" | "awaiting" | "confirmed" | "expired" | "failed">("idle");
   const [isVerifying, setIsVerifying] = useState(false);
   const isVerifyingRef = useRef(false);
   const activeSessionRef = useRef<string | null>(null);
@@ -132,8 +132,8 @@ export default function PairingFlow() {
           }, 800);
           return;
         }
-        if (res.status === "expired") {
-          setVerifyState("expired");
+        if (res.status === "expired" || res.status === "failed") {
+          setVerifyState(res.status);
           stopPolling();
           return;
         }
@@ -476,7 +476,8 @@ export default function PairingFlow() {
                   "flex items-center gap-2 rounded-glass-sm border px-3.5 py-2.5 text-[12.5px] font-medium",
                   verifyState === "awaiting" && "border-primary/25 bg-primary/10 text-primary",
                   verifyState === "confirmed" && "border-green/30 bg-green/10 text-green",
-                  verifyState === "expired" && "border-gold/35 bg-gold/10 text-gold"
+                  verifyState === "expired" && "border-gold/35 bg-gold/10 text-gold",
+                  verifyState === "failed" && "border-danger/30 bg-danger/10 text-danger"
                 )}
               >
                 <span
@@ -484,12 +485,14 @@ export default function PairingFlow() {
                     "size-2 rounded-full",
                     verifyState === "awaiting" && "animate-pulse-soft bg-primary",
                     verifyState === "confirmed" && "bg-green",
-                    verifyState === "expired" && "bg-gold"
+                    verifyState === "expired" && "bg-gold",
+                    verifyState === "failed" && "bg-danger"
                   )}
                 />
                 {verifyState === "awaiting" && "في انتظار تأكيد الربط من واتساب..."}
                 {verifyState === "confirmed" && "تم التأكيد من الخادم ✓"}
                 {verifyState === "expired" && "انتهت صلاحية الرمز. اطلب رمزًا جديدًا."}
+                {verifyState === "failed" && "تعذر إكمال الربط. اطلب رمزًا جديدًا وحاول مرة أخرى."}
               </div>
             )}
 
