@@ -25,7 +25,7 @@ const labels: Record<string, string> = {
 };
 
 const statusLabel = { success: "ناجح", failed: "فشل", info: "معلومة" } as const;
-const statusColor = { success: "#c9f31d", failed: "#ff737e", info: "#a4a7ad" } as const;
+const statusColor = { success: "#aeb3ad", failed: "#dc858b", info: "#858b91" } as const;
 
 function formatClock(value?: string) {
   if (!value) return "--:--:--";
@@ -76,7 +76,7 @@ export default function ActivityPage() {
     return source.map((event, index) => {
       const time = new Date(event.at).getTime();
       const x = max > min && Number.isFinite(time) ? 18 + ((time - min) / (max - min)) * 564 : source.length > 1 ? 18 + (index / (source.length - 1)) * 564 : 300;
-      const y = event.status === "success" ? 35 : event.status === "info" ? 83 : 131;
+      const y = event.status === "success" ? 42 : event.status === "info" ? 88 : 134;
       return { ...event, x, y };
     });
   }, [events]);
@@ -92,7 +92,7 @@ export default function ActivityPage() {
 
         {error ? <div role="alert" className="border-y border-danger/25 py-4 text-xs text-danger">{error}</div> : (
           <>
-            <section className="mb-6 border-y border-white/[0.10] bg-[#111311] px-3 py-4 sm:px-5 sm:py-5">
+            <section className="mb-6 border-y border-white/[0.10] bg-transparent px-3 py-4 sm:px-5 sm:py-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="text-[9px] font-semibold tracking-[.2em] text-text-3">ACTIVITY OVERVIEW</div>
@@ -102,7 +102,7 @@ export default function ActivityPage() {
                   </div>
                 </div>
                 <div className="text-left">
-                  <span className="inline-flex items-center gap-1.5 text-[9px] text-primary"><span className="size-1.5 animate-pulse rounded-full bg-primary" /> تحديث تلقائي</span>
+                  <span className="inline-flex items-center gap-1.5 text-[9px] text-text-3"><span className="size-1.5 animate-pulse rounded-full bg-text-3" /> تحديث تلقائي</span>
                   <div className="mt-2 font-mono text-[11px] tabular-nums text-text-2" dir="ltr">{formatClock(latest?.at)}</div>
                   <div className="mt-1 text-[9px] text-text-3">آخر حدث</div>
                 </div>
@@ -118,16 +118,14 @@ export default function ActivityPage() {
                 <h2 className="text-[10px] font-semibold text-text-2">توزيع الأحداث حسب الحالة</h2>
                 <span className="text-[8px] tracking-widest text-text-3">TIMELINE</span>
               </div>
-              <div className="mt-3 overflow-hidden">
-                <div className="grid grid-cols-[48px_1fr] items-center gap-2">
-                  <span className="text-[9px]" style={{ color: statusColor.success }}>ناجح</span>
-                  <div className="relative h-9 border-b border-dashed border-white/[0.09]">{plotted.filter((p) => p.status === "success").map((p) => <span key={p.id} title={labels[p.type] || p.type} className="absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-[#111311]" style={{ left: (p.x / 600 * 100) + "%", background: statusColor.success }} />)}</div>
-                  <span className="text-[9px]" style={{ color: statusColor.failed }}>فشل</span>
-                  <div className="relative h-9 border-b border-dashed border-white/[0.09]">{plotted.filter((p) => p.status === "failed").map((p) => <span key={p.id} title={labels[p.type] || p.type} className="absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-[#111311]" style={{ left: (p.x / 600 * 100) + "%", background: statusColor.failed }} />)}</div>
-                  <span className="text-[9px] text-text-3">معلومة</span>
-                  <div className="relative h-9">{plotted.filter((p) => p.status === "info").map((p) => <span key={p.id} title={labels[p.type] || p.type} className="absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-[#111311]" style={{ left: (p.x / 600 * 100) + "%", background: statusColor.info }} />)}</div>
-                </div>
-                <div className="mr-[50px] mt-1 flex justify-between text-[8px] text-text-3"><span>الأقدم</span><span>الأحدث</span></div>
+              <div className="mt-3 overflow-hidden border-y border-white/[0.06] py-2">
+                <div className="mb-2 flex justify-between text-[8px] text-text-3"><span>الأقدم</span><span>الأحدث</span></div>
+                <svg viewBox="0 0 600 176" preserveAspectRatio="none" className="block h-[150px] w-full overflow-visible" role="img" aria-label="مخطط زمني لحالات أحداث النظام">
+                  {[42, 88, 134].map((y) => <line key={y} x1="8" x2="592" y1={y} y2={y} stroke="currentColor" opacity=".12" strokeDasharray="3 7" />)}
+                  {plotted.length > 1 && <polyline points={plotted.map((p) => `${p.x},${p.y}`).join(" ")} fill="none" stroke="#777d80" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" opacity=".75" vectorEffect="non-scaling-stroke" />}
+                  {plotted.map((point) => <g key={point.id}><circle cx={point.x} cy={point.y} r="5.2" fill={point.status === "failed" ? "#dc858b" : "#aeb3ad"} stroke="var(--background, #111)" strokeWidth="2" /><title>{labels[point.type] || point.type}</title></g>)}
+                </svg>
+                <div className="flex items-center justify-center gap-4 pt-1 text-[8px] text-text-3"><span>● ناجح</span><span>● فشل</span><span>● معلومة</span></div>
               </div>
             </section>
 
@@ -140,7 +138,7 @@ export default function ActivityPage() {
                 <div aria-live="polite">
                   {events.map((event, index) => (
                     <article key={event.id} className="grid grid-cols-[26px_minmax(0,1fr)_auto] items-center gap-2 border-b border-white/[0.065] py-3 sm:grid-cols-[32px_minmax(0,1fr)_auto] sm:gap-3">
-                      <span className="grid size-6 place-items-center sm:size-7" style={{ color: statusColor[event.status] }}>
+                      <span className="grid size-6 place-items-center sm:size-7" style={{ color: event.status === "success" ? "#c9f31d" : statusColor[event.status] }}>
                         {event.status === "success" ? <CheckCircle2 size={17} strokeWidth={1.8} /> : event.status === "failed" ? <AlertCircle size={17} strokeWidth={1.8} /> : <Zap size={17} strokeWidth={1.8} />}
                       </span>
                       <div className="min-w-0">
