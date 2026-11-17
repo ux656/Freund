@@ -12,7 +12,7 @@ export default function StatusBadge({ children, tone = "neutral", dir }: {
     neutral: "bg-surface-2 text-text-2",
   };
   return (
-    <span dir={dir} className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold ${tones[tone]}`}>
+    <span dir={dir} className={`inline-flex w-fit max-w-full shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-[10px] font-bold leading-4 ${tones[tone]}`}>
       {children}
     </span>
   );
