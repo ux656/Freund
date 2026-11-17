@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Activity, AlertCircle, ArrowDownRight, ArrowUpRight, CheckCircle2, Clock3, Cpu, RefreshCw, Server, Signal, Zap } from "lucide-react";
+import { Activity, AlertCircle, CheckCircle2, Clock3, RefreshCw, Server, Zap } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import EmptyState from "@/components/ui/EmptyState";
 import PageEntrance from "@/components/PageEntrance";
@@ -24,14 +24,18 @@ const labels: Record<string, string> = {
   command_failed: "فشل تنفيذ أمر",
 };
 
-function formatTime(value: string) {
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? "وقت غير معروف" : new Intl.DateTimeFormat("ar-EG", { dateStyle: "medium", timeStyle: "short" }).format(date);
-}
+const statusLabel = { success: "ناجح", failed: "فشل", info: "معلومة" } as const;
+const statusColor = { success: "#c9f31d", failed: "#ff737e", info: "#a4a7ad" } as const;
+
 function formatClock(value?: string) {
-  if (!value) return "--:--";
+  if (!value) return "--:--:--";
   const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? "--:--" : new Intl.DateTimeFormat("ar-EG", { hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(date);
+  return Number.isNaN(date.getTime()) ? "--:--:--" : new Intl.DateTimeFormat("ar-EG", { hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(date);
+}
+function formatDate(value?: string) {
+  if (!value) return "—";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "وقت غير معروف" : new Intl.DateTimeFormat("ar-EG", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(date);
 }
 
 export default function ActivityPage() {
@@ -64,99 +68,86 @@ export default function ActivityPage() {
     info: events.filter((event) => event.status === "info").length,
   }), [events]);
 
-  const chartPoints = useMemo(() => {
-    const source = [...events].slice(0, 18).reverse();
-    if (!source.length) return "";
-    const values = source.map((event) => event.status === "failed" ? 76 : event.status === "info" ? 53 : 30);
-    const width = 600, height = 150, pad = 12;
-    return values.map((value, index) => {
-      const x = source.length === 1 ? width / 2 : pad + (index * (width - pad * 2)) / (source.length - 1);
-      const y = pad + (value / 100) * (height - pad * 2);
-      return (index ? "L" : "M") + x.toFixed(1) + " " + y.toFixed(1);
-    }).join(" ");
+  const plotted = useMemo(() => {
+    const source = [...events].slice(0, 24).reverse();
+    const times = source.map((event) => new Date(event.at).getTime()).filter(Number.isFinite);
+    const min = times.length ? Math.min(...times) : 0;
+    const max = times.length ? Math.max(...times) : 0;
+    return source.map((event, index) => {
+      const time = new Date(event.at).getTime();
+      const x = max > min && Number.isFinite(time) ? 18 + ((time - min) / (max - min)) * 564 : source.length > 1 ? 18 + (index / (source.length - 1)) * 564 : 300;
+      const y = event.status === "success" ? 35 : event.status === "info" ? 83 : 131;
+      return { ...event, x, y };
+    });
   }, [events]);
 
   const latest = events[0];
 
   return (
     <PageEntrance>
-      <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-4 pb-20 pt-6 sm:px-5 sm:pt-8">
-        <PageHeader eyebrow="LIVE SYSTEM MARKET" title="مؤشر نشاط النظام" description="تابع حركة البوت لحظة بلحظة من سجل الأحداث الفعلي." activePage="activity" action={
-          <button type="button" onClick={() => { setLoading(true); void load(); }} disabled={loading} aria-label="تحديث السجل" className="ui-interactive inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2.5 text-[11px] font-semibold disabled:opacity-50"><RefreshCw size={13} className={loading ? "animate-spin" : ""} /><span className="hidden sm:inline">تحديث</span></button>
+      <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-4 pb-20 pt-5 sm:px-5 sm:pt-7">
+        <PageHeader eyebrow="SYSTEM MONITOR" title="سجل النشاط" description="مراقبة أحداث البوت والاتصالات والأوامر." activePage="activity" action={
+          <button type="button" onClick={() => { setLoading(true); void load(); }} disabled={loading} aria-label="تحديث السجل" className="ui-interactive inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-[11px] font-semibold disabled:opacity-50"><RefreshCw size={13} className={loading ? "animate-spin" : ""} /><span className="hidden sm:inline">تحديث</span></button>
         } />
 
-        {error ? <div role="alert" className="rounded-xl border border-danger/25 bg-danger/5 p-4 text-xs text-danger">{error}</div> : (
+        {error ? <div role="alert" className="border-y border-danger/25 py-4 text-xs text-danger">{error}</div> : (
           <>
-            <section className="relative mb-4 overflow-hidden rounded-[26px] border border-white/[0.09] bg-[#171a18] p-4 shadow-[0_18px_55px_rgba(0,0,0,.24)] sm:p-5">
-              <div className="pointer-events-none absolute -left-16 -top-20 size-52 rounded-full bg-primary/10 blur-3xl" />
-              <div className="relative flex items-start justify-between gap-3">
+            <section className="mb-6 border-y border-white/[0.10] bg-[#111311] px-3 py-4 sm:px-5 sm:py-5">
+              <div className="flex items-start justify-between gap-3">
                 <div>
-                  <div className="flex items-center gap-2 text-[10px] font-semibold tracking-[.16em] text-text-3"><Signal size={12} /> SYSTEM ACTIVITY</div>
-                  <h2 className="mt-2 text-sm font-bold text-text">حركة النظام</h2>
-                  <p className="mt-1 text-[10px] text-text-3">آخر {events.length} حدث مسجل</p>
-                </div>
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-2.5 py-1.5 text-[9px] font-semibold text-primary"><span className="size-1.5 animate-pulse rounded-full bg-primary" /> LIVE · 15s</span>
-              </div>
-
-              <div className="relative mt-4 flex items-end justify-between gap-3">
-                <div>
-                  <div className="text-[10px] text-text-3">آخر تحديث مسجل</div>
-                  <div className="mt-1 font-display text-2xl font-semibold tracking-tight text-text" dir="ltr">{formatClock(latest?.at)}</div>
-                  <div className="mt-1 flex items-center gap-1 text-[10px] text-primary"><Activity size={11} />{latest ? labels[latest.type] || "حدث في النظام" : "بانتظار الأحداث"}</div>
+                  <div className="text-[9px] font-semibold tracking-[.2em] text-text-3">ACTIVITY OVERVIEW</div>
+                  <div className="mt-2 flex items-baseline gap-2">
+                    <strong className="font-display text-3xl font-semibold tabular-nums text-text">{events.length.toLocaleString("en-US")}</strong>
+                    <span className="text-[10px] text-text-3">حدث مسجل</span>
+                  </div>
                 </div>
                 <div className="text-left">
-                  <div className="text-[9px] text-text-3">إجمالي الأحداث</div>
-                  <div className="mt-1 font-display text-3xl font-semibold tabular-nums text-text">{events.length.toLocaleString("en-US")}</div>
+                  <span className="inline-flex items-center gap-1.5 text-[9px] text-primary"><span className="size-1.5 animate-pulse rounded-full bg-primary" /> تحديث تلقائي</span>
+                  <div className="mt-2 font-mono text-[11px] tabular-nums text-text-2" dir="ltr">{formatClock(latest?.at)}</div>
+                  <div className="mt-1 text-[9px] text-text-3">آخر حدث</div>
                 </div>
               </div>
 
-              <div className="relative mt-4 h-[142px] overflow-hidden rounded-xl border border-white/[0.05] bg-black/20 px-1 py-1">
-                <div className="absolute inset-0 flex flex-col justify-between px-2 py-3">
-                  <span className="border-t border-dashed border-white/[0.07]" />
-                  <span className="border-t border-dashed border-white/[0.07]" />
-                  <span className="border-t border-dashed border-white/[0.07]" />
-                  <span className="border-t border-dashed border-white/[0.07]" />
+              <div className="mt-5 grid grid-cols-3 border-y border-white/[0.08] py-3">
+                <div className="border-l border-white/[0.08] px-2 text-center"><div className="text-[9px] text-text-3">ناجح</div><strong className="mt-1 block font-display text-xl font-semibold tabular-nums" style={{ color: statusColor.success }}>{stats.success}</strong></div>
+                <div className="border-l border-white/[0.08] px-2 text-center"><div className="text-[9px] text-text-3">فشل</div><strong className="mt-1 block font-display text-xl font-semibold tabular-nums" style={{ color: statusColor.failed }}>{stats.failed}</strong></div>
+                <div className="px-2 text-center"><div className="text-[9px] text-text-3">معلومات</div><strong className="mt-1 block font-display text-xl font-semibold tabular-nums text-text-2">{stats.info}</strong></div>
+              </div>
+
+              <div className="mt-4 flex items-center justify-between">
+                <h2 className="text-[10px] font-semibold text-text-2">توزيع الأحداث حسب الحالة</h2>
+                <span className="text-[8px] tracking-widest text-text-3">TIMELINE</span>
+              </div>
+              <div className="mt-3 overflow-hidden">
+                <div className="grid grid-cols-[48px_1fr] items-center gap-2">
+                  <span className="text-[9px]" style={{ color: statusColor.success }}>ناجح</span>
+                  <div className="relative h-9 border-b border-dashed border-white/[0.09]">{plotted.filter((p) => p.status === "success").map((p) => <span key={p.id} title={labels[p.type] || p.type} className="absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-[#111311]" style={{ left: (p.x / 600 * 100) + "%", background: statusColor.success }} />)}</div>
+                  <span className="text-[9px]" style={{ color: statusColor.failed }}>فشل</span>
+                  <div className="relative h-9 border-b border-dashed border-white/[0.09]">{plotted.filter((p) => p.status === "failed").map((p) => <span key={p.id} title={labels[p.type] || p.type} className="absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-[#111311]" style={{ left: (p.x / 600 * 100) + "%", background: statusColor.failed }} />)}</div>
+                  <span className="text-[9px] text-text-3">معلومة</span>
+                  <div className="relative h-9">{plotted.filter((p) => p.status === "info").map((p) => <span key={p.id} title={labels[p.type] || p.type} className="absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-[#111311]" style={{ left: (p.x / 600 * 100) + "%", background: statusColor.info }} />)}</div>
                 </div>
-                {chartPoints ? (
-                  <svg viewBox="0 0 600 150" preserveAspectRatio="none" className="relative h-full w-full overflow-visible">
-                    <defs><linearGradient id="activityArea" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="var(--color-primary, #c9f31d)" stopOpacity=".24" /><stop offset="100%" stopColor="var(--color-primary, #c9f31d)" stopOpacity="0" /></linearGradient></defs>
-                    <path d={chartPoints + " L588 150 L12 150 Z"} fill="url(#activityArea)" />
-                    <path d={chartPoints} fill="none" stroke="#c9f31d" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-                    {events.slice(0, 18).reverse().map((event, index, source) => {
-                      const x = source.length === 1 ? 300 : 12 + (index * 576) / (source.length - 1);
-                      const value = event.status === "failed" ? 76 : event.status === "info" ? 53 : 30;
-                      const y = 12 + (value / 100) * 126;
-                      return <circle key={event.id} cx={x} cy={y} r="4.5" fill={event.status === "failed" ? "#fb7185" : "#c9f31d"} stroke="#171a18" strokeWidth="2" />;
-                    })}
-                  </svg>
-                ) : <div className="grid h-full place-items-center text-[10px] text-text-3">{loading ? "جارٍ قراءة حركة النظام..." : "لا توجد بيانات كافية للرسم"}</div>}
+                <div className="mr-[50px] mt-1 flex justify-between text-[8px] text-text-3"><span>الأقدم</span><span>الأحدث</span></div>
               </div>
-              <div className="mt-2 flex items-center justify-between text-[9px] text-text-3"><span>الأقدم</span><span>تسلسل الأحداث المسجلة · ليس مؤشرًا ماليًا</span><span>الأحدث</span></div>
             </section>
 
-            <section className="mb-5 grid grid-cols-3 gap-2">
-              <div className="rounded-2xl border border-primary/15 bg-primary/[0.055] p-3"><div className="flex items-center gap-1.5 text-[9px] text-text-3"><ArrowUpRight size={12} className="text-primary" /> ناجح</div><strong className="mt-1 block text-xl font-semibold tabular-nums text-primary">{stats.success}</strong></div>
-              <div className="rounded-2xl border border-danger/15 bg-danger/[0.05] p-3"><div className="flex items-center gap-1.5 text-[9px] text-text-3"><ArrowDownRight size={12} className="text-danger" /> فشل</div><strong className="mt-1 block text-xl font-semibold tabular-nums text-danger">{stats.failed}</strong></div>
-              <div className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-3"><div className="flex items-center gap-1.5 text-[9px] text-text-3"><Zap size={12} /> معلومات</div><strong className="mt-1 block text-xl font-semibold tabular-nums text-text">{stats.info}</strong></div>
-            </section>
-
-            <section className="overflow-hidden rounded-[24px] border border-white/[0.08] bg-[#171a18]">
-              <div className="flex items-center justify-between border-b border-white/[0.07] px-4 py-3.5">
-                <div><h2 className="text-xs font-bold">شريط الأحداث</h2><p className="mt-1 text-[9px] text-text-3">سجل التنفيذ بترتيب الأحدث</p></div>
-                <span className="text-[9px] tracking-wider text-text-3">EVENT TAPE</span>
+            <section>
+              <div className="mb-2 flex items-center justify-between border-b border-white/[0.10] pb-3">
+                <div><h2 className="text-xs font-bold">آخر العمليات</h2><p className="mt-1 text-[9px] text-text-3">تفاصيل الأحداث بترتيب زمني تنازلي</p></div>
+                <span className="font-mono text-[9px] tracking-wider text-text-3">EVENTS · {events.length}</span>
               </div>
-              {loading && !events.length ? <div className="py-8 text-center text-xs text-text-3">جارٍ تحميل سجل النشاط...</div> : events.length === 0 ? <div className="p-5"><EmptyState icon={<Activity size={18} />}>لا توجد أحداث مسجلة حتى الآن.</EmptyState></div> : (
-                <div className="divide-y divide-white/[0.055]" aria-live="polite">
+              {loading && !events.length ? <div className="py-8 text-center text-xs text-text-3">جارٍ تحميل سجل النشاط...</div> : events.length === 0 ? <EmptyState icon={<Activity size={18} />}>لا توجد أحداث مسجلة حتى الآن.</EmptyState> : (
+                <div aria-live="polite">
                   {events.map((event, index) => (
-                    <article key={event.id} className="flex min-w-0 items-center gap-3 px-3.5 py-3 sm:px-4">
-                      <span className={"grid size-8 shrink-0 place-items-center rounded-xl " + (event.status === "success" ? "bg-primary/10 text-primary" : event.status === "failed" ? "bg-danger/10 text-danger" : "bg-white/[0.06] text-text-2")}>
-                        {event.status === "success" ? <CheckCircle2 size={15} /> : event.status === "failed" ? <AlertCircle size={15} /> : <Zap size={15} />}
+                    <article key={event.id} className="grid grid-cols-[26px_minmax(0,1fr)_auto] items-center gap-2 border-b border-white/[0.065] py-3 sm:grid-cols-[32px_minmax(0,1fr)_auto] sm:gap-3">
+                      <span className="grid size-6 place-items-center sm:size-7" style={{ color: statusColor[event.status] }}>
+                        {event.status === "success" ? <CheckCircle2 size={17} strokeWidth={1.8} /> : event.status === "failed" ? <AlertCircle size={17} strokeWidth={1.8} /> : <Zap size={17} strokeWidth={1.8} />}
                       </span>
-                      <div className="min-w-0 flex-1">
-                        <h3 className="truncate text-[11px] font-semibold text-text">{labels[event.type] || "حدث في النظام"}</h3>
+                      <div className="min-w-0">
+                        <div className="flex min-w-0 items-center gap-2"><h3 className="truncate text-[11px] font-semibold text-text">{labels[event.type] || "حدث في النظام"}</h3><span className="hidden shrink-0 text-[8px] sm:inline" style={{ color: statusColor[event.status] }}>{statusLabel[event.status]}</span></div>
                         <div className="mt-1 flex min-w-0 flex-wrap items-center gap-x-2 text-[9px] text-text-3"><span className="inline-flex items-center gap-1"><Server size={10} />{event.bot || "النظام"}</span>{event.command && <span>الأمر: <b dir="ltr">{event.command}</b></span>}</div>
                       </div>
-                      <div className="shrink-0 text-left"><div className="font-mono text-[10px] tabular-nums text-text-2" dir="ltr">{formatClock(event.at)}</div><div className="mt-1 text-[8px] text-text-3">{events.length - index} / {events.length}</div></div>
+                      <div className="text-left"><div className="font-mono text-[9px] tabular-nums text-text-2" dir="ltr">{formatClock(event.at)}</div><div className="mt-1 text-[8px] text-text-3">{formatDate(event.at)}</div></div>
                     </article>
                   ))}
                 </div>
@@ -164,7 +155,7 @@ export default function ActivityPage() {
             </section>
           </>
         )}
-        <p className="mt-4 text-[9px] leading-5 text-text-3">الرسم يوضح تسلسل حالات الأحداث المسجلة، وليس أسعارًا أو بيانات سوق مالية. لا يتضمن السجل أرقام الهواتف أو محتوى الرسائل أو رموز الاقتران.</p>
+        <p className="mt-5 border-t border-white/[0.08] pt-3 text-[9px] leading-5 text-text-3">المخطط يعرض توقيت الأحداث وحالاتها الفعلية، ولا يمثل قيماً مالية أو مؤشرات أداء تقديرية. لا يتضمن السجل أرقام الهواتف أو محتوى الرسائل أو رموز الاقتران.</p>
       </main>
     </PageEntrance>
   );
