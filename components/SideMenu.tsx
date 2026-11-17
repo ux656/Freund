@@ -20,6 +20,7 @@ const dashboardItems = [
   { id: "servers", label: "السيرفرات", href: "/servers", icon: Server },
   { id: "bots", label: "البوتات", href: "/bots", icon: Bot },
   { id: "system", label: "معلومات النظام", href: "/info", icon: Cpu },
+  { id: "activity", label: "سجل النشاط", href: "/activity", icon: Activity },
 ] as const;
 
 export type DashboardPageId = (typeof dashboardItems)[number]["id"];
