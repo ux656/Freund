@@ -43,6 +43,10 @@ export default function BotAssistant() {
     { role: "bot", text: "مرحباً! أنا Reboot. كيف يمكنني مساعدتك؟" },
   ]);
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages]);
+
   useEffect(() => () => {
     replyTimeoutsRef.current.forEach((timeout) => window.clearTimeout(timeout));
     replyTimeoutsRef.current.clear();
@@ -118,6 +122,7 @@ export default function BotAssistant() {
                   {m.text}
                 </div>
               ))}
+              <div ref={messagesEndRef} aria-hidden="true" />
             </div>
 
             <div className="grid shrink-0 grid-cols-2 gap-1.5 border-t border-border bg-surface-2 p-2.5">
