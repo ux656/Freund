@@ -83,14 +83,12 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
 
     const maxRate = Math.max(1, ...candles.map((candle) => candle.high), ...candles.map((candle) => candle.average));
     const maxVolume = Math.max(1, ...candles.map((candle) => candle.volume));
-    const latest = visibleEvents.reduce<number | null>((value, event) => value === null || event.timestamp > value ? event.timestamp : value, null);
     const total = visibleEvents.length;
     return {
       candles,
       maxRate,
       maxVolume,
       total,
-      latest,
       high: Math.max(0, ...candles.map((candle) => candle.high)),
       low: Math.min(...candles.map((candle) => candle.volume)),
       average: total / bucketCount,
@@ -119,7 +117,7 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
 
   return (
     <section className="space-y-3">
-      <div className="grid grid-cols-5 gap-1 rounded-2xl border border-white/[0.10] bg-surface/40 p-1.5">
+      <div dir="ltr" aria-label="الفترة الزمنية للرسم" className="grid grid-cols-5 gap-1 rounded-2xl border border-white/[0.10] bg-surface/40 p-1.5">
         {RANGES.map((item) => (
           <button
             key={item.key}
