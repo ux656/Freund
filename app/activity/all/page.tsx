@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, RefreshCw } from "lucide-react";
 import PageEntrance from "@/components/PageEntrance";
+import LoadingState from "@/components/ui/LoadingState";
 import ActivityEntries, { type ActivityEvent } from "@/components/activity/ActivityEntries";
 import { requestJson, type ApiPayload } from "@/lib/api-client";
 
@@ -64,7 +65,7 @@ export default function AllActivityPage() {
         {error ? (
           <div role="alert" className="border-y border-danger/25 py-4 text-xs text-danger">{error}</div>
         ) : loading && !events.length ? (
-          <div className="py-10 text-center text-xs text-text-3">جارٍ تحميل جميع العمليات...</div>
+          <LoadingState variant="activity-list" label="جارٍ تحميل جميع العمليات..." />
         ) : (
           <>
             <div className="mb-3 flex items-center justify-between border-y border-white/[0.10] py-3">

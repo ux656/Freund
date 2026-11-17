@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import PageEntrance from "@/components/PageEntrance";
+import LoadingState from "@/components/ui/LoadingState";
 import SideMenu from "@/components/SideMenu";
 import ActivityEntries, { type ActivityEvent } from "@/components/activity/ActivityEntries";
 import ActivityMarketChart from "@/components/activity/ActivityMarketChart";
@@ -81,7 +82,7 @@ export default function ActivityPage() {
             </section>
 
             {loading && !events.length ? (
-              <div className="py-12 text-center text-xs text-text-3">جارٍ تحميل سجل النشاط...</div>
+              <LoadingState variant="activity" label="جارٍ تحميل سجل النشاط..." />
             ) : (
               <>
                 <ActivityMarketChart events={events} />

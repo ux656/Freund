@@ -75,7 +75,7 @@ export default function Servers() {
 
       {!hasChecked ? (
         <section className="lg lg-surface rounded-2xl p-3.5 sm:p-5" aria-label="تحميل حالة الخادم">
-          <LoadingState label="جارٍ فحص اتصال خادم BMG..." />
+          <LoadingState variant="server" label="جارٍ فحص اتصال خادم BMG..." />
         </section>
       ) : (
       <section aria-live="polite" aria-busy={checking} className={`lg lg-surface min-w-0 rounded-2xl p-3.5 transition-all duration-300 sm:p-5 ${checking ? "ring-1 ring-primary/20" : ""}`}>

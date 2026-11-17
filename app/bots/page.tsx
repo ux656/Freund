@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpLeft, Bot, Clock3, RefreshCw, Search, Server, Wifi, WifiOff } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
 import EmptyState from "@/components/ui/EmptyState";
+import LoadingState from "@/components/ui/LoadingState";
 import PageEntrance from "@/components/PageEntrance";
 import { requestJson, type ApiPayload } from "@/lib/api-client";
 
@@ -24,9 +25,10 @@ export default function BotsPage() {
   const [counts, setCounts] = useState({ total: 0, connected: 0, disconnected: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const hasLoadedOnce = useRef(false);
 
   const load = useCallback(async () => {
-    setLoading(true);
+    if (!hasLoadedOnce.current) setLoading(true);
     setError("");
     try {
       const result = await requestJson<Overview>("/api/dashboard/overview", { cache: "no-store" });
@@ -38,6 +40,7 @@ export default function BotsPage() {
       setError(err instanceof Error ? err.message : "تعذر الاتصال بالخادم.");
     } finally {
       setLoading(false);
+      hasLoadedOnce.current = true;
     }
   }, []);
 
@@ -63,16 +66,16 @@ export default function BotsPage() {
         </a>
 
         <section className="lg lg-surface rounded-2xl p-3.5 sm:p-5">
-          <div className="mb-4 grid grid-cols-3 gap-2">
+          {loading ? <div className="mb-4"><LoadingState variant="bots-summary" label="جارٍ تحميل إحصائيات البوتات..." /></div> : <div className="mb-4 grid grid-cols-3 gap-2">
             <div className="ui-card rounded-xl p-3"><span className="block text-[10px] text-text-3">الإجمالي</span><strong className="mt-1 block text-lg" dir="ltr">{counts.total}</strong></div>
             <div className="ui-card rounded-xl p-3"><span className="block text-[10px] text-text-3">متصل</span><strong className="mt-1 block text-lg text-green" dir="ltr">{counts.connected}</strong></div>
             <div className="ui-card rounded-xl p-3"><span className="block text-[10px] text-text-3">غير متصل</span><strong className="mt-1 block text-lg" dir="ltr">{counts.disconnected}</strong></div>
-          </div>
+          </div>}
           <label className="mb-4 flex min-h-11 items-center gap-2 rounded-xl border border-border bg-surface/70 px-3.5 py-2.5 focus-within:border-primary/60">
             <Search size={15} className="shrink-0 text-text-3" />
             <input type="search" aria-label="البحث عن جلسة" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث بمعرّف الجلسة..." className="min-w-0 w-full bg-transparent text-xs text-text outline-none placeholder:text-text-3" />
           </label>
-          {error ? <div role="alert" className="rounded-xl border border-danger/25 bg-danger/5 p-4 text-xs text-danger">{error}</div> : loading ? <div className="py-8 text-center text-xs text-text-3">جارٍ تحميل الجلسات...</div> : (
+          {error ? <div role="alert" className="rounded-xl border border-danger/25 bg-danger/5 p-4 text-xs text-danger">{error}</div> : loading ? <LoadingState variant="bots-list" label="جارٍ تحميل جلسات البوتات..." /> : (
             <div className="space-y-3">
               {filtered.map((bot) => (
                 <article key={bot.id} className="ui-card rounded-xl p-3.5 sm:p-4">

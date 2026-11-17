@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Activity, Clock3, Cpu, HardDrive, MemoryStick, Server, Wifi, Zap } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
+import LoadingState from "@/components/ui/LoadingState";
 import PageEntrance from "@/components/PageEntrance";
 import { requestJson, type ApiPayload } from "@/lib/api-client";
 
@@ -34,9 +35,10 @@ export default function InfoPage() {
   const [data, setData] = useState<Overview["data"]>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const hasLoadedOnce = useRef(false);
 
   const load = useCallback(async () => {
-    setLoading(true);
+    if (!hasLoadedOnce.current) setLoading(true);
     setError("");
     try {
       const result = await requestJson<Overview>("/api/dashboard/overview", { cache: "no-store" });
@@ -46,6 +48,7 @@ export default function InfoPage() {
       setError(err instanceof Error ? err.message : "تعذر الاتصال بالخادم.");
     } finally {
       setLoading(false);
+      hasLoadedOnce.current = true;
     }
   }, []);
 
@@ -64,9 +67,9 @@ export default function InfoPage() {
     <PageEntrance>
       <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-4 pb-20 pt-6 sm:px-5 sm:pt-8">
         <PageHeader eyebrow="SYSTEM OVERVIEW" title="معلومات النظام" description="قراءات مباشرة من خدمة البوت، دون أرقام تقديرية أو بيانات ثابتة." activePage="system" action={
-          <button type="button" onClick={() => void load()} disabled={loading} className="ui-interactive rounded-xl border border-border bg-surface px-3 py-2.5 text-[11px] font-semibold disabled:opacity-50">تحديث</button>
+          <button type="button" onClick={() => { if (!data) hasLoadedOnce.current = false; void load(); }} disabled={loading} className="ui-interactive rounded-xl border border-border bg-surface px-3 py-2.5 text-[11px] font-semibold disabled:opacity-50">تحديث</button>
         } />
-        {error ? <div role="alert" className="rounded-xl border border-danger/25 bg-danger/5 p-4 text-xs text-danger">{error}</div> : loading ? <div className="py-10 text-center text-xs text-text-3">جارٍ تحميل بيانات الخادم...</div> : (
+        {error ? <div role="alert" className="rounded-xl border border-danger/25 bg-danger/5 p-4 text-xs text-danger">{error}</div> : loading ? <LoadingState variant="system" label="جارٍ تحميل بيانات النظام..." /> : (
           <>
             <section className="mb-6">
               <div className="mb-4 flex items-center gap-3"><span className="grid size-9 place-items-center rounded-xl bg-primary/10 text-primary"><Activity size={17} /></span><div><h2 className="text-sm font-bold">موارد الخدمة</h2><p className="mt-1 text-[11px] text-text-3">القيم التي يوفرها خادم البوت فعلياً</p></div></div>
