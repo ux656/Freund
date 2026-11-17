@@ -502,17 +502,21 @@ export default function PairingFlow() {
             )}
 
             {/* Instructions */}
-            <ol className="lg lg-surface space-y-3 rounded-glass p-4">
+            <ol aria-label="خطوات ربط البوت بواتساب" className="lg lg-surface space-y-3 rounded-glass p-4">
               {[
-                { icon: Smartphone, text: "افتح واتساب على هاتفك" },
-                { icon: KeyRound, text: "اذهب إلى الإعدادات ← الأجهزة المرتبطة ← ربط جهاز" },
-                { icon: ShieldCheck, text: "اختر الربط برقم الهاتف وأدخل الرمز أعلاه" },
-              ].map(({ icon: Icon, text }, i) => (
+                { icon: Smartphone, before: "افتح ", emphasis: "واتساب", after: " على هاتفك" },
+                { icon: KeyRound, before: "اذهب إلى ", emphasis: "الإعدادات ← الأجهزة المرتبطة ← ربط جهاز", after: "" },
+                { icon: ShieldCheck, before: "اختر ", emphasis: "الربط برقم الهاتف", after: " وأدخل الرمز أعلاه" },
+              ].map(({ before, emphasis, after }, i) => (
                 <li key={i} className="flex items-start gap-3 text-[13px] text-text-2">
-                  <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border border-primary/25 bg-primary/10 text-[10px] font-semibold text-primary">
+                  <span aria-hidden="true" className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border border-primary/25 bg-primary/10 text-[10px] font-semibold text-primary">
                     {i + 1}
                   </span>
-                  <span dangerouslySetInnerHTML={{ __html: text.replace(/(واتساب|الإعدادات ← الأجهزة المرتبطة ← ربط جهاز|الربط برقم الهاتف)/g, "<strong class='font-semibold text-text'>$1</strong>") }} />
+                  <span>
+                    {before}
+                    <strong className="font-semibold text-text">{emphasis}</strong>
+                    {after}
+                  </span>
                 </li>
               ))}
             </ol>
