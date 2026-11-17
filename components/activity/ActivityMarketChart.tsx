@@ -141,7 +141,7 @@ export default function ActivityMarketChart({ events }: { events: Event[] }) {
         <svg
           viewBox="0 0 760 326"
           preserveAspectRatio="none"
-          className="mt-1 block h-[225px] w-full touch-pan-y select-none overflow-visible outline-none focus-visible:ring-1 focus-visible:ring-primary/50 sm:h-[280px]"
+          className="mt-1 block h-[225px] w-full touch-none select-none overflow-visible outline-none focus-visible:ring-1 focus-visible:ring-primary/50 sm:h-[280px]"
           role="group"
           tabIndex={0}
           aria-label="رسم تفاعلي. اسحب أفقياً أو استخدم الأسهم لاستعراض الشموع."
