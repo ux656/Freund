@@ -12,8 +12,8 @@ const MAX_MESSAGES = 40;
 
 const responses: Record<AssistantAction, string> = {
   link: "اذهب لصفحة الربط، أدخل رقمك، ثم أدخل رمز الاقتران في واتساب من: الإعدادات ← الأجهزة المرتبطة ← ربط جهاز.",
-  security: "بياناتك آمنة. الاتصال مشفر ولا نحتفظ برقمك بعد انتهاء الجلسة.",
-  commands: "يدعم البوت 5 أوامر أساسية حالياً. المزيد قادم قريباً.",
+  security: "راجع سياسة الخصوصية لمعرفة كيفية معالجة البيانات. لا تعرض هذه المحادثة تفاصيل تقنية مؤكدة عن التخزين أو التشفير.",
+  commands: "يمكنك مراجعة صفحة المعلومات لمعرفة التفاصيل المتاحة عن الخدمة والأوامر.",
   human: "تواصل مع فريق التطوير من صفحة المطورين.",
 };
 
@@ -39,6 +39,7 @@ export default function BotAssistant() {
   const [open, setOpen] = useState(false);
   const panelId = "reboot-assistant-panel";
   const replyTimeoutsRef = useRef<Set<number>>(new Set());
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<AssistantMessage[]>([
     { role: "bot", text: "مرحباً! أنا Reboot. كيف يمكنني مساعدتك؟" },
   ]);
@@ -66,7 +67,7 @@ export default function BotAssistant() {
   return (
     <>
       <button
-        onClick={() => setOpen(!open)}
+        onClick={() => setOpen((current) => !current)
         className="ui-interactive fixed bottom-5 left-5 z-50 grid size-[60px] place-items-center rounded-full border border-white/10 bg-[#202020] shadow-xl transition-transform hover:scale-105"
         aria-label="فتح مساعد Reboot"
         aria-expanded={open}
@@ -94,10 +95,7 @@ export default function BotAssistant() {
                 </span>
                 <div>
                   <div className="text-sm font-semibold">Reboot</div>
-                  <div className="flex items-center gap-1.5 text-[10px] text-green">
-                    <span className="size-1.5 rounded-full bg-green" />
-                    متصل الآن
-                  </div>
+                  <div className="text-[10px] text-text-3">مساعد إرشادي</div>
                 </div>
               </div>
               <button
