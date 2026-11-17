@@ -62,12 +62,13 @@ export default function AllActivityPage() {
           العودة إلى ملخص النشاط
         </Link>
 
-        {error ? (
+        {error && !events.length ? (
           <div role="alert" className="border-y border-danger/25 py-4 text-xs text-danger">{error}</div>
         ) : loading && !events.length ? (
           <LoadingState variant="activity-list" label="جارٍ تحميل جميع العمليات..." />
         ) : (
           <>
+            {error && <div role="alert" className="mb-4 border-y border-danger/25 py-4 text-xs text-danger">{error}</div>}
             <div className="mb-3 flex items-center justify-between border-y border-white/[0.10] py-3">
               <span className="text-[10px] text-text-3">الأحدث أولاً</span>
               <span className="font-mono text-[10px] text-text-2">TOTAL · {events.length}</span>
