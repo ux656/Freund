@@ -10,13 +10,12 @@ import ActivityEntries, { type ActivityEvent } from "@/components/activity/Activ
 import ActivityMarketChart from "@/components/activity/ActivityMarketChart";
 import { requestJson, type ApiPayload } from "@/lib/api-client";
 
-type Overview = ApiPayload & { ok?: boolean; data?: { demo?: boolean; checkedAt?: string; activity?: ActivityEvent[] } };
+type Overview = ApiPayload & { ok?: boolean; data?: { checkedAt?: string; activity?: ActivityEvent[] } };
 
 export default function ActivityPage() {
   const [events, setEvents] = useState<ActivityEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [demoMode, setDemoMode] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [checkedAt, setCheckedAt] = useState("");
 
@@ -29,7 +28,6 @@ export default function ActivityPage() {
         throw new Error("تعذر تحميل سجل النشاط من الخادم.");
       }
       setEvents(result.data.data.activity);
-      setDemoMode(result.data.data.demo === true);
       setCheckedAt(result.data.data.checkedAt || new Date().toISOString());
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "تعذر الاتصال بالخادم.");
@@ -87,7 +85,7 @@ export default function ActivityPage() {
               </div>
               <div dir="ltr" className="pb-1 text-right">
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-green/25 bg-green/5 px-3 py-1.5 text-[10px] font-semibold text-green">
-                  <span className="size-1.5 animate-pulse rounded-full bg-green" /> {demoMode ? "DEMO · تجريبي" : "LIVE"}
+                  <span className="size-1.5 animate-pulse rounded-full bg-green" /> LIVE
                 </span>
                 <div className="mt-2 text-[8px] text-text-3">آخر تحديث: {checkedAt ? new Intl.DateTimeFormat("ar-EG", { timeStyle: "short" }).format(new Date(checkedAt)) : "—"} · تحديث تلقائي عند فتح الصفحة</div>
               </div>
@@ -107,7 +105,7 @@ export default function ActivityPage() {
         )}
 
         <p className="mt-5 border-t border-white/[0.08] pt-3 text-[9px] leading-5 text-text-3">
-          {demoMode ? "هذه بيانات تجريبية للمعاينة وليست أحداثاً حقيقية من واتساب. " : "الرسم يعرض كثافة الأحداث الفعلية عبر الزمن، وليس أسعاراً مالية. "} لا يتضمن السجل أرقام الهواتف أو محتوى الرسائل أو رموز الاقتران.
+          الرسم يعرض كثافة الأحداث المسجلة عبر الزمن، وليس أسعاراً مالية. لا يتضمن السجل أرقام الهواتف أو محتوى الرسائل أو رموز الاقتران.
         </p>
       </main>
     </PageEntrance>
