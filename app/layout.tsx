@@ -53,11 +53,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="project-hold-glow project-hold-glow-a" />
           <div className="project-hold-glow project-hold-glow-b" />
           <main className="project-hold-card">
-            <div className="project-hold-icon" aria-hidden="true">
-              <svg viewBox="0 0 48 48" fill="none">
-                <path d="M14 10h20a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4H14a4 4 0 0 1-4-4V14a4 4 0 0 1 4-4Z" stroke="currentColor" strokeWidth="2"/>
-                <path d="m20 19-6 5 6 5M28 19l6 5-6 5M26 17l-4 14" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+            <div className="project-hold-robot">
+              <img src="/reboot.png" alt="روبوت" />
             </div>
             <div className="project-hold-code">503 <span>·</span> UNDER CONSTRUCTION</div>
             <h1>المشروع لم يكتمل بعد</h1>
