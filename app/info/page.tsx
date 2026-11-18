@@ -11,7 +11,6 @@ import { requestJson, type ApiPayload } from "@/lib/api-client";
 type Overview = ApiPayload & {
   ok?: boolean;
   data?: {
-    demo?: boolean;
     checkedAt?: string;
     service?: { status?: string; uptimeMs?: number | null; latencyMs?: number | null; memory?: { rss?: number | null; heapUsed?: number | null; heapTotal?: number | null } | null };
     bots?: { total?: number; connected?: number; disconnected?: number };
@@ -70,10 +69,9 @@ export default function InfoPage() {
   return (
     <PageEntrance>
       <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-4 pb-20 pt-6 sm:px-5 sm:pt-8">
-        <PageHeader eyebrow="SYSTEM OVERVIEW" title="معلومات النظام" description={data?.demo ? "بيانات تجريبية للمعاينة — ليست قراءات فعلية من خادم البوت." : "قراءات مباشرة من خدمة البوت."} activePage="system" action={
+        <PageHeader eyebrow="SYSTEM OVERVIEW" title="معلومات النظام" description="قراءات مباشرة من خدمة البوت." activePage="system" action={
           <button type="button" onClick={() => { if (!data) hasLoadedOnce.current = false; void load(); }} disabled={loading || refreshing} className="ui-interactive rounded-xl border border-border bg-surface px-3 py-2.5 text-[11px] font-semibold disabled:opacity-50">{refreshing ? "جارٍ التحديث..." : "تحديث"}</button>
         } />
-        {data?.demo && <div className="mb-4 rounded-xl border border-gold/30 bg-gold/10 px-3.5 py-3 text-[11px] leading-6 text-gold">DEMO · هذه الأرقام محاكاة توضيحية وليست قياسات حقيقية.</div>}
         {error && !data ? <div role="alert" className="rounded-xl border border-danger/25 bg-danger/5 p-4 text-xs text-danger">{error}</div> : loading ? <LoadingState variant="system" label="جارٍ تحميل بيانات النظام..." /> : (
           <>
             {error && <div role="alert" className="mb-4 rounded-xl border border-danger/25 bg-danger/5 p-4 text-xs text-danger">{error}</div>}
