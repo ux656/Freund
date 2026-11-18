@@ -16,13 +16,13 @@ export default function Navbar({ activePage, onNavigate }: { activePage: string;
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
       <div className="flex min-w-0 items-center gap-3">
-        <div className="min-[900px]:hidden"><SideMenu mode="home" activePage={activePage} onNavigate={onNavigate} /></div>
+        <SideMenu mode="home" activePage={activePage} onNavigate={onNavigate} />
         <div className="min-w-0">
           <div className="truncate text-sm font-bold tracking-wide">BMG BOT</div>
           <div className="text-[10px] text-text-3">WhatsApp automation</div>
         </div>
       </div>
-      <nav aria-label="التنقل الرئيسي" className="hidden min-w-0 flex-1 items-center justify-center gap-1 2xl:flex">
+      <nav aria-label="التنقل الرئيسي" className="hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex">
         {desktopSections.map((item) => (
           <button key={item.id} type="button" onClick={() => onNavigate(item.id)} aria-current={activePage === item.id ? "page" : undefined}
             className={activePage === item.id ? "ui-interactive whitespace-nowrap rounded-lg bg-primary/10 px-3 py-2 text-[11px] font-medium text-primary" : "ui-interactive whitespace-nowrap rounded-lg px-3 py-2 text-[11px] font-medium text-text-2 hover:bg-surface-2 hover:text-text"}>
