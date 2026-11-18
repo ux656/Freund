@@ -27,7 +27,7 @@ export default function Home() {
   return (
     <>
       <DesktopSidebar activePage={activePage} onNavigate={setActivePage} />
-      <div className="min-h-screen xl:mr-[264px]">
+      <div className="min-h-screen min-[900px]:mr-[240px]">
         <Navbar activePage={activePage} onNavigate={setActivePage} />
         <PageEntrance key={activePage}>
           <main className="mx-auto w-full max-w-7xl px-4 pb-20 pt-5 sm:px-6 sm:pt-8 lg:px-10 xl:px-10">
