@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomInt, randomUUID } from "node:crypto";
 import { enforcePairingLimits } from "@/lib/server/rate-limit";
 import { isTrustedAppRequest } from "@/lib/server/request-guard";
 import { isFiniteNumber, readNonEmptyString, readUpstreamJson } from "@/lib/server/upstream-response";
@@ -10,10 +11,6 @@ const MAX_BODY_BYTES = 2048;
 
 export async function POST(request: NextRequest) {
   const now = Date.now();
-  const base = process.env.BOT_API_URL?.replace(/\/+$/, "");
-  const token = process.env.BOT_API_TOKEN;
-  if (!base || !token) return NextResponse.json({ error: "bot_service_not_configured", serverTime: now }, { status: 503 });
-
   if (!isTrustedAppRequest(request, true)) {
     return NextResponse.json({ error: "forbidden", serverTime: now }, { status: 403, headers: { "Cache-Control": "no-store" } });
   }
@@ -56,6 +53,19 @@ export async function POST(request: NextRequest) {
       { status: 429, headers: { "Retry-After": String(Math.ceil(limit.retryAfterMs / 1000)), "Cache-Control": "no-store" } }
     );
   }
+
+  if (process.env.DASHBOARD_DEMO_MODE !== "false") {
+    const sessionId = "demo_" + Date.now().toString(36) + "_" + randomUUID().replace(/-/g, "");
+    const code = String(randomInt(0, 100_000_000)).padStart(8, "0");
+    return NextResponse.json({
+      demo: true, sessionId, code, expiresAt: now + 60_000,
+      nextAllowedAt: now + 60_000, serverTime: now,
+    }, { headers: { "Cache-Control": "no-store, max-age=0", "Pragma": "no-cache" } });
+  }
+
+  const base = process.env.BOT_API_URL?.replace(/\/+$/, "");
+  const token = process.env.BOT_API_TOKEN;
+  if (!base || !token) return NextResponse.json({ error: "bot_service_not_configured", serverTime: now }, { status: 503 });
 
   try {
     const response = await fetch(base + "/api/install", {
