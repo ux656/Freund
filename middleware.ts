@@ -1,30 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const SHOW_MAINTENANCE = true;
+const MAINTENANCE_PATH = "/maintenance";
 
 export function middleware(request: NextRequest) {
-  const response = (() => {
-    const pathname = request.nextUrl.pathname;
+  const pathname = request.nextUrl.pathname;
+  let response: NextResponse;
 
-    // Keep API endpoints closed while maintenance is enabled.
-    if (SHOW_MAINTENANCE && pathname.startsWith("/api/")) {
-      return NextResponse.json(
-        { error: "Service temporarily unavailable", code: 503, maintenance: true },
-        { status: 503 }
-      );
-    }
-
-    // Force every user-facing route to render the maintenance page.
-    // Root is allowed through because app/page.tsx renders the 503 screen there.
-    if (SHOW_MAINTENANCE && pathname !== "/") {
-      const destination = request.nextUrl.clone();
-      destination.pathname = "/";
-      destination.search = "";
-      return NextResponse.rewrite(destination);
-    }
-
-    return NextResponse.next();
-  })();
+  if (SHOW_MAINTENANCE && pathname.startsWith("/api/")) {
+    response = NextResponse.json(
+      { error: "Service temporarily unavailable", code: 503, maintenance: true },
+      { status: 503 }
+    );
+  } else if (SHOW_MAINTENANCE && pathname !== MAINTENANCE_PATH) {
+    const destination = request.nextUrl.clone();
+    destination.pathname = MAINTENANCE_PATH;
+    destination.search = "";
+    response = NextResponse.rewrite(destination, { status: 503 });
+  } else {
+    response = NextResponse.next();
+  }
 
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("X-Frame-Options", "DENY");
