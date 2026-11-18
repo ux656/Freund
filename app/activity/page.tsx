@@ -5,6 +5,7 @@ import { RefreshCw } from "lucide-react";
 import PageEntrance from "@/components/PageEntrance";
 import LoadingState from "@/components/ui/LoadingState";
 import ErrorState from "@/components/ui/ErrorState";
+import ServiceUnavailable from "@/components/ui/ServiceUnavailable";
 import SideMenu from "@/components/SideMenu";
 import ActivityEntries, { type ActivityEvent } from "@/components/activity/ActivityEntries";
 import ActivityMarketChart from "@/components/activity/ActivityMarketChart";
@@ -18,12 +19,14 @@ export default function ActivityPage() {
   const [error, setError] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const [checkedAt, setCheckedAt] = useState("");
+  const [unavailable, setUnavailable] = useState(false);
 
   const load = useCallback(async () => {
     setError("");
     setRefreshing(true);
     try {
       const result = await requestJson<Overview>("/api/dashboard/overview", { cache: "no-store" });
+      setUnavailable(result.response.status === 503);
       if (!result.response.ok || result.data.ok !== true || !Array.isArray(result.data.data?.activity)) {
         throw new Error("تعذر تحميل سجل النشاط من الخادم.");
       }
@@ -68,7 +71,7 @@ export default function ActivityPage() {
           </button>
         </header>
 
-        {error && !events.length ? (
+        {unavailable ? <ServiceUnavailable onRetry={() => void load()} compact /> : error && !events.length ? (
           <ErrorState onRetry={() => void load()}>{error}</ErrorState>
         ) : (
           <>
