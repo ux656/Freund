@@ -204,7 +204,7 @@ html:not(.dark) .lg {
 
 
 /* ========== BMG BOT maintenance / 503 screen ========== */
-html, body { overflow: hidden !important; }
+
 .project-hold-screen {
   position: fixed; inset: 0; z-index: 999999; display: grid; place-items: center;
   overflow: auto; padding: max(24px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
@@ -266,3 +266,9 @@ html, body { overflow: hidden !important; }
 @media (prefers-reduced-motion: reduce) {
   .project-hold-content, .project-hold-robot img { animation: none; }
 }
+
+/* Responsive desktop/laptop widths */
+@media (min-width: 1024px) { main.mx-auto.max-w-3xl { max-width: min(1200px, calc(100vw - 4rem)); } }
+@media (min-width: 1280px) { main.mx-auto.max-w-3xl { max-width: min(1320px, calc(100vw - 5rem)); } }
+@media (min-width: 1536px) { main.mx-auto.max-w-3xl { max-width: min(1440px, calc(100vw - 6rem)); } }
+@media (min-width: 1024px) { main.mx-auto.max-w-7xl { padding-left: 2.5rem; padding-right: 2.5rem; } }

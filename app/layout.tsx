@@ -22,6 +22,8 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+const SHOW_MAINTENANCE = false;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
@@ -49,7 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         )}
       >
         {children}
-        <div className="project-hold-screen" role="status" aria-live="polite">
+        {SHOW_MAINTENANCE && <div className="project-hold-screen" role="status" aria-live="polite">
           <main className="project-hold-content">
             <div className="project-hold-brand">
               <span className="project-hold-brand-mark">B</span>
@@ -67,7 +69,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <span>قيد التطوير</span>
             </div>
           </main>
-        </div>
+        </div>}
       </body>
     </html>
   );

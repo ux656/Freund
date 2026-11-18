@@ -27,11 +27,11 @@ export default function Home() {
     <>
       <Navbar activePage={activePage} onNavigate={setActivePage} />
       <PageEntrance key={activePage}>
-      <main className="flex-1 max-w-3xl mx-auto w-full px-5 pb-20 pt-12">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-10 xl:px-12 pb-20 pt-8 sm:pt-12">
         {activePage === "home" && (
-          <div id="home" className="space-y-8">
-            <Hero />
-            <PairingFlow />
+          <div id="home" className="space-y-8 lg:grid lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start lg:gap-12 lg:space-y-0">
+            <div className="min-w-0 lg:pt-8"><Hero /></div>
+            <div className="min-w-0"><PairingFlow /></div>
           </div>
         )}
         {activePage === "about" && <div id="about"><About /></div>}
