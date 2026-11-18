@@ -10,12 +10,14 @@ export type PairingResult =
       expiresAt: number;
       serverTime: number;
       nextAllowedAt: number;
+      demo?: boolean;
     }
   | {
       ok: false;
       error?: string;
       retryAfterMs?: number;
       serverTime?: number;
+      demo?: boolean;
     };
 
 export type SessionState = "awaiting" | "confirmed" | "expired" | "failed";
@@ -78,6 +80,7 @@ export async function requestPairing({ phone }: { phone: string }): Promise<Pair
       expiresAt,
       nextAllowedAt,
       serverTime,
+      demo: data.demo === true,
     };
   } catch {
     return { ok: false, error: "network_error", serverTime: Date.now() };
@@ -129,6 +132,7 @@ export async function checkSession({ sessionId }: { sessionId: string }): Promis
     return {
       ok: true,
       status,
+      demo: data.demo === true,
       error: readApiString(data.error),
       code: readApiString(data.code),
       expiresAt: readApiNumber(data.expiresAt),
