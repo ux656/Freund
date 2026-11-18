@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
-
 import Hero from "@/components/Hero";
 import PairingFlow from "@/components/PairingFlow";
 import Features from "@/components/Features";
@@ -26,27 +25,24 @@ export default function Home() {
 
   return (
     <>
-      
-      <div className="desktop-home-shell min-h-screen">
-        <Navbar activePage={activePage} onNavigate={setActivePage} />
-        <PageEntrance key={activePage}>
-          <main className="desktop-home-main mx-auto w-full max-w-7xl px-3 pb-20 pt-4 sm:px-4 sm:pt-6 lg:px-5 xl:px-5">
-            {activePage === "home" && (
-              <div id="home" className="space-y-8 min-[600px]:grid min-[600px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] min-[600px]:items-start min-[600px]:gap-6 min-[600px]:space-y-0">
-                <div className="min-w-0 min-[600px]:pt-2"><Hero /></div>
-                <div className="min-w-0"><PairingFlow /></div>
-              </div>
-            )}
-            {activePage === "about" && <div id="about"><About /></div>}
-            {activePage === "features" && <div id="features"><Features /></div>}
-            {activePage === "faq" && <div id="faq"><FAQ /></div>}
-            {activePage === "developers" && <div id="developers"><Developers /></div>}
-            {activePage === "privacy" && <div id="privacy"><Privacy /></div>}
-          </main>
-        </PageEntrance>
-        <Footer />
-        <BotAssistant />
-      </div>
+      <Navbar activePage={activePage} onNavigate={setActivePage} />
+      <PageEntrance key={activePage}>
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-10 xl:px-12 pb-20 pt-8 sm:pt-12">
+        {activePage === "home" && (
+          <div id="home" className="space-y-8 lg:grid lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start lg:gap-12 lg:space-y-0">
+            <div className="min-w-0 lg:pt-8"><Hero /></div>
+            <div className="min-w-0"><PairingFlow /></div>
+          </div>
+        )}
+        {activePage === "about" && <div id="about"><About /></div>}
+        {activePage === "features" && <div id="features"><Features /></div>}
+        {activePage === "faq" && <div id="faq"><FAQ /></div>}
+        {activePage === "developers" && <div id="developers"><Developers /></div>}
+        {activePage === "privacy" && <div id="privacy"><Privacy /></div>}
+      </main>
+      </PageEntrance>
+      <Footer />
+      <BotAssistant />
     </>
   );
 }
