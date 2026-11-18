@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import ErrorPage from "@/components/ui/ErrorPage";
 
 export const metadata: Metadata = {
   title: "BMG Bot | ربط واتساب",
@@ -50,25 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           "min-h-dvh antialiased transition-colors duration-300"
         )}
       >
-        {SHOW_MAINTENANCE ? <div className="project-hold-screen" role="status" aria-live="polite">
-          <main className="project-hold-content">
-            <div className="project-hold-brand">
-              <span className="project-hold-brand-mark">B</span>
-              <span>BMG BOT</span>
-            </div>
-            <div className="project-hold-error" aria-label="Error 503">503</div>
-            <div className="project-hold-robot">
-              <img src="/reboot.png" alt="BMG Bot robot" />
-            </div>
-            <h1>الموقع تحت التطوير</h1>
-            <p className="project-hold-lead">نعمل على تجهيز <strong>BMG BOT</strong> ليكون جاهزًا للاستخدام.</p>
-            <p className="project-hold-copy">نقوم حاليًا بتطوير البوت وتحسين الموقع. سنفتحه فور الانتهاء والتأكد من عمل جميع الخدمات بشكل صحيح.</p>
-            <div className="project-hold-status">
-              <span className="project-hold-dot" />
-              <span>قيد التطوير</span>
-            </div>
-          </main>
-        </div> : children}
+        {SHOW_MAINTENANCE ? <ErrorPage code="503" /> : children}
       </body>
     </html>
   );
