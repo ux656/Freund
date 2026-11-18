@@ -68,7 +68,7 @@ export default function InfoPage() {
 
   return (
     <PageEntrance>
-      <main dir="rtl" className="mx-auto min-h-[75dvh] w-full desktop-wide-main max-w-3xl px-4 pb-20 pt-6 sm:px-5 sm:pt-8">
+      <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-4 pb-20 pt-6 sm:px-5 sm:pt-8">
         <PageHeader eyebrow="SYSTEM OVERVIEW" title="معلومات النظام" description="قراءات مباشرة من خدمة البوت، دون أرقام تقديرية أو بيانات ثابتة." activePage="system" action={
           <button type="button" onClick={() => { if (!data) hasLoadedOnce.current = false; void load(); }} disabled={loading || refreshing} className="ui-interactive rounded-xl border border-border bg-surface px-3 py-2.5 text-[11px] font-semibold disabled:opacity-50">{refreshing ? "جارٍ التحديث..." : "تحديث"}</button>
         } />
