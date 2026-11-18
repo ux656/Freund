@@ -16,7 +16,7 @@ export type PairingResult =
       error?: string;
       retryAfterMs?: number;
       serverTime?: number;
-      demo?: boolean;
+      httpStatus?: number;
     };
 
 export type SessionState = "awaiting" | "confirmed" | "expired" | "failed";
@@ -29,7 +29,6 @@ export type SessionStatus =
       code?: string;
       expiresAt?: number;
       serverTime?: number;
-      demo?: boolean;
     }
   | {
       ok: false;
@@ -134,7 +133,6 @@ export async function checkSession({ sessionId }: { sessionId: string }): Promis
     return {
       ok: true,
       status,
-      demo: data.demo === true,
       error: readApiString(data.error),
       code: readApiString(data.code),
       expiresAt: readApiNumber(data.expiresAt),
