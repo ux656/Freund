@@ -14,11 +14,13 @@ export default function AllActivityPage() {
   const [events, setEvents] = useState<ActivityEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [unavailable, setUnavailable] = useState(false);
 
   const load = useCallback(async () => {
     setError("");
     try {
       const result = await requestJson<Overview>("/api/dashboard/overview", { cache: "no-store" });
+      setUnavailable(result.response.status === 503);
       if (!result.response.ok || result.data.ok !== true || !Array.isArray(result.data.data?.activity)) {
         throw new Error("تعذر تحميل سجل النشاط من الخادم.");
       }
@@ -62,7 +64,7 @@ export default function AllActivityPage() {
           العودة إلى ملخص النشاط
         </Link>
 
-        {error && !events.length ? (
+        {unavailable ? <ServiceUnavailable onRetry={() => void load()} compact /> : error && !events.length ? (
           <div role="alert" className="border-y border-danger/25 py-4 text-xs text-danger">{error}</div>
         ) : loading && !events.length ? (
           <LoadingState variant="activity-list" label="جارٍ تحميل جميع العمليات..." />
