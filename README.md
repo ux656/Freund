@@ -364,6 +364,22 @@ GET /api/health
 - طبقة قاعدة البيانات تحتوي على drivers منفصلة وخيار memory fallback.
 - راجع مسارات الـ API وطبقات request guard وrate limit قبل أي تغيير متعلق بالاتصال أو الأمان.
 
+## Contributors
+
+<div align="center">
+
+| Role | Contributor | Profile |
+|---|---|---|
+| Full project developer | **ux656** | [GitHub](https://github.com/ux656) |
+| Contributor | **sovereignempirex-ux** | [GitHub](https://github.com/sovereignempirex-ux) |
+| AI development assistant | **OpenAI GPT-6** | AI-assisted development, code review, debugging, and documentation. No GitHub account is claimed. |
+
+</div>
+
+> GitHub contributor graphs reflect commits GitHub can attribute to accounts. The AI assistant is acknowledged transparently here, not represented as a fake GitHub profile.
+
+---
+
 ##  المساهمة
 
 نرحب بالمساهمات والتحسينات، مع الحفاظ على وضوح بنية المشروع واستقرار الوظائف.
