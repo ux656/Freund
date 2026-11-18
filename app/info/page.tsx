@@ -36,6 +36,7 @@ export default function InfoPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
+  const [unavailable, setUnavailable] = useState(false);
   const hasLoadedOnce = useRef(false);
 
   const load = useCallback(async () => {
@@ -44,6 +45,7 @@ export default function InfoPage() {
     setError("");
     try {
       const result = await requestJson<Overview>("/api/dashboard/overview", { cache: "no-store" });
+      setUnavailable(result.response.status === 503);
       if (!result.response.ok || result.data.ok !== true || !result.data.data) throw new Error("تعذر تحميل بيانات النظام الحقيقية.");
       setData(result.data.data);
     } catch (err) {
@@ -72,7 +74,7 @@ export default function InfoPage() {
         <PageHeader eyebrow="SYSTEM OVERVIEW" title="معلومات النظام" description="قراءات مباشرة من خدمة البوت." activePage="system" action={
           <button type="button" onClick={() => { if (!data) hasLoadedOnce.current = false; void load(); }} disabled={loading || refreshing} className="ui-interactive rounded-xl border border-border bg-surface px-3 py-2.5 text-[11px] font-semibold disabled:opacity-50">{refreshing ? "جارٍ التحديث..." : "تحديث"}</button>
         } />
-        {error && !data ? <div role="alert" className="rounded-xl border border-danger/25 bg-danger/5 p-4 text-xs text-danger">{error}</div> : loading ? <LoadingState variant="system" label="جارٍ تحميل بيانات النظام..." /> : (
+        {unavailable ? <ServiceUnavailable onRetry={() => void load()} compact /> : error && !data ? <div role="alert" className="rounded-xl border border-danger/25 bg-danger/5 p-4 text-xs text-danger">{error}</div> : loading ? <LoadingState variant="system" label="جارٍ تحميل بيانات النظام..." /> : (
           <>
             {error && <div role="alert" className="mb-4 rounded-xl border border-danger/25 bg-danger/5 p-4 text-xs text-danger">{error}</div>}
             <section className="mb-6">
