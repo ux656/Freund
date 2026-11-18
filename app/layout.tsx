@@ -61,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
             <h1>الموقع تحت التطوير</h1>
             <p className="project-hold-lead">نعمل على تجهيز <strong>BMG BOT</strong> ليكون جاهزًا للاستخدام.</p>
-            <p className="project-hold-copy">نقوم حاليًا بتطوير البوت وتحسين الموقع. سنเปิดه فور الانتهاء والتأكد من عمل جميع الخدمات بشكل صحيح.</p>
+            <p className="project-hold-copy">نقوم حاليًا بتطوير البوت وتحسين الموقع. سنفتحه فور الانتهاء والتأكد من عمل جميع الخدمات بشكل صحيح.</p>
             <div className="project-hold-status">
               <span className="project-hold-dot" />
               <span>قيد التطوير</span>
