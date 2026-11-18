@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight, RefreshCw } from "lucide-react";
 import PageEntrance from "@/components/PageEntrance";
 import LoadingState from "@/components/ui/LoadingState";
+import ServiceUnavailable from "@/components/ui/ServiceUnavailable";
 import ActivityEntries, { type ActivityEvent } from "@/components/activity/ActivityEntries";
 import { requestJson, type ApiPayload } from "@/lib/api-client";
 
