@@ -10,7 +10,7 @@ export default function PageHeader({ eyebrow, title, description, activePage, ac
 }) {
   return (
     <header className="mb-7 flex items-start gap-3">
-      <SideMenu mode="dashboard" activePage={activePage} />
+      <div className="min-[900px]:hidden"><SideMenu mode="dashboard" activePage={activePage} /></div>
       <div className="min-w-0 flex-1">
         <div className="mb-2 text-[10px] font-bold tracking-[.16em] text-primary">{eyebrow}</div>
         <h1 className="font-display text-2xl font-bold sm:text-3xl">{title}</h1>
