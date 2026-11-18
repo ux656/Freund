@@ -27,10 +27,10 @@ export default function Home() {
   return (
     <>
       
-      <div className="min-h-screen min-[900px]:mr-[240px]">
+      <div className="desktop-home-shell min-h-screen">
         <Navbar activePage={activePage} onNavigate={setActivePage} />
         <PageEntrance key={activePage}>
-          <main className="desktop-wide-main mx-auto w-full max-w-7xl px-3 pb-20 pt-4 sm:px-4 sm:pt-6 lg:px-5 xl:px-5">
+          <main className="desktop-home-main mx-auto w-full max-w-7xl px-3 pb-20 pt-4 sm:px-4 sm:pt-6 lg:px-5 xl:px-5">
             {activePage === "home" && (
               <div id="home" className="space-y-8 min-[600px]:grid min-[600px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] min-[600px]:items-start min-[600px]:gap-6 min-[600px]:space-y-0">
                 <div className="min-w-0 min-[600px]:pt-2"><Hero /></div>
