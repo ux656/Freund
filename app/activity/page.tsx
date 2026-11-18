@@ -39,10 +39,10 @@ export default function ActivityPage() {
 
   return (
     <PageEntrance>
-      <main dir="rtl" className="mx-auto min-h-[75dvh] w-full desktop-wide-main max-w-3xl px-4 pb-20 pt-5 sm:px-5 sm:pt-7">
+      <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-4 pb-20 pt-5 sm:px-5 sm:pt-7">
         <header dir="rtl" className="mb-6 flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="min-[900px]:hidden"><SideMenu mode="dashboard" activePage="activity" /></div>
+            <SideMenu mode="dashboard" activePage="activity" />
             <div className="min-w-0 text-right">
               <div className="text-[9px] font-bold tracking-[.2em] text-primary">FREUND · ACTIVITY</div>
               <h1 className="mt-0.5 truncate font-display text-lg font-bold text-text sm:text-xl">سجل النشاط</h1>
