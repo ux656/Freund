@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import PageEntrance from "@/components/PageEntrance";
 import LoadingState from "@/components/ui/LoadingState";
+import ErrorState from "@/components/ui/ErrorState";
 import SideMenu from "@/components/SideMenu";
 import ActivityEntries, { type ActivityEvent } from "@/components/activity/ActivityEntries";
 import ActivityMarketChart from "@/components/activity/ActivityMarketChart";
@@ -16,9 +17,12 @@ export default function ActivityPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [demoMode, setDemoMode] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [checkedAt, setCheckedAt] = useState("");
 
   const load = useCallback(async () => {
     setError("");
+    if (events.length) setRefreshing(true);
     try {
       const result = await requestJson<Overview>("/api/dashboard/overview", { cache: "no-store" });
       if (!result.response.ok || result.data.ok !== true || !Array.isArray(result.data.data?.activity)) {
@@ -26,17 +30,21 @@ export default function ActivityPage() {
       }
       setEvents(result.data.data.activity);
       setDemoMode(result.data.data.demo === true);
+      setCheckedAt(result.data.data.checkedAt || new Date().toISOString());
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "تعذر الاتصال بالخادم.");
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, []);
 
   useEffect(() => {
     void load();
-    const timer = setInterval(() => void load(), 15000);
-    return () => clearInterval(timer);
+    const timer = setInterval(() => { if (document.visibilityState === "visible") void load(); }, 30000);
+    const onVisible = () => { if (document.visibilityState === "visible") void load(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => { clearInterval(timer); document.removeEventListener("visibilitychange", onVisible); };
   }, [load]);
 
   return (
@@ -53,20 +61,21 @@ export default function ActivityPage() {
           </div>
           <button
             type="button"
-            onClick={() => { setLoading(true); void load(); }}
-            disabled={loading}
+            onClick={() => void load()}
+            disabled={loading || refreshing}
             aria-label="تحديث سجل النشاط"
             className="ui-interactive grid size-10 shrink-0 place-items-center rounded-full border border-white/[0.12] bg-surface/55 text-text-2 hover:bg-surface disabled:opacity-50"
           >
-            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+            <RefreshCw size={16} strokeWidth={1.8} className={loading || refreshing ? "animate-spin" : ""} />
           </button>
         </header>
 
         {error && !events.length ? (
-          <div role="alert" className="border-y border-danger/25 py-4 text-xs text-danger">{error}</div>
+          <ErrorState onRetry={() => void load()}>{error}</ErrorState>
         ) : (
           <>
-            {error && <div role="alert" className="mb-4 border-y border-danger/25 py-4 text-xs text-danger">{error}</div>}
+            {error && <div className="mb-4"><ErrorState onRetry={() => void load()}>{error}</ErrorState></div>}
+            {refreshing && <div className="mb-2 text-[9px] text-text-3">جارٍ تحديث البيانات في الخلفية...</div>}
             <section dir="ltr" className="mb-5 flex items-end justify-between gap-3 px-1">
               <div dir="rtl" className="min-w-0 text-left">
                 <div className="text-[10px] text-text-3">إجمالي الأحداث المسجلة</div>
@@ -80,7 +89,7 @@ export default function ActivityPage() {
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-green/25 bg-green/5 px-3 py-1.5 text-[10px] font-semibold text-green">
                   <span className="size-1.5 animate-pulse rounded-full bg-green" /> {demoMode ? "DEMO · تجريبي" : "LIVE"}
                 </span>
-                <div className="mt-2 text-[8px] text-text-3">آخر تحديث تلقائي · 15 ثانية</div>
+                <div className="mt-2 text-[8px] text-text-3">آخر تحديث: {checkedAt ? new Intl.DateTimeFormat("ar-EG", { timeStyle: "short" }).format(new Date(checkedAt)) : "—"} · تحديث تلقائي عند فتح الصفحة</div>
               </div>
             </section>
 
