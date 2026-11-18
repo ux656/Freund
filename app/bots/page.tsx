@@ -6,6 +6,7 @@ import PageHeader from "@/components/ui/PageHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
 import EmptyState from "@/components/ui/EmptyState";
 import ErrorState from "@/components/ui/ErrorState";
+import ServiceUnavailable from "@/components/ui/ServiceUnavailable";
 import LoadingState from "@/components/ui/LoadingState";
 import PageEntrance from "@/components/PageEntrance";
 import { requestJson, type ApiPayload } from "@/lib/api-client";
@@ -28,6 +29,7 @@ export default function BotsPage() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [checkedAt, setCheckedAt] = useState("");
+  const [unavailable, setUnavailable] = useState(false);
   const hasLoadedOnce = useRef(false);
 
   const load = useCallback(async () => {
@@ -36,6 +38,7 @@ export default function BotsPage() {
     setError("");
     try {
       const result = await requestJson<Overview>("/api/dashboard/overview", { cache: "no-store" });
+      setUnavailable(result.response.status === 503);
       if (!result.response.ok || result.data.ok !== true || !result.data.data?.bots) throw new Error("تعذر تحميل بيانات البوتات من الخادم.");
       const next = result.data.data.bots;
       setCheckedAt(result.data.data.checkedAt || new Date().toISOString());
@@ -91,7 +94,7 @@ export default function BotsPage() {
             <Search size={15} strokeWidth={1.8} className="shrink-0 text-text-3" />
             <input type="search" aria-label="البحث عن جلسة" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث بمعرّف الجلسة..." className="min-w-0 w-full bg-transparent text-xs text-text outline-none placeholder:text-text-3" />
           </label>
-          {error && !bots.length ? <ErrorState onRetry={() => void load()}>{error}</ErrorState> : loading ? <LoadingState variant="bots-list" label="جارٍ تحميل جلسات البوتات..." /> : (
+          {unavailable ? <ServiceUnavailable onRetry={() => void load()} compact /> : error && !bots.length ? <ErrorState onRetry={() => void load()}>{error}</ErrorState> : loading ? <LoadingState variant="bots-list" label="جارٍ تحميل جلسات البوتات..." /> : (
             <>
             {error && <div className="mb-3"><ErrorState onRetry={() => void load()}>{error}</ErrorState></div>}
             <div className="grid gap-3 lg:grid-cols-2">
