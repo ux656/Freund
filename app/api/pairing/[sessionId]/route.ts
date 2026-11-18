@@ -24,17 +24,6 @@ export async function GET(request: NextRequest, context: { params: { sessionId: 
       status: 429, headers: { "Retry-After": String(Math.ceil(limit.retryAfterMs / 1000)), "Cache-Control": "no-store" },
     });
   }
-  if (process.env.DASHBOARD_DEMO_MODE !== "false" && sessionId.startsWith("demo_")) {
-    const createdAt = Number.parseInt(sessionId.split("_")[1] || "", 36);
-    if (!Number.isFinite(createdAt)) return NextResponse.json({ error: "invalid_session" }, { status: 400 });
-    const age = Date.now() - createdAt;
-    const status = age >= 9000 ? "linked" : "awaiting";
-    return NextResponse.json({
-      demo: true, status, serverTime: Date.now(),
-      expiresAt: createdAt + 60_000,
-    }, { headers: { "Cache-Control": "no-store, max-age=0" } });
-  }
-
   const base = process.env.BOT_API_URL?.replace(/\/+$/, "");
   const token = process.env.BOT_API_TOKEN;
   if (!base || !token) return NextResponse.json({ error: "bot_service_not_configured" }, { status: 503 });
