@@ -12,6 +12,9 @@ import Privacy from "@/components/Privacy";
 import Footer from "@/components/Footer";
 import BotAssistant from "@/components/BotAssistant";
 import PageEntrance from "@/components/PageEntrance";
+import ErrorPage from "@/components/ui/ErrorPage";
+
+const SHOW_MAINTENANCE = true;
 
 export default function Home() {
   const [activePage, setActivePage] = useState("home");
@@ -22,6 +25,10 @@ export default function Home() {
       setActivePage(section);
     }
   }, []);
+
+  if (SHOW_MAINTENANCE) {
+    return <ErrorPage code="503" />;
+  }
 
   return (
     <>
