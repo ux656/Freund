@@ -8,13 +8,12 @@ import LoadingState from "@/components/ui/LoadingState";
 import ActivityEntries, { type ActivityEvent } from "@/components/activity/ActivityEntries";
 import { requestJson, type ApiPayload } from "@/lib/api-client";
 
-type Overview = ApiPayload & { ok?: boolean; data?: { demo?: boolean; activity?: ActivityEvent[] } };
+type Overview = ApiPayload & { ok?: boolean; data?: { activity?: ActivityEvent[] } };
 
 export default function AllActivityPage() {
   const [events, setEvents] = useState<ActivityEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [demoMode, setDemoMode] = useState(false);
 
   const load = useCallback(async () => {
     setError("");
@@ -24,7 +23,6 @@ export default function AllActivityPage() {
         throw new Error("تعذر تحميل سجل النشاط من الخادم.");
       }
       setEvents(result.data.data.activity);
-      setDemoMode(result.data.data.demo === true);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "تعذر الاتصال بالخادم.");
     } finally {
@@ -70,7 +68,6 @@ export default function AllActivityPage() {
           <LoadingState variant="activity-list" label="جارٍ تحميل جميع العمليات..." />
         ) : (
           <>
-            {demoMode && <div className="mb-4 rounded-xl border border-gold/30 bg-gold/10 px-3.5 py-3 text-[11px] leading-6 text-gold">DEMO · السجل المعروض بيانات تجريبية وليست أحداثًا حقيقية.</div>}
             {error && <div role="alert" className="mb-4 border-y border-danger/25 py-4 text-xs text-danger">{error}</div>}
             <div className="mb-3 flex items-center justify-between border-y border-white/[0.10] py-3">
               <span className="text-[10px] text-text-3">الأحدث أولاً</span>
