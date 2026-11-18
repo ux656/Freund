@@ -10,7 +10,6 @@ export type PairingResult =
       expiresAt: number;
       serverTime: number;
       nextAllowedAt: number;
-      demo?: boolean;
     }
   | {
       ok: false;
@@ -81,7 +80,6 @@ export async function requestPairing({ phone }: { phone: string }): Promise<Pair
       expiresAt,
       nextAllowedAt,
       serverTime,
-      demo: data.demo === true,
     };
   } catch {
     return { ok: false, error: "network_error", serverTime: Date.now() };
