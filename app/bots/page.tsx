@@ -11,7 +11,7 @@ import PageEntrance from "@/components/PageEntrance";
 import { requestJson, type ApiPayload } from "@/lib/api-client";
 
 type BotItem = { id: string; status: "connected" | "disconnected" | "connecting"; lastActiveAt: number | null };
-type Overview = ApiPayload & { ok?: boolean; data?: { demo?: boolean; checkedAt?: string; bots?: { total?: number; connected?: number; disconnected?: number; items?: BotItem[] } } };
+type Overview = ApiPayload & { ok?: boolean; data?: { checkedAt?: string; bots?: { total?: number; connected?: number; disconnected?: number; items?: BotItem[] } } };
 
 function formatTime(value?: number | null) {
   if (!value) return "لا يوجد نشاط مسجل";
@@ -27,7 +27,6 @@ export default function BotsPage() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
-  const [demoMode, setDemoMode] = useState(false);
   const [checkedAt, setCheckedAt] = useState("");
   const hasLoadedOnce = useRef(false);
 
@@ -39,7 +38,6 @@ export default function BotsPage() {
       const result = await requestJson<Overview>("/api/dashboard/overview", { cache: "no-store" });
       if (!result.response.ok || result.data.ok !== true || !result.data.data?.bots) throw new Error("تعذر تحميل بيانات البوتات من الخادم.");
       const next = result.data.data.bots;
-      setDemoMode(result.data.data.demo === true);
       setCheckedAt(result.data.data.checkedAt || new Date().toISOString());
       setBots(Array.isArray(next.items) ? next.items : []);
       setCounts({ total: next.total || 0, connected: next.connected || 0, disconnected: next.disconnected || 0 });
@@ -81,7 +79,7 @@ export default function BotsPage() {
 
         <section className="lg lg-surface rounded-2xl p-3.5 sm:p-5">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-[10px] text-text-3">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1">{demoMode ? "DEMO · بيانات تجريبية" : "بيانات الخادم"}</span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1">بيانات الخادم</span>
             <span>آخر تحديث: {formatTime(checkedAt ? Date.parse(checkedAt) : null)}</span>
           </div>
           {loading ? <div className="mb-4"><LoadingState variant="bots-summary" label="جارٍ تحميل إحصائيات البوتات..." /></div> : <div className="mb-4 grid grid-cols-3 gap-2">
