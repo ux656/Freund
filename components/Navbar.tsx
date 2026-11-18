@@ -22,7 +22,7 @@ export default function Navbar({ activePage, onNavigate }: { activePage: string;
           <div className="text-[10px] text-text-3">WhatsApp automation</div>
         </div>
       </div>
-      <nav aria-label="التنقل الرئيسي" className="hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex">
+      <nav aria-label="التنقل الرئيسي" className="hidden min-w-0 flex-1 items-center justify-center gap-1 2xl:flex">
         {desktopSections.map((item) => (
           <button key={item.id} type="button" onClick={() => onNavigate(item.id)} aria-current={activePage === item.id ? "page" : undefined}
             className={activePage === item.id ? "ui-interactive whitespace-nowrap rounded-lg bg-primary/10 px-3 py-2 text-[11px] font-medium text-primary" : "ui-interactive whitespace-nowrap rounded-lg px-3 py-2 text-[11px] font-medium text-text-2 hover:bg-surface-2 hover:text-text"}>
