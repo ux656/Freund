@@ -47,7 +47,12 @@ export async function GET(request: NextRequest) {
   if (!isTrustedAppRequest(request)) {
     return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403, headers: { "Cache-Control": "no-store" } });
   }
-  // Demo data is enabled by default until a real bot integration is ready.\n  if (process.env.DASHBOARD_DEMO_MODE !== "false") {\n    return NextResponse.json({ ok: true, data: buildDemoOverview() }, { headers: { "Cache-Control": "no-store, max-age=0" } });\n  }\n\n  const base = process.env.BOT_API_URL?.replace(/\/+$/, "");
+  // Demo data is enabled by default until a real bot integration is ready.
+  if (process.env.DASHBOARD_DEMO_MODE !== "false") {
+    return NextResponse.json({ ok: true, data: buildDemoOverview() }, { headers: { "Cache-Control": "no-store, max-age=0" } });
+  }
+
+  const base = process.env.BOT_API_URL?.replace(/\/+$/, "");
   const token = process.env.BOT_API_TOKEN;
 
   if (!base || !token) {
