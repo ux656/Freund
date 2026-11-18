@@ -17,11 +17,37 @@ function numeric(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null;
 }
 
+function buildDemoOverview() {
+  const now = Date.now();
+  const bots = [
+    { id: "freund-main-01", name: "Freund Main", status: "connected", lastActiveAt: now - 45000 },
+    { id: "freund-sub-02", name: "Freund Sub 02", status: "connected", lastActiveAt: now - 180000 },
+    { id: "freund-sub-03", name: "Freund Sub 03", status: "connecting", lastActiveAt: now - 1080000 },
+    { id: "freund-sub-04", name: "Freund Sub 04", status: "disconnected", lastActiveAt: now - 14400000 },
+  ];
+  const samples = [
+    ["message_received", "استقبال رسالة", "success"], ["command_executed", ".منيو", "success"],
+    ["group_event", "تحديث بيانات مجموعة", "info"], ["command_executed", ".حالة", "success"],
+    ["connection_event", "إعادة اتصال جلسة", "info"], ["command_failed", ".تحميل", "failed"],
+    ["message_received", "استقبال رسالة", "success"], ["command_executed", ".مساعدة", "success"],
+    ["group_event", "تحديث أعضاء", "info"], ["command_executed", ".بروفايل", "success"],
+    ["message_received", "استقبال رسالة", "success"], ["command_executed", ".منيو", "success"],
+  ];
+  const activity = samples.map(([type, command, status], index) => ({
+    id: "demo-event-" + index, type, command, status, bot: bots[index % bots.length].name,
+    at: new Date(now - (index * 17 + (index % 3) * 8) * 60000).toISOString(),
+  }));
+  return { demo: true, checkedAt: new Date(now).toISOString(),
+    service: { status: "online", uptimeMs: 543600000, latencyMs: 42, memory: { rss: 192937984, heapUsed: 75497472, heapTotal: 134217728 } },
+    bots: { total: 4, connected: 2, disconnected: 1, items: bots },
+    sessions: { active: 2, pending: 1 }, activity };
+}
+
 export async function GET(request: NextRequest) {
   if (!isTrustedAppRequest(request)) {
     return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403, headers: { "Cache-Control": "no-store" } });
   }
-  const base = process.env.BOT_API_URL?.replace(/\/+$/, "");
+  // Demo data is enabled by default until a real bot integration is ready.\n  if (process.env.DASHBOARD_DEMO_MODE !== "false") {\n    return NextResponse.json({ ok: true, data: buildDemoOverview() }, { headers: { "Cache-Control": "no-store, max-age=0" } });\n  }\n\n  const base = process.env.BOT_API_URL?.replace(/\/+$/, "");
   const token = process.env.BOT_API_TOKEN;
 
   if (!base || !token) {
