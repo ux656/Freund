@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import DesktopSidebar from "@/components/DesktopSidebar";
 
 export const metadata: Metadata = {
   title: "BMG Bot | ربط واتساب",
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           "min-h-dvh antialiased transition-colors duration-300"
         )}
       >
+        <DesktopSidebar />
         {children}
         {SHOW_MAINTENANCE && <div className="project-hold-screen" role="status" aria-live="polite">
           <main className="project-hold-content">
