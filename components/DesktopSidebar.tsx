@@ -20,7 +20,7 @@ const dashboard = [
 
 export default function DesktopSidebar({ activePage, onNavigate }: { activePage: string; onNavigate: (id: string) => void }) {
   return (
-    <aside dir="rtl" className="fixed right-0 top-0 z-40 hidden h-dvh w-[264px] flex-col border-l border-border/70 bg-surface/80 px-4 py-5 backdrop-blur-xl xl:flex">
+    <aside dir="rtl" className="fixed right-0 top-0 z-40 hidden h-dvh w-[240px] flex-col border-l border-border/70 bg-surface/80 px-4 py-5 backdrop-blur-xl min-[900px]:flex">
       <div className="flex items-center gap-3 px-2 pb-6">
         <div className="grid size-11 shrink-0 place-items-center overflow-hidden rounded-xl border border-primary/20 bg-primary/10">
           <img src="/reboot.png" alt="BMG BOT" className="size-full object-cover" />
