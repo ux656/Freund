@@ -22,7 +22,7 @@ export default function ActivityPage() {
 
   const load = useCallback(async () => {
     setError("");
-    if (events.length) setRefreshing(true);
+    setRefreshing(true);
     try {
       const result = await requestJson<Overview>("/api/dashboard/overview", { cache: "no-store" });
       if (!result.response.ok || result.data.ok !== true || !Array.isArray(result.data.data?.activity)) {
