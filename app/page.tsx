@@ -30,10 +30,10 @@ export default function Home() {
       <div className="min-h-screen min-[900px]:mr-[240px]">
         <Navbar activePage={activePage} onNavigate={setActivePage} />
         <PageEntrance key={activePage}>
-          <main className="mx-auto w-full max-w-7xl px-4 pb-20 pt-5 sm:px-6 sm:pt-8 lg:px-10 xl:px-10">
+          <main className="mx-auto w-full max-w-7xl px-3 pb-20 pt-4 sm:px-4 sm:pt-6 lg:px-5 xl:px-5">
             {activePage === "home" && (
-              <div id="home" className="space-y-8 min-[720px]:grid min-[720px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] min-[720px]:items-start min-[720px]:gap-6 min-[720px]:space-y-0">
-                <div className="min-w-0 min-[720px]:pt-2"><Hero /></div>
+              <div id="home" className="space-y-8 min-[600px]:grid min-[600px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] min-[600px]:items-start min-[600px]:gap-6 min-[600px]:space-y-0">
+                <div className="min-w-0 min-[600px]:pt-2"><Hero /></div>
                 <div className="min-w-0"><PairingFlow /></div>
               </div>
             )}
