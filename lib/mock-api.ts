@@ -30,6 +30,7 @@ export type SessionStatus =
       code?: string;
       expiresAt?: number;
       serverTime?: number;
+      demo?: boolean;
     }
   | {
       ok: false;
