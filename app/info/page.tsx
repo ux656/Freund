@@ -77,7 +77,7 @@ export default function InfoPage() {
             {error && <div role="alert" className="mb-4 rounded-xl border border-danger/25 bg-danger/5 p-4 text-xs text-danger">{error}</div>}
             <section className="mb-6">
               <div className="mb-4 flex items-center gap-3"><span className="grid size-9 place-items-center rounded-xl bg-primary/10 text-primary"><Activity size={17} /></span><div><h2 className="text-sm font-bold">موارد الخدمة</h2><p className="mt-1 text-[11px] text-text-3">القيم التي يوفرها خادم البوت فعلياً</p></div></div>
-              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3">
+              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4">
                 {metrics.map(({ label, value, Icon }) => <article key={label} className="lg lg-surface ui-card min-w-0 rounded-2xl p-3 sm:p-4"><div className="mb-3 flex min-h-8 items-start justify-between gap-2"><span className="min-w-0 text-[10px] leading-5 text-text-2">{label}</span><Icon size={16} className="shrink-0 text-primary" /></div><div className="break-words font-display text-lg font-bold sm:text-xl" dir="auto">{value}</div></article>)}
               </div>
             </section>

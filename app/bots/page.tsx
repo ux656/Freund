@@ -81,7 +81,7 @@ export default function BotsPage() {
           {error && !bots.length ? <div role="alert" className="rounded-xl border border-danger/25 bg-danger/5 p-4 text-xs text-danger">{error}</div> : loading ? <LoadingState variant="bots-list" label="جارٍ تحميل جلسات البوتات..." /> : (
             <>
             {error && <div role="alert" className="mb-3 rounded-xl border border-danger/25 bg-danger/5 p-4 text-xs text-danger">{error}</div>}
-            <div className="space-y-3">
+            <div className="grid gap-3 lg:grid-cols-2">
               {filtered.map((bot) => (
                 <article key={bot.id} className="ui-card rounded-xl p-3.5 sm:p-4">
                   <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
