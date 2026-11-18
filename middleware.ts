@@ -1,7 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export function middleware(_request: NextRequest) {
-  const response = NextResponse.next();
+const SHOW_MAINTENANCE = true;
+
+export function middleware(request: NextRequest) {
+  const response = (() => {
+    const pathname = request.nextUrl.pathname;
+
+    // Keep API endpoints closed while maintenance is enabled.
+    if (SHOW_MAINTENANCE && pathname.startsWith("/api/")) {
+      return NextResponse.json(
+        { error: "Service temporarily unavailable", code: 503, maintenance: true },
+        { status: 503 }
+      );
+    }
+
+    // Force every user-facing route to render the maintenance page.
+    // Root is allowed through because app/page.tsx renders the 503 screen there.
+    if (SHOW_MAINTENANCE && pathname !== "/") {
+      const destination = request.nextUrl.clone();
+      destination.pathname = "/";
+      destination.search = "";
+      return NextResponse.rewrite(destination);
+    }
+
+    return NextResponse.next();
+  })();
+
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("X-Frame-Options", "DENY");
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
@@ -11,4 +35,6 @@ export function middleware(_request: NextRequest) {
   return response;
 }
 
-export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"] };
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|css|js|woff|woff2|ttf|otf|mp4|webm)$).*)"],
+};
