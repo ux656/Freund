@@ -7,6 +7,7 @@ import CountryPicker, { COUNTRIES, type Country } from "@/components/CountryPick
 import { cn } from "@/lib/utils";
 import { requestPairing, checkSession } from "@/lib/mock-api";
 import { getPairingRequestErrorMessage, getSessionCheckErrorMessage } from "@/lib/api-client";
+import ServiceUnavailable from "@/components/ui/ServiceUnavailable";
 
 type Step = 1 | 2 | 3;
 
@@ -29,6 +30,7 @@ export default function PairingFlow() {
   const requestGenerationRef = useRef(0);
   const requestInFlightRef = useRef(false);
   const [error, setError] = useState("");
+  const [serviceUnavailable, setServiceUnavailable] = useState(false);
   const [rateLimit, setRateLimit] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -107,6 +109,7 @@ export default function PairingFlow() {
         if (activeSessionRef.current !== sessionId) return;
         syncTime(res.serverTime);
         if (!res.ok) {
+        if (res.httpStatus === 503) setServiceUnavailable(true);
           // Only a missing session is terminal. Network, rate-limit, and
           // upstream failures are temporary and must not be shown as expiry.
           if (res.error === "session_not_found") {
@@ -186,6 +189,10 @@ export default function PairingFlow() {
         return;
       }
 
+      if (res.httpStatus === 503) {
+        setServiceUnavailable(true);
+        return;
+      }
       if (res.error === "cooldown") {
         setCooldownUntil(serverNow() + (res.retryAfterMs || 0));
         setRateLimit(getPairingRequestErrorMessage(res.error, res.retryAfterMs));
@@ -284,6 +291,10 @@ export default function PairingFlow() {
 
   const fullPhoneLength = country.code.length + phone.length;
   const canGenerate = phone.length >= 4 && fullPhoneLength >= 7 && fullPhoneLength <= 15;
+
+  if (serviceUnavailable) {
+    return <ServiceUnavailable compact onRetry={() => { setServiceUnavailable(false); void handleGenerate(); }} />;
+  }
 
   return (
     <div className="space-y-5">
