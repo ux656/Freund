@@ -5,6 +5,7 @@ import { Activity, Clock3, Cpu, HardDrive, MemoryStick, Server, Wifi, Zap } from
 import PageHeader from "@/components/ui/PageHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
 import LoadingState from "@/components/ui/LoadingState";
+import ServiceUnavailable from "@/components/ui/ServiceUnavailable";
 import PageEntrance from "@/components/PageEntrance";
 import { requestJson, type ApiPayload } from "@/lib/api-client";
 
