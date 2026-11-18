@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
-import DesktopSidebar from "@/components/DesktopSidebar";
+
 import Hero from "@/components/Hero";
 import PairingFlow from "@/components/PairingFlow";
 import Features from "@/components/Features";
@@ -26,11 +26,11 @@ export default function Home() {
 
   return (
     <>
-      <DesktopSidebar activePage={activePage} onNavigate={setActivePage} />
+      
       <div className="min-h-screen min-[900px]:mr-[240px]">
         <Navbar activePage={activePage} onNavigate={setActivePage} />
         <PageEntrance key={activePage}>
-          <main className="mx-auto w-full max-w-7xl px-3 pb-20 pt-4 sm:px-4 sm:pt-6 lg:px-5 xl:px-5">
+          <main className="desktop-wide-main mx-auto w-full max-w-7xl px-3 pb-20 pt-4 sm:px-4 sm:pt-6 lg:px-5 xl:px-5">
             {activePage === "home" && (
               <div id="home" className="space-y-8 min-[600px]:grid min-[600px]:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] min-[600px]:items-start min-[600px]:gap-6 min-[600px]:space-y-0">
                 <div className="min-w-0 min-[600px]:pt-2"><Hero /></div>
