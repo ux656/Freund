@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   icons: {
     icon: [{ url: "/reboot.png", type: "image/png" }],
     shortcut: ["/reboot.png"],
-    apple: [{ url: "/reboot.png", type: "image/png" }],
+    apple: ["/reboot.png"],
   },
 };
 
@@ -37,6 +37,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   else if (window.matchMedia('(prefers-color-scheme: light)').matches) document.documentElement.classList.remove('dark');
                   else document.documentElement.classList.add('dark');
                 } catch(e) {}
+              })();
+            `,
+          }}
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(){
+                var protectedPaths = ['/', '/servers', '/bots', '/activity', '/activity/all', '/info'];
+                function isProtectedPath(path) {
+                  return protectedPaths.some(function(route) {
+                    return route === '/' ? path === '/' : path === route || path.indexOf(route + '/') === 0;
+                  });
+                }
+                window.addEventListener('pageshow', function(event) {
+                  if (event.persisted && isProtectedPath(window.location.pathname)) {
+                    window.location.reload();
+                  }
+                });
               })();
             `,
           }}
