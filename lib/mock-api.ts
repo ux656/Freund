@@ -36,6 +36,7 @@ export type SessionStatus =
       error?: string;
       retryAfterMs?: number;
       serverTime?: number;
+      httpStatus?: number;
     };
 
 export async function requestPairing({ phone }: { phone: string }): Promise<PairingResult> {
@@ -53,6 +54,7 @@ export async function requestPairing({ phone }: { phone: string }): Promise<Pair
         error: readApiString(data.error) || "request_failed",
         retryAfterMs: readApiNumber(data.retryAfterMs),
         serverTime: readApiNumber(data.serverTime) || Date.now(),
+        httpStatus: response.status,
       };
     }
 
@@ -105,6 +107,7 @@ export async function checkSession({ sessionId }: { sessionId: string }): Promis
         ),
         retryAfterMs: readApiNumber(data.retryAfterMs),
         serverTime: readApiNumber(data.serverTime) || Date.now(),
+        httpStatus: response.status,
       };
     }
 
