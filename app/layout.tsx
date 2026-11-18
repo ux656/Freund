@@ -22,7 +22,7 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-const SHOW_MAINTENANCE = false;
+const SHOW_MAINTENANCE = true;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -50,8 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           "min-h-dvh antialiased transition-colors duration-300"
         )}
       >
-        {children}
-        {SHOW_MAINTENANCE && <div className="project-hold-screen" role="status" aria-live="polite">
+        {SHOW_MAINTENANCE ? <div className="project-hold-screen" role="status" aria-live="polite">
           <main className="project-hold-content">
             <div className="project-hold-brand">
               <span className="project-hold-brand-mark">B</span>
@@ -69,7 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <span>قيد التطوير</span>
             </div>
           </main>
-        </div>}
+        </div> : children}
       </body>
     </html>
   );
