@@ -50,22 +50,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         {children}
         <div className="project-hold-screen" role="status" aria-live="polite">
-          <div className="project-hold-glow project-hold-glow-a" />
-          <div className="project-hold-glow project-hold-glow-b" />
-          <main className="project-hold-card">
-            <div className="project-hold-robot">
-              <img src="/reboot.png" alt="روبوت" />
+          <main className="project-hold-content">
+            <div className="project-hold-brand">
+              <span className="project-hold-brand-mark">B</span>
+              <span>BMG BOT</span>
             </div>
-            <div className="project-hold-code">503 <span>·</span> UNDER CONSTRUCTION</div>
-            <h1>المشروع لم يكتمل بعد</h1>
-            <p className="project-hold-lead">نعمل حاليًا على تطوير بوت واتساب وتجهيز الموقع.</p>
-            <p className="project-hold-copy">الموقع غير جاهز للاستخدام الآن. بمجرد انتهاء التطوير والتأكد من أن كل شيء يعمل بشكل صحيح، سيتم تشغيله وإتاحته لكم.</p>
+            <div className="project-hold-error" aria-label="Error 503">503</div>
+            <div className="project-hold-robot">
+              <img src="/reboot.png" alt="BMG Bot robot" />
+            </div>
+            <h1>الموقع تحت التطوير</h1>
+            <p className="project-hold-lead">نعمل على تجهيز <strong>BMG BOT</strong> ليكون جاهزًا للاستخدام.</p>
+            <p className="project-hold-copy">نقوم حاليًا بتطوير البوت وتحسين الموقع. سنเปิดه فور الانتهاء والتأكد من عمل جميع الخدمات بشكل صحيح.</p>
             <div className="project-hold-status">
               <span className="project-hold-dot" />
-              <span>جاري العمل على المشروع</span>
+              <span>قيد التطوير</span>
             </div>
-            <div className="project-hold-progress" aria-hidden="true"><span /></div>
-            <footer>نشكرك على انتظارك</footer>
           </main>
         </div>
       </body>
