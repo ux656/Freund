@@ -66,7 +66,7 @@ export default function Servers() {
 
   return (
     <PageEntrance>
-    <main dir="rtl" className="mx-auto min-h-[75dvh] w-full max-w-3xl px-4 pb-20 pt-6 sm:px-5 sm:pt-8">
+    <main dir="rtl" className="mx-auto min-h-[75dvh] w-full desktop-wide-main max-w-3xl px-4 pb-20 pt-6 sm:px-5 sm:pt-8">
       <PageHeader eyebrow="SERVER STATUS" title="سيرفرات التشغيل" description="فحص اتصال بوابة خادم البوت ومتابعة آخر استجابة." activePage="servers" action={
         <button type="button" onClick={() => void checkServer()} disabled={checking} aria-label="تحديث الفحص" className="ui-interactive inline-flex shrink-0 items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2.5 text-[11px] font-semibold text-text transition hover:bg-surface-2 disabled:opacity-50">
           <RefreshCw size={13} className={checking ? "animate-spin" : ""} /><span className="hidden sm:inline">تحديث</span>
