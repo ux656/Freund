@@ -31,6 +31,7 @@ export default function PairingFlow() {
   const [error, setError] = useState("");
   const [rateLimit, setRateLimit] = useState("");
   const [copied, setCopied] = useState(false);
+  const [isDemoPairing, setIsDemoPairing] = useState(false);
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -106,6 +107,7 @@ export default function PairingFlow() {
         // or replaced while this request was in flight.
         if (activeSessionRef.current !== sessionId) return;
         syncTime(res.serverTime);
+        if (res.ok && res.demo) setIsDemoPairing(true);
         if (!res.ok) {
           // Only a missing session is terminal. Network, rate-limit, and
           // upstream failures are temporary and must not be shown as expiry.
@@ -178,6 +180,7 @@ export default function PairingFlow() {
       if (res.ok) {
         activeSessionRef.current = res.sessionId;
         setSessionId(res.sessionId);
+        setIsDemoPairing(res.demo === true);
         setCode(res.code || null);
         setExpiresAt(res.expiresAt);
         setCooldownUntil(res.nextAllowedAt);
@@ -267,6 +270,7 @@ export default function PairingFlow() {
     setCountry(COUNTRIES[0]);
     setSessionId(null);
     setCode(null);
+    setIsDemoPairing(false);
     setExpiresAt(0);
     setCooldownUntil(0);
     setVerifyState("idle");
@@ -409,6 +413,13 @@ export default function PairingFlow() {
             exit={{ opacity: 0, y: -10 }}
             className="space-y-4"
           >
+            {isDemoPairing && (
+              <div role="status" className="rounded-glass-sm border border-gold/35 bg-gold/10 px-3.5 py-3 text-[11.5px] leading-6 text-gold">
+                <strong className="block font-bold">DEMO · محاكاة تجريبية</strong>
+                هذا رمز وهمي للمعاينة فقط. لن يربط رقمك بواتساب ولن ينشئ جلسة حقيقية.
+              </div>
+            )}
+
             {/* Code panel */}
             <button
               type="button"
@@ -503,6 +514,11 @@ export default function PairingFlow() {
             )}
 
             {/* Instructions */}
+            {isDemoPairing ? (
+              <div className="lg lg-surface rounded-glass p-4 text-[12px] leading-6 text-text-2">
+                تتم المحاكاة تلقائيًا: سيظهر تأكيد تجريبي بعد عدة ثوانٍ. لا تفتح واتساب ولا تدخل هذا الرمز في أي مكان.
+              </div>
+            ) : (
             <ol aria-label="خطوات ربط البوت بواتساب" className="lg lg-surface space-y-3 rounded-glass p-4">
               {[
                 { icon: Smartphone, before: "افتح ", emphasis: "واتساب", after: " على هاتفك" },
@@ -521,6 +537,7 @@ export default function PairingFlow() {
                 </li>
               ))}
             </ol>
+            )}
 
             <button
               onClick={() => verify(false)}
@@ -562,13 +579,13 @@ export default function PairingFlow() {
               >
                 <Check size={40} strokeWidth={3} className="text-white" />
               </motion.div>
-              <h2 className="font-display text-2xl font-bold">تم ربط البوت بنجاح</h2>
+              <h2 className="font-display text-2xl font-bold">{isDemoPairing ? "اكتملت المحاكاة بنجاح" : "تم ربط البوت بنجاح"}</h2>
               <p className="mt-2 text-[13.5px] leading-relaxed text-text-2">
-                رقمك الآن مرتبط بالبوت. يمكنك البدء في استخدامه فورًا من تطبيق واتساب.
+                {isDemoPairing ? "تم اختبار خطوات الاقتران ببيانات تجريبية فقط. لم يتم إنشاء اتصال بواتساب." : "رقمك الآن مرتبط بالبوت. يمكنك البدء في استخدامه فورًا من تطبيق واتساب."}
               </p>
               <div className="mt-4 inline-flex items-center gap-1.5 rounded-pill border border-green/30 bg-green/10 px-3.5 py-1.5 text-xs font-medium text-green">
                 <span className="size-1.5 rounded-full bg-green" />
-                الحالة: جاهز ومتصل
+                {isDemoPairing ? "DEMO · نتيجة تجريبية" : "الحالة: جاهز ومتصل"}
               </div>
             </div>
             <button
