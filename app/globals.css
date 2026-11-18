@@ -278,5 +278,7 @@ html:not(.dark) .lg {
 @media (min-width: 900px) {
  .desktop-sidebar { width: 240px; }
  main.desktop-wide-main { width: calc(100% - 240px); margin-right: 240px; margin-left: 0; max-width: none !important; padding-left: clamp(1.25rem, 3vw, 3rem); padding-right: clamp(1.25rem, 3vw, 3rem); }
+ .desktop-home-shell { margin-right: 240px; }
+ main.desktop-home-main { width: 100%; max-width: none !important; }
  main.desktop-wide-main > * { min-width: 0; }
 }
