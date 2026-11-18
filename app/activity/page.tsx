@@ -9,12 +9,13 @@ import ActivityEntries, { type ActivityEvent } from "@/components/activity/Activ
 import ActivityMarketChart from "@/components/activity/ActivityMarketChart";
 import { requestJson, type ApiPayload } from "@/lib/api-client";
 
-type Overview = ApiPayload & { ok?: boolean; data?: { activity?: ActivityEvent[] } };
+type Overview = ApiPayload & { ok?: boolean; data?: { demo?: boolean; checkedAt?: string; activity?: ActivityEvent[] } };
 
 export default function ActivityPage() {
   const [events, setEvents] = useState<ActivityEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [demoMode, setDemoMode] = useState(false);
 
   const load = useCallback(async () => {
     setError("");
@@ -24,6 +25,7 @@ export default function ActivityPage() {
         throw new Error("تعذر تحميل سجل النشاط من الخادم.");
       }
       setEvents(result.data.data.activity);
+      setDemoMode(result.data.data.demo === true);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "تعذر الاتصال بالخادم.");
     } finally {
@@ -76,7 +78,7 @@ export default function ActivityPage() {
               </div>
               <div dir="ltr" className="pb-1 text-right">
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-green/25 bg-green/5 px-3 py-1.5 text-[10px] font-semibold text-green">
-                  <span className="size-1.5 animate-pulse rounded-full bg-green" /> LIVE
+                  <span className="size-1.5 animate-pulse rounded-full bg-green" /> {demoMode ? "DEMO · تجريبي" : "LIVE"}
                 </span>
                 <div className="mt-2 text-[8px] text-text-3">آخر تحديث تلقائي · 15 ثانية</div>
               </div>
@@ -96,7 +98,7 @@ export default function ActivityPage() {
         )}
 
         <p className="mt-5 border-t border-white/[0.08] pt-3 text-[9px] leading-5 text-text-3">
-          الرسم يعرض كثافة الأحداث الفعلية عبر الزمن، وليس أسعاراً مالية. لا يتضمن السجل أرقام الهواتف أو محتوى الرسائل أو رموز الاقتران.
+          {demoMode ? "هذه بيانات تجريبية للمعاينة وليست أحداثاً حقيقية من واتساب. " : "الرسم يعرض كثافة الأحداث الفعلية عبر الزمن، وليس أسعاراً مالية. "} لا يتضمن السجل أرقام الهواتف أو محتوى الرسائل أو رموز الاقتران.
         </p>
       </main>
     </PageEntrance>
