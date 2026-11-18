@@ -4,13 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import ErrorPage from "@/components/ui/ErrorPage";
 
-export default function GlobalError({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) {
+export default function GlobalError() {
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
       <body className={cn(
